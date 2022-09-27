@@ -1,0 +1,20 @@
+{
+  "name": "ts-mapjs-storelocator-sample",
+  "version": "1.0.0",
+  "description": "Store Locator sample based on Woosmap Map JS using typescript and vanillajs",
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {
+    "start": "parcel serve ./index.html",
+    "build": "parcel build ./index.html --dist-dir ./dist --public-url ./"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "4.8.3"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.7.0",
+    "parcel": "latest",
+    "@types/woosmap.map": "^1.4.0"
+  }
+}
