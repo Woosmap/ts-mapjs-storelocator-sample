@@ -1,11 +1,12 @@
 import Component from '../Component';
 import Urls from "../../configuration/urls.config";
 import {loadScript} from '../../utils/LoadScript';
-import {MapOptions, StoresStyle} from "../../configuration/map.config";
 
 export interface IMap {
     containerId: string;
     woosmapPublicKey: string;
+    mapOptions: woosmap.map.MapOptions;
+    storesStyle: woosmap.map.Style;
 }
 
 export default class Map extends Component<IMap> {
@@ -32,8 +33,8 @@ export default class Map extends Component<IMap> {
     }
 
     initMapView() {
-        this.map = new woosmap.map.Map(this.$element!.id, MapOptions);
-        this.storesOverlay = new woosmap.map.StoresOverlay(StoresStyle);
+        this.map = new woosmap.map.Map(this.$element!.id,this.state!.mapOptions);
+        this.storesOverlay = new woosmap.map.StoresOverlay(this.state!.storesStyle);
         this.storesOverlay.setMap(this.map);
     }
 }
