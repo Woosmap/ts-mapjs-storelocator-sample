@@ -1,4 +1,4 @@
-type StringMap = Record<string, string>;
+import {objectToQueryString, StringMap} from "./utils";
 
 interface ScriptElement {
     url: string;
@@ -8,7 +8,7 @@ interface ScriptElement {
 }
 
 /**
- * Load a custom script asynchronously.
+ * Load a script asynchronously.
  *
  * @param {Object} options - used to set the script url and attributes.
  * @return {Promise<void>} returns a promise to indicate if the script was successfully loaded.
@@ -59,11 +59,3 @@ function createScriptElement(
     return newScript;
 }
 
-function objectToQueryString(params: StringMap): string {
-    let queryString = "";
-    Object.keys(params).forEach((key) => {
-        if (queryString.length !== 0) queryString += "&";
-        queryString += key + "=" + params[key];
-    });
-    return queryString;
-}
