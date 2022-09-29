@@ -1,22 +1,23 @@
-import Component from '../Component';
+import Component from '../component';
 import Urls from "../../configuration/urls.config";
-import {loadScript} from '../../utils/LoadScript';
+import {loadScript} from '../../utils/load_script';
+import Selectors from "../../configuration/selectors.config";
+import {AssetFeatureResponse, AssetResponse} from "../../types/stores/asset_response";
 
-export interface IMap {
-    containerId: string;
+export interface IMapComponent {
     woosmapPublicKey: string;
     mapOptions: woosmap.map.MapOptions;
     storesStyle: woosmap.map.Style;
+    nearbyLocation?: woosmap.map.LatLngLiteral;
 }
 
-export default class Map extends Component<IMap> {
+export default class MapComponent extends Component<IMapComponent> {
     private map!: woosmap.map.Map;
     private storesOverlay!: woosmap.map.StoresOverlay;
 
     init(): void {
         this.$element = document.createElement('div');
-        this.$element.className = 'map';
-        this.$element.id = this.state?.containerId || 'MapContainer';
+        this.$element.id = Selectors.mapWrapperID;
         this.$target.appendChild(this.$element);
     }
 
@@ -33,8 +34,21 @@ export default class Map extends Component<IMap> {
     }
 
     initMapView() {
-        this.map = new woosmap.map.Map(this.$element!.id,this.state!.mapOptions);
+        this.map = new woosmap.map.Map(this.$element!.id, this.state!.mapOptions);
         this.storesOverlay = new woosmap.map.StoresOverlay(this.state!.storesStyle);
         this.storesOverlay.setMap(this.map);
+    }
+
+    setCenter(location: woosmap.map.LatLngLiteral) {
+        this.map.setCenter(location);
+    }
+
+    setSelectedStore(store: AssetFeatureResponse) {
+        const latlng: woosmap.map.LatLngLiteral = {
+            lat: store.geometry.coordinates[1],
+            lng: store.geometry.coordinates[0]
+        }
+        this.map.setCenter(latlng)
+        this.map.setZoom(14)
     }
 }
