@@ -1,14 +1,17 @@
+import {EventEmitter} from "../utils/event_emitter";
+
 export interface IComponentProps<StateType> {
     $target: Element;
     initialState: StateType;
 }
 
-export default abstract class Component<StateType> {
+export default abstract class Component<StateType> extends EventEmitter {
     protected $target;
-    protected $element: Element | null;
+    protected $element: HTMLElement | null;
     protected state?;
 
     constructor({$target, initialState}: IComponentProps<StateType>) {
+        super();
         this.$target = $target;
         this.state = initialState;
         this.$element = null;
