@@ -1,9 +1,13 @@
 enum Selectors {
-    mapContainerID = "MapContainer",
-    searchContainer = "#SearchContainer",
-    filterPanelContainer = "#filterPanelContainer",
-    listStoresContainer = "#ListStoresContainer",
-    detailsStoreContainer = "#detailsStoreContainer"
+    mapContainerID = "mapContainer",
+    mapWrapperID = "mapWrapper",
+    sidebarContainerID = "sidebarContainer",
+    searchContainerID = "searchContainer",
+    searchWrapperID = "searchWrapper",
+    searchInputID = "searchInput",
+    filterPanelContainerID = "filterPanelContainer",
+    listStoresContainerID = "listStoresContainer",
+    detailsStoreContainerID = "detailsStoreContainer"
 }
 
 export default Selectors;
