@@ -1,0 +1,25 @@
+$min-width: 380px !default;
+$max-width: 480px !default;
+
+#sidebarContainer {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  flex-grow: 1;
+  flex-basis: 0;
+  position: relative;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 -2px 4px 0 rgba(0, 0, 0, 0.12);
+
+  @include respond-to('medium') {
+    flex-basis: 25vw;
+    min-width: $min-width;
+    max-width: $max-width;
+    order: 1;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    -webkit-box-flex: 0;
+    flex-grow: 0;
+    height: 100%;
+  }
+}

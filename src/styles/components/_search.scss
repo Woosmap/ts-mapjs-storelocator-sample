@@ -1,0 +1,83 @@
+#searchContainer {
+  display: flex;
+  position: relative;
+  box-shadow: none;
+  width: 100%;
+  flex-shrink: 0;
+  z-index: 1;
+  padding-top: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, .08);
+}
+
+#searchWrapper {
+  flex-direction: column;
+  display: flex;
+  padding: 0 1.3rem;
+  flex: 1;
+  position: relative;
+  justify-content: space-between;
+}
+
+#searchInput {
+  height: 48px;
+  width: 100%;
+  border: 0;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 4.8rem;
+  padding-left: 1em;
+  font-size: 17px !important;
+  border-bottom-color: transparent;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0 rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
+  transition-property: all;
+  transition-duration: 0.5s;
+}
+
+
+.localities-input-wrapper, .localities-input-container {
+  width: 100%;
+}
+
+.localities-item {
+  padding: 8px 8px 8px 30px;
+  cursor: pointer;
+}
+
+.localities-icon {
+  top: 8px;
+}
+
+.localities-empty-button {
+  right: 12px;
+  width: 24px;
+  background-color: #FFF;
+  z-index: 1;
+  margin-top: 0;
+  height: 42px;
+}
+
+.localities-input-container::before {
+  content: "";
+  background-image: url("data:image/svg+xml,%3Csvg width='24px' height='24px' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' style='vertical-align: middle;width: 24px; height: 24px;' focusable='false'%3E%3Cpath d='M16.0824,17.406 C14.3832,18.81 12.2034,19.6536 9.8268,19.6536 C4.3998,19.6536 0,15.2544 0,9.8268 C0,4.3998 4.3998,0 9.8268,0 C15.2544,0 19.6536,4.3998 19.6536,9.8268 C19.6536,12.2028 18.81,14.3832 17.406,16.0824 L23.7264,22.4028 C24.0906,22.767 24.0924,23.3568 23.724,23.724 C23.358,24.09 22.7658,24.09 22.4028,23.7264 L16.0824,17.406 Z M9.8268,17.7822 C14.2206,17.7822 17.7828,14.2206 17.7828,9.8262 C17.7828,5.4342 14.2206,1.872 9.8268,1.872 C5.4336,1.872 1.872,5.4336 1.872,9.8268 C1.872,14.2206 5.4336,17.7828 9.8268,17.7828 L9.8268,17.7822 Z' id='Shape' fill='%23808080'%3E%3C/path%3E%3C/svg%3E");
+  background-color: white;
+  width: 24px;
+  height: 24px;
+  right: 12px;
+  top: 12px;
+  z-index: 1;
+  position: absolute;
+}
+
+.localities-container {
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-radius: 0 0 6px 6px;
+  margin-top: -3px;
+}
+
+.localities-container li:last-child {
+  border-radius: 0 0 6px 6px;
+}
