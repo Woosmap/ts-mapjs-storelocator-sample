@@ -1,14 +1,14 @@
-#StoreLocator {
-  height: 100%;
-  width: 100%;
-}
+@charset "UTF-8";
 
-#MapContainer {
-    display: flex;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    flex-direction: column;
-}
+@import 'abstracts/variables';
+@import 'abstracts/mixins';
+
+@import 'base/typography';
+
+@import 'layout/base';
+@import 'layout/sidebar';
+@import 'layout/map';
+
+@import 'components/button';
+@import 'components/search';
+@import 'components/stores_list';
