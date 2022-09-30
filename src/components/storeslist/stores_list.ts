@@ -13,18 +13,18 @@ export default class StoresListComponent extends Component<IStoresListComponent>
         this.styleOnScroll();
     }
 
-    render() {
+    render(): void {
         if (this.state && this.$element) {
-            let storesElements: HTMLLIElement[] = this.state.stores
+            const storesElements: HTMLLIElement[] = this.state.stores
                 ?.map((store: AssetFeatureResponse) => {
-                    let $storeElement: HTMLLIElement = document.createElement('li');
+                    const $storeElement: HTMLLIElement = document.createElement('li');
                     $storeElement.className = "summaryStore";
-                    $storeElement.dataset.storeId = store.properties?.store_id;
+                    $storeElement.dataset.storeId = store.properties.store_id;
                     $storeElement.innerHTML = `
-                             <div class="summaryStore__name">${store.properties?.name}</div>
-                             <div class="summaryStore__address">${getReadableAddress(store.properties?.address!)}</div>
-                             <div class="summaryStore__phone">${getPhoneLink(store.properties?.contact!)}</div>
-                             <div class="summaryStore__distance">${getReadableDistance(store.properties?.distance!)}</div>`
+                             <div class="summaryStore__name">${store.properties.name}</div>
+                             <div class="summaryStore__address">${getReadableAddress(store.properties.address)}</div>
+                             <div class="summaryStore__phone">${getPhoneLink(store.properties.contact)}</div>
+                             <div class="summaryStore__distance">${getReadableDistance(store.properties.distance)}</div>`
                     $storeElement.addEventListener('click', () => {
                         this.emit('selected_store', store)
                     });
@@ -35,7 +35,7 @@ export default class StoresListComponent extends Component<IStoresListComponent>
         }
     }
 
-    styleOnScroll() {
+    styleOnScroll(): void {
         this.$target.addEventListener('scroll', () => {
             const scroll = this.$target.scrollTop;
             if (scroll > 0) {

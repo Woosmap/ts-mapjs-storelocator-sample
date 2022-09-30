@@ -27,8 +27,8 @@ export class WoosmapApiClient {
 
     searchStores({...params}: ParamsSearchRequest): Promise<AssetFeatureCollectionResponse> {
         params.key = this.apiKey;
-        let url_ = `${this.baseUrl}/search/?${objectToQueryString(params)}`;
-        let options_: RequestInit = {
+        const url_ = `${this.baseUrl}/search/?${objectToQueryString(params)}`;
+        const options_: RequestInit = {
             method: "GET",
             headers: {
                 "Accept": "application/json"
@@ -42,7 +42,7 @@ export class WoosmapApiClient {
 
     protected processSearchStores(response: Response): Promise<AssetFeatureCollectionResponse> {
         const status = response.status;
-        let _headers: any = {};
+        const _headers: any = {};
         if (response.headers && response.headers.forEach) {
             response.headers.forEach((v: any, k: any) => _headers[k] = v);
         }

@@ -19,9 +19,9 @@ export default class SearchComponent extends Component<ISearchComponent> {
         this.$target.appendChild(this.$element);
     }
 
-    render() {
+    render(): void {
         if (this.state && this.$element) {
-            loadScript({url: Urls.localitiesWidgetJS, attributes: {"key": this.state!.woosmapPublicKey}})
+            loadScript({url: Urls.localitiesWidgetJS, attributes: {"key": this.state.woosmapPublicKey}})
                 .then(() => {
                     this.initSearchView();
                     this.loadWidgetStylesheet();
@@ -32,15 +32,15 @@ export default class SearchComponent extends Component<ISearchComponent> {
         }
     }
 
-    initSearchView() {
-        this.localitiesWidget = new woosmap.localities.Autocomplete(this.$element!.id, this.state?.searchOptions);
+    initSearchView(): void {
+        this.localitiesWidget = new woosmap.localities.Autocomplete(Selectors.searchInputID, this.state?.searchOptions);
         this.localitiesWidget.addListener('selected_suggestion', () => {
             const locality: woosmap.localities.DetailsResponseItem = this.localitiesWidget.getSelectedSuggestionDetails();
             this.emit('selected_locality', locality)
         });
     }
 
-    loadWidgetStylesheet() {
+    loadWidgetStylesheet(): void {
         const newLink: HTMLLinkElement = document.createElement("link");
         newLink.rel = 'stylesheet';
         newLink.href = Urls.localitiesWidgetCSS;

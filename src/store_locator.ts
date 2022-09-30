@@ -10,23 +10,23 @@ import {LocalitiesConf, SearchAPIParameters} from "./configuration/search.config
 import "./styles/main.scss";
 
 export default class StoreLocator {
-    private state = {};
     private api: WoosmapApiClient;
 
     constructor(private $storelocator: HTMLDivElement) {
         this.api = new WoosmapApiClient(WoosmapPublicKey);
+
         window.addEventListener('DOMContentLoaded', () => {
             this.$storelocator.innerHTML = '';
             this.$storelocator.insertAdjacentHTML('afterbegin', this.getHTMLSkeleton());
             const searchComponent = new SearchComponent({
-                $target: document.getElementById(Selectors.searchWrapperID)!,
+                $target: document.getElementById(Selectors.searchWrapperID) as HTMLElement,
                 initialState: {
                     woosmapPublicKey: WoosmapPublicKey,
                     searchOptions: LocalitiesConf
                 },
             })
             const mapComponent = new MapComponent({
-                $target: document.getElementById(Selectors.mapContainerID)!,
+                $target: document.getElementById(Selectors.mapContainerID) as HTMLElement,
                 initialState: {
                     woosmapPublicKey: WoosmapPublicKey,
                     mapOptions: MapOptions,
@@ -34,7 +34,7 @@ export default class StoreLocator {
                 }
             })
             const storesListComponent = new StoresListComponent({
-                $target: document.getElementById(Selectors.listStoresContainerID)!,
+                $target: document.getElementById(Selectors.listStoresContainerID) as HTMLElement,
                 initialState: {
                     stores: []
                 }
@@ -44,7 +44,7 @@ export default class StoreLocator {
                 mapComponent.setCenter(location)
                 this.api.searchStores(Object.assign(SearchAPIParameters, {lat: location.lat, lng: location.lng}))
                     .then(response => {
-                        const storesList = response!.features!.map((store) => store);
+                        const storesList = response?.features.map((store) => store);
                         storesListComponent.setState({stores: storesList})
                     }).catch(exception => {
                     console.error(exception);
@@ -56,15 +56,8 @@ export default class StoreLocator {
         });
     }
 
-    setState(nextState: {}) {
-        this.state = {...this.state, ...nextState};
-        this.render();
-    }
 
-    render() {
-    }
-
-    getHTMLSkeleton() {
+    getHTMLSkeleton(): string {
         return `
         <div id="${Selectors.mapContainerID}"></div>
         <div id="${Selectors.sidebarContainerID}">

@@ -5,7 +5,17 @@
   "browserslist": "> 0.25%, not dead",
   "scripts": {
     "start": "parcel serve ./index.html",
-    "build": "parcel build ./index.html --dist-dir ./dist --public-url ./"
+    "build": "parcel build ./index.html --dist-dir ./dist --public-url ./",
+    "lint": "npx eslint --fix ./",
+    "prettier": "npx prettier --write ."
+  },
+  "lint-staged": {
+    "*.ts": [
+      "npm run lint"
+    ],
+    "*.{ts,html,css,json,md}": [
+      "npx prettier --write ."
+    ]
   },
   "author": "",
   "license": "MIT",
@@ -15,6 +25,9 @@
   "devDependencies": {
     "@parcel/transformer-sass": "^2.7.0",
     "parcel": "latest",
-    "@types/woosmap.map": "^1.4.0"
+    "@types/woosmap.map": "^1.4.0",
+    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/parser": "^4.33.0",
+    "lint-staged": "^13.0.3"
   }
 }
