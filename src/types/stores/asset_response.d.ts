@@ -19,12 +19,8 @@ export interface AssetFeatureResponse {
 export interface AssetResponse {
     name: string;
     store_id: string;
-    address?: AssetAddress
-    contact?: {
-        website?: string;
-        phone?: string;
-        email?: string;
-    };
+    address?: AssetAddress;
+    contact?: AssetContact;
     open?: {
         current_slice?: AssetOpeningHours;
         open_hours?: AssetOpeningHours[];
@@ -42,6 +38,12 @@ export interface AssetResponse {
     user_properties?: object;
     opening_hours?: AssetOpeningHours | null;
     distance?: number;
+}
+
+export interface AssetContact {
+    website?: string;
+    phone?: string;
+    email?: string;
 }
 
 export interface AssetAddress {
