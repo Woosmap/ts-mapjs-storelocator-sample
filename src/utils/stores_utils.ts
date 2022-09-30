@@ -1,7 +1,10 @@
-import {AssetAddress, AssetContact} from "../types/stores/asset_response";
+import {AssetAddress, AssetContact, AssetResponse} from "../types/stores/asset_response";
 
-export function getReadableAddress(address: AssetAddress): string {
-    let readableAddress: string[] = [];
+export function getReadableAddress(address: AssetAddress | undefined): string {
+    if (!address) {
+        return ""
+    }
+    const readableAddress: string[] = [];
     if (typeof address.lines !== "undefined" && address.lines.length >= 0) {
         readableAddress.push(...address.lines);
     }
@@ -14,8 +17,11 @@ export function getReadableAddress(address: AssetAddress): string {
     return readableAddress.join(', ');
 }
 
-export function getReadableDistance(distance: number, unitSystem = 'metric'): string {
-    let readableDistance: string = ""
+export function getReadableDistance(distance: number | undefined, unitSystem = 'metric'): string {
+    if (!distance) {
+        return ""
+    }
+    let readableDistance = ""
     const meterToYard = 1.09361;
     const unitSystemValues = {
         'metric': {unit: 'km', smallUnit: 'm', factor: 1000},
@@ -33,8 +39,8 @@ export function getReadableDistance(distance: number, unitSystem = 'metric'): st
     return readableDistance;
 }
 
-export function getPhoneLink(contact: AssetContact): string {
-    if (!contact.phone) {
+export function getPhoneLink(contact: AssetContact | undefined): string {
+    if (!contact || !contact.phone) {
         return ""
     }
     const contactLink: HTMLAnchorElement = document.createElement("a");
@@ -43,4 +49,54 @@ export function getPhoneLink(contact: AssetContact): string {
     contactLink.text = contact.phone;
     return contactLink.outerHTML;
 }
+
+export function getOpeningLabel(store: AssetResponse, locale = "en"): string {
+    let openLabel = "";
+
+    interface ILocale {
+        [key: string]: Record<string, string>
+    }
+
+    const i18n: ILocale = {
+        "en": {
+            "at": "at",
+            "opensToday": "Opens today",
+            "opens": "Opens",
+            "openUntil": "Open until"
+        },
+        "fr": {
+            "at": "à",
+            "opensToday": "Ouvre aujourd'hui",
+            "opens": "Ouvre",
+            "openUntil": "Ouvert jusqu'à"
+        }
+    };
+
+    function _isToday(date: Date): boolean {
+        const today = new Date();
+        return today.toDateString() === date.toDateString();
+    }
+
+    function _convertTime(UNIX_timestamp: number) {
+        const a = new Date(UNIX_timestamp * 1000);
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return months[a.getMonth()] + ' ' + a.getDate() + ', ' + a.getFullYear();
+    }
+
+    try {
+        if (store.open?.open_now) {
+            openLabel = `${i18n[locale].openUntil} ${store.open.current_slice.end}`;
+        } else if (store.open?.next_opening) {
+            if (_isToday(new Date(store.open?.next_opening.day))) {
+                openLabel += openLabel += `${i18n[locale].opensToday} ${i18n[locale].at} ${store.open.next_opening.start}`
+            } else {
+                openLabel += `${i18n[locale].opens} ${_convertTime(Date.parse(store.open.next_opening.day) / 1000)} ${i18n[locale].at} ${store.open.next_opening.start}`
+            }
+        }
+        return openLabel
+    } catch (error) {
+        return ""
+    }
+}
+
 
