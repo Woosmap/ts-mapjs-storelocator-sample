@@ -1,4 +1,4 @@
-import {EventEmitter} from "../utils/event_emitter";
+import {EventEmitter} from "./event_emitter";
 
 export interface IComponentProps<StateType> {
     $target: Element;

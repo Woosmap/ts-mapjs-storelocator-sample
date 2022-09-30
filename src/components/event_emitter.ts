@@ -18,6 +18,12 @@ namespace EventEmitter {
     }
 }
 
+/**
+ * @class EventEmitter
+ * @description
+ * Simple EventEmitter to manage a set of listeners and publishing
+ * events to them when it is told that such events happened.
+ */
 export class EventEmitter implements EventEmitter.Emitter {
     private readonly events: EventEmitter.Events = {
         '*': [],
