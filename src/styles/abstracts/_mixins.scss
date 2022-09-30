@@ -7,9 +7,9 @@
 
   @if $raw-query {
     $query: if(
-      type-of($raw-query) == 'string',
-      unquote($raw-query),
-      inspect($raw-query)
+                    type-of($raw-query) == 'string',
+                    unquote($raw-query),
+                    inspect($raw-query)
     );
 
     @media #{$query} {
@@ -18,5 +18,26 @@
   } @else {
     @error 'No value found for `#{$breakpoint}`. '
          + 'Please make sure it is defined in `$breakpoints` map.';
+  }
+}
+
+
+/// prepend an image to a link
+/// @access public
+/// @param {String} $base64Image - the Base 64 encoded image
+
+@mixin link-image($base64Image) {
+  padding: 0.2em 0;
+  margin-left: 20px;
+  color: inherit;
+
+  &:before {
+    content: "";
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+    padding-right: 20px;
+    vertical-align: middle;
+    margin-left: -20px;
+    background-image: url($base64Image);
   }
 }
