@@ -1,5 +1,6 @@
 import Component from '../component';
-import {AssetAddress, AssetFeatureResponse, AssetResponse} from "../../types/stores/asset_response";
+import {AssetFeatureResponse} from "../../types/stores/asset_response";
+import {getPhoneLink, getReadableAddress, getReadableDistance} from "../../utils/stores_utils";
 
 export interface IStoresListComponent {
     stores: AssetFeatureResponse[];
@@ -8,8 +9,8 @@ export interface IStoresListComponent {
 export default class StoresListComponent extends Component<IStoresListComponent> {
     init(): void {
         this.$element = document.createElement('ul');
-        this.$element.className = 'container';
         this.$target.appendChild(this.$element);
+        this.styleOnScroll();
     }
 
     render() {
@@ -20,43 +21,23 @@ export default class StoresListComponent extends Component<IStoresListComponent>
                     $storeElement.className = "summaryStore";
                     $storeElement.dataset.storeId = store.properties?.store_id;
                     $storeElement.innerHTML = `
-                             <h4 class="SummaryStore__name">${store.properties?.name}</h4>
-                             <p class="SummaryStore__address">${this.getReadableAddress(store.properties?.address!)}</p>
-                             <p class="SummaryStore__distance">${this.getReadableDistance(store.properties?.distance!)}</p>`
-                    $storeElement.addEventListener('click', (e) => {
+                             <div class="summaryStore__name">${store.properties?.name}</div>
+                             <div class="summaryStore__address">${getReadableAddress(store.properties?.address!)}</div>
+                             <div class="summaryStore__phone">${getPhoneLink(store.properties?.contact!)}</div>
+                             <div class="summaryStore__distance">${getReadableDistance(store.properties?.distance!)}</div>`
+                    $storeElement.addEventListener('click', () => {
                         this.emit('selected_store', store)
                     });
                     return $storeElement;
                 })
-            this.$element.append(...storesElements)
-            this.styleOnScroll();
-        }
-    }
-
-    getReadableAddress(address: AssetAddress) {
-        return address.lines?.join(', ');
-    }
-
-    getReadableDistance(distance: number, unitSystem = 'metric') {
-        const meterToYard = 1.09361;
-        const value = {
-            'metric': {unit: 'km', smallUnit: 'm', factor: 1000},
-            'imperial': {unit: 'mi', smallUnit: 'yd', factor: 1760}
-        };
-        const system = value['metric'];
-        if (unitSystem === 'imperial') {
-            distance *= meterToYard;
-        }
-        if (distance < system.factor) {
-            return Math.round(distance) + '\u00A0' + system.smallUnit;
-        } else {
-            return parseFloat((distance / system.factor).toFixed(1)) + '\u00A0' + system.unit;
+            this.$target.scrollTo(0, 0);
+            this.$element.replaceChildren(...storesElements)
         }
     }
 
     styleOnScroll() {
         this.$target.addEventListener('scroll', () => {
-            var scroll = this.$target.scrollTop;
+            const scroll = this.$target.scrollTop;
             if (scroll > 0) {
                 this.$target.classList.add('active');
             } else {
