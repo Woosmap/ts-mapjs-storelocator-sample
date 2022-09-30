@@ -2,7 +2,7 @@ import {AssetFeatureCollectionResponse} from "../types/stores/asset_response";
 import Urls from "../configuration/urls.config";
 import {objectToQueryString} from "../utils/utils";
 
-interface ParamsSearchRequest {
+export interface ParamsSearchRequest {
     key?: string
     query?: string;
     lat?: number;
