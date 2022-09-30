@@ -22,20 +22,20 @@ export interface AssetResponse {
     address?: AssetAddress;
     contact?: AssetContact;
     open?: {
-        current_slice?: AssetOpeningHours;
-        open_hours?: AssetOpeningHours[];
-        open_now?: boolean;
+        current_slice: AssetOpeningHoursPeriod;
+        open_hours: AssetOpeningHours[];
+        open_now: boolean;
         next_opening?: {
-            end?: string;
-            start?: string;
-            day?: string;
+            end: string;
+            start: string;
+            day: string;
         };
         week_day?: 1 | 2 | 3 | 4 | 5 | 6 | 7;
     };
     weekly_opening?: AssetWeeklyOpeningResponse;
     types?: string[];
     tags?: string[];
-    user_properties?: object;
+    user_properties?: Record<string, unknown>;
     opening_hours?: AssetOpeningHours | null;
     distance?: number;
 }
