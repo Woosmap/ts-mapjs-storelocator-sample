@@ -1,6 +1,6 @@
 import Component from '../component';
 import {AssetFeatureResponse} from "../../types/stores/asset_response";
-import {getPhoneLink, getReadableAddress, getReadableDistance} from "../../utils/stores_utils";
+import {getPhoneLink, getReadableAddress, getReadableDistance} from "../../helpers/stores";
 
 export interface IStoresListComponent {
     stores: AssetFeatureResponse[];
