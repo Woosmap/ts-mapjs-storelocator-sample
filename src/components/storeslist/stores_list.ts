@@ -17,21 +17,23 @@ export default class StoresListComponent extends Component<IStoresListComponent>
         if (this.state && this.$element) {
             const storesElements: HTMLLIElement[] = this.state.stores
                 ?.map((store: AssetFeatureResponse) => {
+                    const properties = store.properties;
                     const $storeElement: HTMLLIElement = document.createElement('li');
                     $storeElement.className = "summaryStore";
                     $storeElement.dataset.storeId = store.properties.store_id;
                     $storeElement.innerHTML = `
                              <div class="summaryStore__name">${store.properties.name}</div>
-                             <div class="summaryStore__address">${getReadableAddress(store.properties.address)}</div>
-                             <div class="summaryStore__phone">${getPhoneLink(store.properties.contact)}</div>
-                             <div class="summaryStore__distance">${getReadableDistance(store.properties.distance)}</div>`
+                             ${properties.address ? `<div class="summaryStore__address">${getReadableAddress(properties.address)}</div>` : ''}
+                             ${properties.contact?.phone ? `<div class="summaryStore__phone">${getPhoneLink(properties.contact)}</div>` : ''}
+                             ${properties.distance ? `<div class="summaryStore__distance">${getReadableDistance(properties.distance)}</div>` : ''}`
                     $storeElement.addEventListener('click', () => {
-                        this.emit('selected_store', store)
+                        this.emit('store_selected', store)
                     });
                     return $storeElement;
                 })
             this.$target.scrollTo(0, 0);
             this.$element.replaceChildren(...storesElements)
+            this.show();
         }
     }
 
@@ -44,6 +46,14 @@ export default class StoresListComponent extends Component<IStoresListComponent>
                 this.$target.classList.remove("active");
             }
         });
+    }
+
+    hide(): void {
+        this.$target.setAttribute('style', 'display:none');
+    }
+
+    show(): void {
+        this.$target.setAttribute('style', '');
     }
 
 }

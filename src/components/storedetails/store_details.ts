@@ -1,24 +1,57 @@
 import Component from '../component';
 import {AssetFeatureResponse} from "../../types/stores/asset_response";
+import {
+    getOpeningLabel,
+    getOpeningWeek,
+    getPhoneLink,
+    getReadableAddress,
+    getWebsiteLink
+} from "../../helpers/stores";
 
 export interface IStoreDetailsComponent {
-    store: AssetFeatureResponse;
+    store?: AssetFeatureResponse;
 }
 
 export default class StoreDetailsComponent extends Component<IStoreDetailsComponent> {
     init(): void {
         this.$element = document.createElement('div');
         this.$element.className = 'container';
-        this.$element.innerHTML = "<p> THIS IS IT </p>"
         this.$target.appendChild(this.$element);
     }
 
     render(): void {
         if (this.state && this.$element) {
-            const $storeElement: HTMLDivElement = document.createElement('div');
-            $storeElement.className = "summaryStore";
-            this.$target.scrollTo(0, 0);
-            this.$element.replaceChildren()
+            if (this.state.store) {
+                const properties = this.state.store.properties;
+                const htmlElements: HTMLElement[] = []
+                const $backBtn: HTMLButtonElement = document.createElement('button');
+                $backBtn.textContent = `Back`
+                $backBtn.addEventListener('click', () => this.emit('back'))
+                const $storeDetails: HTMLDivElement = document.createElement('div')
+                $storeDetails.className = 'detailsStore';
+                $storeDetails.innerHTML = `
+                             <div class="detailsStore__name">${properties.name}</div>
+                             ${properties.types ? `<div class="detailsStore__types">${properties.types.join(' ,')}</div>` : ''}                             
+                             ${properties.open ? `<div class="detailsStore__opening">${getOpeningLabel(properties)}</div>` : ''}
+                             ${properties.address ? `<div class="detailsStore__address">${getReadableAddress(properties.address)}</div>` : ''}
+                             ${properties.contact?.phone ? `<div class="detailsStore__phone">${getPhoneLink(properties.contact)}</div>` : ''}
+                             ${properties.contact?.website ? `<div class="detailsStore__website">${getWebsiteLink(properties.contact)}</div>` : ''}                            
+                             ${properties.weekly_opening ? `<div class="detailsStore__listItems"><div class="detailsStore__headerList">Opening hours</div>${getOpeningWeek(properties.weekly_opening)}</div>` : ''}`
+                htmlElements.push($backBtn, $storeDetails)
+                this.$element.replaceChildren(...htmlElements)
+                this.$target.scrollTo(0, 0);
+                this.show();
+            } else {
+                this.hide();
+            }
         }
+    }
+
+    hide(): void {
+        this.$target.setAttribute('style', 'display:none');
+    }
+
+    show(): void {
+        this.$target.setAttribute('style', '');
     }
 }

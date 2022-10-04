@@ -1,4 +1,9 @@
-import {AssetAddress, AssetContact, AssetResponse} from "../types/stores/asset_response";
+import {
+    AssetAddress,
+    AssetContact,
+    AssetOpeningHoursPeriod,
+    AssetResponse, AssetWeeklyOpeningResponse
+} from "../types/stores/asset_response";
 
 export function getReadableAddress(address: AssetAddress | undefined): string {
     if (!address) {
@@ -21,7 +26,7 @@ export function getReadableDistance(distance: number | undefined, unitSystem = '
     if (!distance) {
         return ""
     }
-    let readableDistance = ""
+    let readableDistance: string
     const meterToYard = 1.09361;
     const unitSystemValues = {
         'metric': {unit: 'km', smallUnit: 'm', factor: 1000},
@@ -43,11 +48,23 @@ export function getPhoneLink(contact: AssetContact | undefined): string {
     if (!contact || !contact.phone) {
         return ""
     }
-    const contactLink: HTMLAnchorElement = document.createElement("a");
-    contactLink.className = 'contactPhone';
-    contactLink.href = `tel:${contact.phone}`;
-    contactLink.text = contact.phone;
-    return contactLink.outerHTML;
+    const $contactLink: HTMLAnchorElement = document.createElement("a");
+    $contactLink.className = 'contactPhone';
+    $contactLink.href = `tel:${contact.phone}`;
+    $contactLink.text = contact.phone;
+    return $contactLink.outerHTML;
+}
+
+export function getWebsiteLink(contact: AssetContact | undefined): string {
+    if (!contact || !contact.website) {
+        return ""
+    }
+    const $websiteLink: HTMLAnchorElement = document.createElement("a");
+    $websiteLink.className = 'contactWebsite';
+    $websiteLink.href = `${contact.website}`;
+    $websiteLink.target = `_blank`;
+    $websiteLink.text = `Go to website`;
+    return $websiteLink.outerHTML;
 }
 
 export function getOpeningLabel(store: AssetResponse, locale = "en"): string {
@@ -72,10 +89,6 @@ export function getOpeningLabel(store: AssetResponse, locale = "en"): string {
         }
     };
 
-    function _isToday(date: Date): boolean {
-        const today = new Date();
-        return today.toDateString() === date.toDateString();
-    }
 
     function _convertTime(UNIX_timestamp: number) {
         const a = new Date(UNIX_timestamp * 1000);
@@ -87,7 +100,7 @@ export function getOpeningLabel(store: AssetResponse, locale = "en"): string {
         if (store.open?.open_now) {
             openLabel = `${i18n[locale].openUntil} ${store.open.current_slice.end}`;
         } else if (store.open?.next_opening) {
-            if (_isToday(new Date(store.open?.next_opening.day))) {
+            if (isToday(new Date(store.open?.next_opening.day))) {
                 openLabel += openLabel += `${i18n[locale].opensToday} ${i18n[locale].at} ${store.open.next_opening.start}`
             } else {
                 openLabel += `${i18n[locale].opens} ${_convertTime(Date.parse(store.open.next_opening.day) / 1000)} ${i18n[locale].at} ${store.open.next_opening.start}`
@@ -99,4 +112,65 @@ export function getOpeningLabel(store: AssetResponse, locale = "en"): string {
     }
 }
 
+export function getOpeningWeek(weeklyOpening: AssetWeeklyOpeningResponse): string {
+    interface IReadableOpeningHours {
+        [key: string]: { dayName: string, hoursDay: string, today?: boolean }
+    }
 
+    const readableOpeningHours: IReadableOpeningHours = {
+        "1": {dayName: "Monday", hoursDay: ""},
+        "2": {dayName: "Tuesday", hoursDay: ""},
+        "3": {dayName: "Wednesday", hoursDay: ""},
+        "4": {dayName: "Thursday", hoursDay: ""},
+        "5": {dayName: "Friday", hoursDay: ""},
+        "6": {dayName: "Saturday", hoursDay: ""},
+        "7": {dayName: "Sunday", hoursDay: ""}
+    }
+
+    const $storeOpeningWeek: HTMLUListElement = document.createElement('ul');
+    $storeOpeningWeek.className = "storeDetails__openingWeek";
+    const today = new Date().toLocaleString('en-us', {weekday: 'long'});
+
+    Object.entries(weeklyOpening).forEach(([day, hoursPeriod]) => {
+        if (!hoursPeriod || hoursPeriod.length === 0) {
+            readableOpeningHours[day].hoursDay = "Closed"
+        } else if (readableOpeningHours[day]) {
+            if (readableOpeningHours[day].dayName === today) {
+                readableOpeningHours[day].today = true
+            }
+            if (hoursPeriod.hours?.length === 0) {
+                readableOpeningHours[day].hoursDay = "Closed"
+            } else {
+                readableOpeningHours[day].hoursDay = concatenateStoreHours(hoursPeriod.hours);
+            }
+        }
+    });
+    const hoursHTML: HTMLLIElement[] = Object.entries(readableOpeningHours).map(([dayIndex, dayValues]) => {
+        const $listDay: HTMLLIElement = document.createElement('li');
+        $listDay.className = dayValues.today ? 'currentDay' : '';
+        $listDay.innerHTML = `<span class='day ${dayIndex}'>${dayValues.dayName}</span><span class='hours'>${dayValues.hoursDay}</span>`
+        return $listDay
+    })
+    $storeOpeningWeek.append(...hoursHTML)
+    return $storeOpeningWeek.outerHTML;
+
+}
+
+
+function isToday(date: Date): boolean {
+    const today = new Date();
+    return today.toDateString() === date.toDateString();
+}
+
+function concatenateStoreHours(openHours: AssetOpeningHoursPeriod[]) {
+    const hoursText: string[] = [];
+    let end = '';
+    openHours.forEach((period) => {
+        if ('all-day' in period || (period.end === '00:00' && period.start === '00:00')) {
+            return "24h/24";
+        }
+        end = period.end;
+        hoursText.push(`${period.start}–${end}`);
+    })
+    return hoursText.join(', ');
+}

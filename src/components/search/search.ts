@@ -15,6 +15,7 @@ export default class SearchComponent extends Component<ISearchComponent> {
     init(): void {
         this.$element = <HTMLInputElement>document.createElement('input');
         this.$element.className = 'search';
+        this.$element.setAttribute('placeholder', "Search an address");
         this.$element.id = Selectors.searchInputID;
         this.$target.appendChild(this.$element);
     }

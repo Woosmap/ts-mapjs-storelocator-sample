@@ -1,4 +1,4 @@
-import StoreLocator from './src/store_locator';
+import StoreLocator from './src/App';
 
-const $storelocator = document.querySelector<HTMLDivElement>('#StoreLocator');
-if ($storelocator) new StoreLocator($storelocator);
+const $storelocator = document.querySelector<HTMLDivElement>('#StoreLocator') as HTMLElement;
+if ($storelocator) new StoreLocator({$target: $storelocator, initialState: {}});

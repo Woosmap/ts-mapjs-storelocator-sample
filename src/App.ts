@@ -1,23 +1,36 @@
 import Selectors from './configuration/selectors.config';
 import {WoosmapPublicKey, MapOptions, StoresStyle} from './configuration/map.config';
+import {LocalitiesConf, SearchAPIParameters} from "./configuration/search.config";
+import {AssetFeatureResponse} from "./types/stores/asset_response";
+import Component from "./components/component";
 import MapComponent from "./components/map/map";
 import SearchComponent from "./components/search/search";
+import StoreDetailsComponent from "./components/storedetails/store_details";
 import StoresListComponent from "./components/storeslist/stores_list";
 import {WoosmapApiClient} from "./services/woosmap_stores";
-import {AssetFeatureResponse} from "./types/stores/asset_response";
-import {LocalitiesConf, SearchAPIParameters} from "./configuration/search.config";
-
 import "./styles/main.scss";
 
-export default class StoreLocator {
-    private api: WoosmapApiClient;
+export interface IStoreLocator {
+    initialSearch?: string,
+    showList?: boolean,
+    showSelected?: boolean,
+}
 
-    constructor(private $storelocator: HTMLDivElement) {
+export default class StoreLocator extends Component<IStoreLocator> {
+    private api!: WoosmapApiClient;
+
+    init(): void {
         this.api = new WoosmapApiClient(WoosmapPublicKey);
+        this.state = {
+            showList: false,
+            showSelected: false,
+        };
+    }
 
+    render(): void {
         window.addEventListener('DOMContentLoaded', () => {
-            this.$storelocator.innerHTML = '';
-            this.$storelocator.insertAdjacentHTML('afterbegin', this.getHTMLSkeleton());
+            this.$target.innerHTML = '';
+            this.$target.insertAdjacentHTML('afterbegin', this.getHTMLSkeleton());
             const searchComponent = new SearchComponent({
                 $target: document.getElementById(Selectors.searchWrapperID) as HTMLElement,
                 initialState: {
@@ -39,23 +52,42 @@ export default class StoreLocator {
                     stores: []
                 }
             })
+            const storeDetailsComponent = new StoreDetailsComponent({
+                $target: document.getElementById(Selectors.detailsStoreContainerID) as HTMLElement,
+                initialState: {}
+            })
             searchComponent.on('selected_locality', (locality: woosmap.localities.DetailsResponseItem) => {
                 const location: woosmap.map.LatLngLiteral = locality.geometry.location;
-                mapComponent.setCenter(location)
                 this.api.searchStores(Object.assign(SearchAPIParameters, {lat: location.lat, lng: location.lng}))
                     .then(response => {
                         const storesList = response?.features.map((store) => store);
+                        storeDetailsComponent.hide();
                         storesListComponent.setState({stores: storesList})
+                        mapComponent.setState({stores: storesList}, true, () => mapComponent.emit('stores_changed'))
+                        storesListComponent.show();
+
                     }).catch(exception => {
                     console.error(exception);
                 });
             })
-            storesListComponent.on('selected_store', (selectedStore: AssetFeatureResponse) => {
-                mapComponent.setSelectedStore(selectedStore)
+            storesListComponent.on('store_selected', (selectedStore: AssetFeatureResponse) => {
+                storesListComponent.hide()
+                storeDetailsComponent.setState({store: selectedStore})
+                storeDetailsComponent.show()
+                mapComponent.setState({selectedStore: selectedStore}, true, () => mapComponent.emit('store_selected'))
+            })
+            storeDetailsComponent.on('back', () => {
+                storeDetailsComponent.hide()
+                storesListComponent.show()
+                mapComponent.setState({selectedStore: null}, true, () => mapComponent.emit('store_unselected'))
+            })
+            mapComponent.on('store_selected', (selectedStore: AssetFeatureResponse) => {
+                storesListComponent.hide()
+                storeDetailsComponent.setState({store: selectedStore})
+                storeDetailsComponent.show()
             })
         });
     }
-
 
     getHTMLSkeleton(): string {
         return `
