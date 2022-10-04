@@ -8,9 +8,11 @@
     "allowJs": true,
     "lib": [
       "es6",
-      "dom"
+      "dom",
+      "es2017.object"
     ],
     "rootDir": "src",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+	"typeRoots": ["./src/types", "./node_modules/@types"]
   }
 }
