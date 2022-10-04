@@ -34,13 +34,18 @@ export default abstract class Component<StateType> extends EventEmitter {
      *
      * @param newState state value to change
      * @param preventRender If true, no rendering is done after the state is changed.
+     * @param callback If set, called back if state has changed.
      */
-    setState<K extends keyof StateType>(newState: Pick<StateType, K> | StateType, preventRender?: boolean): void {
+    setState<K extends keyof StateType>(newState: Pick<StateType, K> | StateType, preventRender?: boolean, callback?: () => any): void {
         if (!this.checkNeedUpdate(newState)) return;
         if (this.state) {
             this.state = {...this.state, ...newState};
         } else {
             this.state = {...newState} as StateType;
+        }
+        if (callback) {
+            callback();
+            return;
         }
         if (preventRender) return;
         this.render();
@@ -48,7 +53,7 @@ export default abstract class Component<StateType> extends EventEmitter {
 
 
     /**
-     * Component state validation
+     * Component state validation, basic... can use more advanced like fast-deep-equal package
      *
      * @param newState state value to validate
      */
@@ -57,4 +62,5 @@ export default abstract class Component<StateType> extends EventEmitter {
         const currentState = JSON.stringify({...this.state, ...newState});
         return prevState !== currentState;
     }
+
 }
