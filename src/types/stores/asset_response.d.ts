@@ -7,13 +7,10 @@ export interface AssetFeatureCollectionResponse {
     };
 }
 
-export interface AssetFeatureResponse {
+export interface AssetFeatureResponse extends woosmap.map.GeoJSONFeature {
     type: "Feature";
     properties: AssetResponse;
-    geometry: {
-        type: "Point";
-        coordinates: number[];
-    };
+    geometry: woosmap.map.GeoJSONPoint
 }
 
 export interface AssetResponse {
