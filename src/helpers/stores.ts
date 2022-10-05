@@ -4,6 +4,7 @@ import {
     AssetOpeningHoursPeriod,
     AssetResponse, AssetWeeklyOpeningResponse
 } from "../types/stores/asset_response";
+import {availableServices} from "../configuration/search.config";
 
 export function getReadableAddress(address: AssetAddress | undefined): string {
     if (!address) {
@@ -67,6 +68,23 @@ export function getWebsiteLink(contact: AssetContact | undefined): string {
     return $websiteLink.outerHTML;
 }
 
+export function getServicesList(servicesList: string[]): string {
+    const storeServices = servicesList.map(service => (availableServices.filter(({serviceKey}) => serviceKey === service)[0])).filter(x => x);
+    const $storeServices: HTMLUListElement = document.createElement('ul');
+    $storeServices.className = "detailsStore__services";
+    const servicesHTML: HTMLLIElement[] = storeServices.map((service) => {
+        const $service: HTMLLIElement = document.createElement('li');
+        $service.dataset.servicekey = service.serviceKey;
+        $service.dataset.servicename = service.serviceName;
+        $service.innerHTML = `
+        <div class='iconService iconService__${service.serviceKey}'></div>
+        <div class='serviceName'>${service.serviceName}</div>`
+        return $service
+    })
+    $storeServices.append(...servicesHTML)
+    return $storeServices.outerHTML;
+}
+
 export function getOpeningLabel(store: AssetResponse, locale = "en"): string {
     let openLabel = "";
 
@@ -112,7 +130,7 @@ export function getOpeningLabel(store: AssetResponse, locale = "en"): string {
     }
 }
 
-export function getOpeningWeek(weeklyOpening: AssetWeeklyOpeningResponse): string {
+export function getOpeningWeekList(weeklyOpening: AssetWeeklyOpeningResponse): string {
     interface IReadableOpeningHours {
         [key: string]: { dayName: string, hoursDay: string, today?: boolean }
     }

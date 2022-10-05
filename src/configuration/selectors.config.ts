@@ -2,6 +2,7 @@ enum Selectors {
     mapContainerID = "mapContainer",
     mapWrapperID = "mapWrapper",
     sidebarContainerID = "sidebarContainer",
+    sidebarContentContainerID = "sidebarContentContainer",
     searchContainerID = "searchContainer",
     searchWrapperID = "searchWrapper",
     searchInputID = "searchInput",

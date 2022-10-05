@@ -2,9 +2,9 @@ import Component from '../component';
 import {AssetFeatureResponse} from "../../types/stores/asset_response";
 import {
     getOpeningLabel,
-    getOpeningWeek,
+    getOpeningWeekList,
     getPhoneLink,
-    getReadableAddress,
+    getReadableAddress, getServicesList,
     getWebsiteLink
 } from "../../helpers/stores";
 
@@ -25,18 +25,20 @@ export default class StoreDetailsComponent extends Component<IStoreDetailsCompon
                 const properties = this.state.store.properties;
                 const htmlElements: HTMLElement[] = []
                 const $backBtn: HTMLButtonElement = document.createElement('button');
-                $backBtn.textContent = `Back`
+                $backBtn.className = 'backButton';
                 $backBtn.addEventListener('click', () => this.emit('back'))
+                $backBtn.innerHTML = `<div class="backButton__icon">Back</div>`;
                 const $storeDetails: HTMLDivElement = document.createElement('div')
                 $storeDetails.className = 'detailsStore';
                 $storeDetails.innerHTML = `
                              <div class="detailsStore__name">${properties.name}</div>
-                             ${properties.types ? `<div class="detailsStore__types">${properties.types.join(' ,')}</div>` : ''}                             
+                             ${properties.types?.length ? `<div class="detailsStore__types">${properties.types.join(' ,')}</div>` : ''}                             
                              ${properties.open ? `<div class="detailsStore__opening">${getOpeningLabel(properties)}</div>` : ''}
                              ${properties.address ? `<div class="detailsStore__address">${getReadableAddress(properties.address)}</div>` : ''}
                              ${properties.contact?.phone ? `<div class="detailsStore__phone">${getPhoneLink(properties.contact)}</div>` : ''}
                              ${properties.contact?.website ? `<div class="detailsStore__website">${getWebsiteLink(properties.contact)}</div>` : ''}                            
-                             ${properties.weekly_opening ? `<div class="detailsStore__listItems"><div class="detailsStore__headerList">Opening hours</div>${getOpeningWeek(properties.weekly_opening)}</div>` : ''}`
+                             ${properties.weekly_opening ? `<div class="detailsStore__listItems"><div class="detailsStore__headerList">Opening hours</div>${getOpeningWeekList(properties.weekly_opening)}</div>` : ''}
+                             ${properties.tags?.length ? `<div class="detailsStore__listItems"><div class="detailsStore__headerList">Services</div>${getServicesList(properties.tags)}</div>` : ''}`
                 htmlElements.push($backBtn, $storeDetails)
                 this.$element.replaceChildren(...htmlElements)
                 this.$target.scrollTo(0, 0);

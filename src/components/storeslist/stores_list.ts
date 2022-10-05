@@ -10,7 +10,6 @@ export default class StoresListComponent extends Component<IStoresListComponent>
     init(): void {
         this.$element = document.createElement('ul');
         this.$target.appendChild(this.$element);
-        this.styleOnScroll();
     }
 
     render(): void {
@@ -35,17 +34,6 @@ export default class StoresListComponent extends Component<IStoresListComponent>
             this.$element.replaceChildren(...storesElements)
             this.show();
         }
-    }
-
-    styleOnScroll(): void {
-        this.$target.addEventListener('scroll', () => {
-            const scroll = this.$target.scrollTop;
-            if (scroll > 0) {
-                this.$target.classList.add('active');
-            } else {
-                this.$target.classList.remove("active");
-            }
-        });
     }
 
     hide(): void {
