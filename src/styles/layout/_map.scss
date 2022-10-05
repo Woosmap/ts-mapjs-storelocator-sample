@@ -2,13 +2,12 @@
   display: flex;
   flex-direction: column;
   flex-grow: 0;
-  height: 55vh;
+  height: 100%;
   position: relative;
   @include respond-to('medium') {
-    flex-basis: 75vw;
+    flex-basis: 100%;
     order: 2;
     position: relative;
-    height: 100%;
   }
 }
 

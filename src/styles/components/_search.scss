@@ -7,6 +7,7 @@
   z-index: 1;
   padding: 10px 0;
   border-bottom: 1px solid rgba(0, 0, 0, .08);
+  background-color: $brand-color;
 
   #searchWrapper {
     flex-direction: column;
@@ -24,7 +25,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      padding-right: 4.8rem;
+      padding-right: 2.5rem;
       padding-left: 1em;
       font-size: 17px !important;
       border-bottom-color: transparent;
@@ -41,6 +42,7 @@
 // override/customize some of woosmap.localities-widget class.
 .localities-input-wrapper, .localities-input-container {
   width: 100%;
+  position: relative;
 }
 
 .localities-item {

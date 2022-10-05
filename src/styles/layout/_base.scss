@@ -1,14 +1,15 @@
 #StoreLocator {
   display: flex;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   flex-direction: column;
+  position: relative;
+  height: 92vh;
+  width: 92vw;
+  min-height: 600px;
+  min-width: 320px;
+  margin: 0 auto;
+  margin-top: 4vh;
 
   @include respond-to('medium') {
     flex-direction: row;
-    height: 100%;
   }
 }

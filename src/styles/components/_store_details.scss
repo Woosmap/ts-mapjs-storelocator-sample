@@ -18,7 +18,7 @@
     padding: 0.8rem 1.4rem;
 
     &__name {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
     }
 
     &__listItems {
@@ -48,11 +48,11 @@
     }
 
     &__headerList {
-      border-bottom: 1px solid rgba(0, 0, 0, .08);
+      border-bottom: 1px solid rgba(0, 0, 0, .25);
       padding: 0.5rem 0 0.2rem;
       line-height: 20px;
-      font-size: .85rem;
-      opacity: .55;
+      font-size: .95rem;
+      opacity: .68;
       font-weight: 600;
       text-transform: uppercase;
     }
@@ -68,6 +68,18 @@
 
     &__opening, .currentDay {
       font-weight: 600;
+    }
+
+    &__services {
+      display: grid !important;
+      grid-column-gap: 2%;
+      grid-template-columns: repeat(2, 1fr);
+
+      .serviceName {
+        flex-grow: 1
+      }
+
+
     }
 
   }
