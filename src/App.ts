@@ -31,6 +31,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
         window.addEventListener('DOMContentLoaded', () => {
             this.$target.innerHTML = '';
             this.$target.insertAdjacentHTML('afterbegin', this.getHTMLSkeleton());
+            this.styleOnScroll();
             const searchComponent = new SearchComponent({
                 $target: document.getElementById(Selectors.searchWrapperID) as HTMLElement,
                 initialState: {
@@ -89,6 +90,18 @@ export default class StoreLocator extends Component<IStoreLocator> {
         });
     }
 
+    styleOnScroll(): void {
+        const $scrollableCopntainer: HTMLElement = document.getElementById(Selectors.sidebarContentContainerID) as HTMLElement;
+        $scrollableCopntainer?.addEventListener('scroll', () => {
+            const scroll = $scrollableCopntainer.scrollTop;
+            if (scroll > 0) {
+                $scrollableCopntainer.classList.add('active');
+            } else {
+                $scrollableCopntainer.classList.remove("active");
+            }
+        });
+    }
+
     getHTMLSkeleton(): string {
         return `
         <div id="${Selectors.mapContainerID}"></div>
@@ -96,9 +109,11 @@ export default class StoreLocator extends Component<IStoreLocator> {
            <div id="${Selectors.searchContainerID}">
               <div id="${Selectors.searchWrapperID}"></div>
            </div>
-           <div id="${Selectors.listStoresContainerID}"></div>
-           <div id="${Selectors.detailsStoreContainerID}"></div>
-        </div>
-        <div id="${Selectors.filterPanelContainerID}"></div>`;
+           <div id="${Selectors.sidebarContentContainerID}">
+               <div id="${Selectors.filterPanelContainerID}"></div>
+               <div id="${Selectors.listStoresContainerID}"></div>
+               <div id="${Selectors.detailsStoreContainerID}"></div>
+           </div>
+        </div>`;
     }
 }

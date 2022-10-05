@@ -1,4 +1,10 @@
 export const WoosmapPublicKey = "woos-48c80350-88aa-333e-835a-07f4b658a9a4"
+
+export const mapPaddings: { [key: string]: woosmap.map.Padding } = {
+    mobile: {left: 50, right: 50, top: 50, bottom: 350},
+    full: {left: 450, right: 50, top: 50, bottom: 50}
+}
+
 export const StoresStyle: woosmap.map.Style = {
     breakPoint: 14,
     rules: [],

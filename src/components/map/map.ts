@@ -5,6 +5,7 @@ import Selectors from "../../configuration/selectors.config";
 import {AssetFeatureResponse} from "../../types/stores/asset_response";
 import GeoJSONFeature = woosmap.map.GeoJSONFeature;
 import Styler from "../../helpers/styler";
+import {mapPaddings} from "../../configuration/map.config";
 
 export interface IMapComponent {
     woosmapPublicKey: string;
@@ -26,7 +27,6 @@ export default class MapComponent extends Component<IMapComponent> {
         this.$element = document.createElement('div');
         this.$element.id = Selectors.mapWrapperID;
         this.$target.appendChild(this.$element);
-        this.padding = {};
     }
 
     render(): void {
@@ -44,6 +44,7 @@ export default class MapComponent extends Component<IMapComponent> {
     initMapView(): void {
         this.map = new woosmap.map.Map(Selectors.mapWrapperID, this.state.mapOptions);
         this.styler = new Styler(this.state.storesStyle);
+        this.updatePadding();
         this.storesOverlay = new woosmap.map.StoresOverlay(this.state.storesStyle);
         this.storesOverlay.setMap(this.map);
         this.data = new woosmap.map.Data();
@@ -104,7 +105,7 @@ export default class MapComponent extends Component<IMapComponent> {
                     const LatLngPoint = feature.getGeometry() as woosmap.map.Data.Point
                     bounds.extend(LatLngPoint.get());
                 });
-                this.map.fitBounds(bounds);
+                this.map.fitBounds(bounds, this.padding);
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 this.storesOverlay.setMap(null);
@@ -155,4 +156,9 @@ export default class MapComponent extends Component<IMapComponent> {
         }
 
     }
+
+    updatePadding() {
+        this.padding = mapPaddings.full;
+    }
+
 }
