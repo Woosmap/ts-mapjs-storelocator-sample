@@ -4,9 +4,11 @@ import {getPhoneLink, getReadableAddress, getReadableDistance} from "../../helpe
 import {SearchAPIParameters} from "../../configuration/search.config";
 import {WoosmapApiClient} from "../../services/woosmap_stores";
 import {WoosmapPublicKey} from "../../configuration/map.config";
+import emptyListImage from '../../assets/empty.jpg';
+
 
 export interface IStoresListComponent {
-    stores: AssetFeatureResponse[];
+    stores?: AssetFeatureResponse[];
     nearbyLocation?: woosmap.map.LatLngLiteral;
     query?: string;
 }
@@ -31,24 +33,43 @@ export default class StoresListComponent extends Component<IStoresListComponent>
 
     render(): void {
         if (this.state && this.$element) {
-            const storesElements: HTMLLIElement[] = this.state.stores
-                ?.map((store: AssetFeatureResponse) => {
-                    const properties = store.properties;
-                    const $storeElement: HTMLLIElement = document.createElement('li');
-                    $storeElement.className = "summaryStore";
-                    $storeElement.dataset.storeId = store.properties.store_id;
-                    $storeElement.innerHTML = `
+            if (this.state.stores?.length) {
+                const storesElements: HTMLLIElement[] = this.state.stores
+                    ?.map((store: AssetFeatureResponse) => {
+                        const properties = store.properties;
+                        const $storeElement: HTMLLIElement = document.createElement('li');
+                        $storeElement.className = "summaryStore";
+                        $storeElement.dataset.storeId = store.properties.store_id;
+                        $storeElement.innerHTML = `
                              <div class="summaryStore__name">${store.properties.name}</div>
                              ${properties.address ? `<div class="summaryStore__address">${getReadableAddress(properties.address)}</div>` : ''}
                              ${properties.contact?.phone ? `<div class="summaryStore__phone">${getPhoneLink(properties.contact)}</div>` : ''}
                              ${properties.distance ? `<div class="summaryStore__distance">${getReadableDistance(properties.distance)}</div>` : ''}`
-                    $storeElement.addEventListener('click', () => {
-                        this.emit('store_selected', store)
-                    });
-                    return $storeElement;
-                })
-            this.$target.scrollTo(0, 0);
-            this.$element.replaceChildren(...storesElements)
+                        $storeElement.addEventListener('click', () => {
+                            this.emit('store_selected', store)
+                        });
+                        return $storeElement;
+                    })
+                this.$target.scrollTo(0, 0);
+                this.$element.replaceChildren(...storesElements)
+            } else {
+                const $emptyResults: HTMLDivElement = document.createElement('div');
+                const mesqageHeader = this.state.stores
+                    ? "No Stores Returned"
+                    : "Start by Searching a Locality";
+                const mesqageBody = this.state.stores
+                    ? "Please Search a locality elsewhere or unselect your filters"
+                    : "Or click on the Map to select a store";
+                $emptyResults.innerHTML = `
+                <div class="summaryStore__empty">
+                    <div>
+                        <img src="${emptyListImage}" width="120">
+                    </div>
+                    <h3>${mesqageHeader}</h3>
+                    <div>${mesqageBody}</div>
+                <div>`
+                this.$element.replaceChildren($emptyResults)
+            }
         }
     }
 

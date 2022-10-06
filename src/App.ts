@@ -45,9 +45,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
             })
             const storesListComponent = new StoresListComponent({
                 $target: document.getElementById(Selectors.listStoresContainerID) as HTMLElement,
-                initialState: {
-                    stores: []
-                }
+                initialState: {}
             })
             const storeDetailsComponent = new StoreDetailsComponent({
                 $target: document.getElementById(Selectors.detailsStoreContainerID) as HTMLElement,

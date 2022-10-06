@@ -34,5 +34,13 @@
       color: $dark-grey;
       line-height: 1.5em;
     }
+
+    &__empty {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 1.4rem;
+    }
   }
 }
