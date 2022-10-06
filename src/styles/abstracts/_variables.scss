@@ -8,8 +8,9 @@ $text-color: rgb(29, 29, 29) !default;
 
 /// Main brand color
 /// @type Color
-$brand-color: rgb(255, 171, 0) !default;
-
+$brand-color: rgba(69, 90, 100) !default;
+$brand-color-light: rgba(113, 135, 146) !default;
+$brand-color-dark: rgba(28, 49, 58) !default;
 
 /// Light grey
 /// @type Color
@@ -41,3 +42,13 @@ $breakpoints: (
 /// @example scss - When using a CDN
 ///   $base-url: 'https://cdn.example.com/assets/';
 $base-url: '/assets/' !default;
+
+
+/// Selectors map
+/// @prop {String} keys - Keys are identifiers mapped to a given c
+/// @prop {Map} values - Values are actual selector ID
+$selectors: (
+        filterPanelContainerID : "#filterPanelContainer",
+        listStoresContainerID : "#listStoresContainer",
+        detailsStoreContainerID : "#detailsStoreContainer",
+);

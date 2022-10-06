@@ -42,18 +42,7 @@ export default class StoreDetailsComponent extends Component<IStoreDetailsCompon
                 htmlElements.push($backBtn, $storeDetails)
                 this.$element.replaceChildren(...htmlElements)
                 this.$target.scrollTo(0, 0);
-                this.show();
-            } else {
-                this.hide();
             }
         }
-    }
-
-    hide(): void {
-        this.$target.setAttribute('style', 'display:none');
-    }
-
-    show(): void {
-        this.$target.setAttribute('style', '');
     }
 }

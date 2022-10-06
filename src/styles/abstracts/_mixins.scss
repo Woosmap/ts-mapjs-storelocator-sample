@@ -27,17 +27,43 @@
 /// @param {String} $base64Image - the Base 64 encoded image
 
 @mixin link-image($base64Image) {
-  padding: 0.2em 0;
-  margin-left: 20px;
+  padding: 0.3em 0;
+  margin-left: 24px;
   color: inherit;
 
   &:before {
     content: "";
-    background-size: 16px 16px;
+    background-size: 18px 18px;
+    background-position: center;
     background-repeat: no-repeat;
-    padding-right: 20px;
+    padding-right: 24px;
     vertical-align: middle;
-    margin-left: -20px;
+    margin-left: -24px;
     background-image: url($base64Image);
+  }
+}
+
+
+@mixin hide($selector) {
+  $selector: map-get($selectors, $selector);
+  @if $selector {
+    #{$selector} {
+      display: none;
+    }
+  } @else {
+    @error 'No value found for `#{$selector}`. '
+         + 'Please make sure it is defined in `$selectors` map.';
+  }
+}
+
+@mixin show($selector) {
+  $selector: map-get($selectors, $selector);
+  @if $selector {
+    #{$selector} {
+      display: flex;
+    }
+  } @else {
+    @error 'No value found for `#{$selector}`. '
+         + 'Please make sure it is defined in `$selectors` map.';
   }
 }

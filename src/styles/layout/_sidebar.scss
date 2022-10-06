@@ -14,6 +14,8 @@ $max-width: 390px !default;
   box-shadow: 0 -2px 4px 0 rgba(0, 0, 0, 0.12);
   bottom: 0;
   top: 45%;
+  width: 100%;
+  z-index: 2;
 
   @include respond-to('medium') {
     min-width: $min-width;
@@ -43,5 +45,16 @@ $max-width: 390px !default;
       }
     }
 
+    &.list_view {
+      @include show(filterPanelContainerID);
+      @include show(listStoresContainerID);
+      @include hide(detailsStoreContainerID);
+    }
+
+    &.details_view {
+      @include hide(filterPanelContainerID);
+      @include hide(listStoresContainerID);
+      @include show(detailsStoreContainerID);
+    }
   }
 }

@@ -14,6 +14,7 @@ export interface IMapComponent {
     nearbyLocation?: woosmap.map.LatLngLiteral;
     selectedStore?: AssetFeatureResponse | null;
     stores?: woosmap.map.GeoJSONFeature[];
+    query?: string;
 }
 
 export default class MapComponent extends Component<IMapComponent> {
@@ -77,6 +78,9 @@ export default class MapComponent extends Component<IMapComponent> {
         })
         this.on('store_unselected', () => {
             this.selectStore();
+        })
+        this.on('filters_updated', () => {
+            this.updateFilters();
         })
     }
 
@@ -157,8 +161,15 @@ export default class MapComponent extends Component<IMapComponent> {
 
     }
 
-    updatePadding() {
+    updatePadding(): void {
         this.padding = mapPaddings.full;
     }
 
+    updateFilters(): void {
+        if (this.state.query) {
+            this.storesOverlay.setQuery(this.state.query);
+        } else {
+            this.storesOverlay.setQuery(undefined);
+        }
+    }
 }

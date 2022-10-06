@@ -1,7 +1,60 @@
 #filterPanelContainer {
-  background: #fff;
+  background: $brand-color;
   flex-direction: column;
   justify-content: space-between;
   display: flex;
-  overflow: auto;
+  max-height: 350px;
+  padding: .8rem 0;
+
+  .filterHeader {
+    font-weight: 600;
+    @include link-image("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='48' width='48'%3E%3Cpath d='M22 40q-.85 0-1.425-.575Q20 38.85 20 38V26L8.05 10.75q-.7-.85-.2-1.8Q8.35 8 9.4 8h29.2q1.05 0 1.55.95t-.2 1.8L28 26v12q0 .85-.575 1.425Q26.85 40 26 40Z' fill='white'/%3E%3C/svg%3E");
+    margin-left: 28px;
+
+    &:before {
+      margin-left: -36px;
+      padding-right: 36px;
+    }
+
+    padding: .2rem 1.4rem .6rem;
+  }
+
+  .filterList {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    height: 100%;
+    overflow: auto;
+
+    button {
+      position: relative;
+      text-align: left;
+      width: 100%;
+      border-radius: 0;
+      padding: 1.3rem;
+      border: none;
+      margin: 0;
+    }
+
+    &__serviceName {
+      flex-grow: 1
+    }
+
+    &__iconWrapper {
+      width: 21px;
+      height: 21px;
+      display: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns= 'http://www.w3.org/2000/svg' viewBox= '0 0 24 24' focusable= 'false' style= 'width: 21px;height: 21px;' %3E%3Cpath d= 'M4.29 12.104c-.277-.308-.75-.332-1.06-.054-.306.278-.33.752-.053 1.06l4.485 4.963c.29.322.795.33 1.096.017L20.414 6.003c.288-.298.28-.773-.02-1.06-.297-.288-.772-.28-1.06.02L8.237 16.47 4.29 12.105z' fill= '%2300a862' %3E%3C/path%3E%3C/svg%3E");
+    }
+
+    li.active {
+      button{
+        background-color: $lighter-grey;
+      }
+
+      .filterList__iconWrapper {
+        display: block;
+      }
+    }
+  }
 }

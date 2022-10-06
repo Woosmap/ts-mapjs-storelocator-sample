@@ -1,15 +1,32 @@
 import Component from '../component';
 import {AssetFeatureResponse} from "../../types/stores/asset_response";
 import {getPhoneLink, getReadableAddress, getReadableDistance} from "../../helpers/stores";
+import {SearchAPIParameters} from "../../configuration/search.config";
+import {WoosmapApiClient} from "../../services/woosmap_stores";
+import {WoosmapPublicKey} from "../../configuration/map.config";
 
 export interface IStoresListComponent {
     stores: AssetFeatureResponse[];
+    nearbyLocation?: woosmap.map.LatLngLiteral;
+    query?: string;
 }
 
 export default class StoresListComponent extends Component<IStoresListComponent> {
+    private api!: WoosmapApiClient;
+
     init(): void {
+        this.api = new WoosmapApiClient(WoosmapPublicKey);
         this.$element = document.createElement('ul');
         this.$target.appendChild(this.$element);
+        this.on('locality_changed', () => {
+                this.searchStores();
+            }
+        )
+        this.on('query_changed', () => {
+                this.searchStores();
+            }
+        )
+
     }
 
     render(): void {
@@ -32,16 +49,28 @@ export default class StoresListComponent extends Component<IStoresListComponent>
                 })
             this.$target.scrollTo(0, 0);
             this.$element.replaceChildren(...storesElements)
-            this.show();
         }
     }
 
-    hide(): void {
-        this.$target.setAttribute('style', 'display:none');
+    searchStores(): void {
+        if (this.state.nearbyLocation) {
+            let params = Object.assign({}, SearchAPIParameters, {
+                lat: this.state.nearbyLocation.lat,
+                lng: this.state.nearbyLocation.lng
+            })
+            if (this.state.query) {
+                params = Object.assign({}, params, {
+                    query: this.state.query
+                })
+            }
+            this.api.searchStores(params)
+                .then(response => {
+                    const storesList = response?.features.map((store) => store);
+                    this.emit('stores_changed', storesList);
+                    this.setState({stores: storesList})
+                }).catch(exception => {
+                console.error(exception);
+            });
+        }
     }
-
-    show(): void {
-        this.$target.setAttribute('style', '');
-    }
-
 }
