@@ -1,5 +1,5 @@
 import Component from '../component';
-import {AssetFeatureResponse} from "../../types/stores/asset_response";
+import {AssetFeatureResponse} from "../../types/stores";
 import {getPhoneLink, getReadableAddress, getReadableDistance} from "../../helpers/stores";
 import {SearchAPIParameters} from "../../configuration/search.config";
 import {WoosmapApiClient} from "../../services/woosmap_stores";

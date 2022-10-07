@@ -3,7 +3,7 @@ import {
     AssetContact,
     AssetOpeningHoursPeriod,
     AssetResponse, AssetWeeklyOpeningResponse
-} from "../types/stores/asset_response";
+} from "../types/stores";
 import {availableServices} from "../configuration/search.config";
 
 export function getReadableAddress(address: AssetAddress | undefined): string {

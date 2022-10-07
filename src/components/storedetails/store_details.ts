@@ -1,5 +1,5 @@
 import Component from '../component';
-import {AssetFeatureResponse} from "../../types/stores/asset_response";
+import {AssetFeatureResponse} from "../../types/stores";
 import {
     getOpeningLabel,
     getOpeningWeekList,

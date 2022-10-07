@@ -1,4 +1,4 @@
-import {AssetFeatureCollectionResponse} from "../types/stores/asset_response";
+import {AssetFeatureCollectionResponse} from "../types/stores";
 import Urls from "../configuration/urls.config";
 import {objectToQueryString} from "../utils/utils";
 

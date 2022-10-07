@@ -2,7 +2,7 @@ import Component from '../component';
 import Urls from "../../configuration/urls.config";
 import {loadScript} from '../../utils/load_script';
 import Selectors from "../../configuration/selectors.config";
-import {AssetFeatureResponse} from "../../types/stores/asset_response";
+import {AssetFeatureResponse} from "../../types/stores";
 import GeoJSONFeature = woosmap.map.GeoJSONFeature;
 import Styler from "../../helpers/styler";
 import {mapPaddings} from "../../configuration/map.config";
