@@ -1,0 +1,181 @@
+#directionsInstructionsContainer {
+  display: flex;
+  z-index: 2;
+  background-color: #fff;
+  flex-direction: column;
+  flex: 1 0 0;
+  position: relative;
+  inset: 0;
+  overflow: hidden;
+}
+
+.routeRoadbook {
+  flex-direction: column;
+  flex: 1 0 0;
+  display: flex;
+  overflow: hidden;
+
+  &__header {
+    flex: none;
+    display: flex;
+    background: $brand-color;
+    padding: 1.3rem;
+    box-sizing: border-box;
+  }
+
+  &__headerBack {
+    background: no-repeat url(https://images.woosmap.com/directions/back.png);
+    background-size: 24px 24px;
+    flex: 0 0 24px;
+    cursor: pointer;
+    margin: 0 20px 0 -4px;
+  }
+
+  &__headerFromTo {
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+
+  &__headerTo, &__headerFrom {
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  &__headerWaypoint {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 13px;
+    line-height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__summaryHeader {
+    font-size: 20px;
+    flex: 1 1 auto;
+    color: #008248;
+    padding: 1.3rem;
+    border-bottom: 1px solid #e6e6e6;
+  }
+
+  &__summarySubtitle {
+    color: rgba(0, 0, 0, 0.54);
+    font-weight: 300;
+  }
+
+  &__summaryDescription {
+    display: block;
+    color: rgba(0, 0, 0, 0.54);
+    font-size: 13px;
+    padding-top: 8px;
+  }
+
+  &__waypoint {
+    padding: 1.3rem;
+
+    h4 {
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: baseline;
+    float: right;
+    margin: 1.2rem 1.3rem 0 0;
+  }
+
+  &__actionsButton {
+    height: 24px;
+    width: 24px;
+    background: no-repeat url(https://images.woosmap.com/directions/share.png);
+    background-size: 24px 24px;
+    opacity: 0.54;
+    margin-left: 12px;
+    cursor: pointer;
+
+    :hover {
+      opacity: 0.87;
+    }
+  }
+
+  &__steps {
+    padding: 1.3rem 1.3rem 0;
+  }
+
+  &__body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    &.active {
+      &:before {
+        z-index: 2;
+        content: "";
+        width: 100%;
+        height: 14px;
+        position: absolute;
+        box-shadow: inset 0 14px 10px -10px rgb(60 64 67 / 28%);
+      }
+    }
+  }
+
+  &__step {
+    position: relative;
+    padding: 1.3rem 0 1.3rem 2rem;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    box-sizing: border-box;
+    display: inline-block;
+  }
+
+  &__stepBody {
+    font-size: 0.875rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.25rem;
+  }
+
+  &__stepDistance {
+    position: relative;
+    font-size: 0.75rem;
+    letter-spacing: 0;
+    line-height: 1rem;
+    color: rgba(0, 0, 0, 0.54);
+    padding-left: 2rem;
+  }
+
+  &__stepDistanceSeparator {
+    border-bottom: 1px solid #e6e6e6;
+  }
+
+  &__stepDistanceText {
+    display: inline-block;
+    position: absolute;
+    top: -7px;
+    background-color: #fff;
+    padding-right: 5px;
+    z-index: 1;
+  }
+
+  &__stepIcon {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 1.3rem;
+
+    img {
+      height: 18px;
+      aspect-ratio: auto 18 / 18;
+      width: 18px;
+    }
+
+    &reverse {
+      transform: scaleX(-1);
+    }
+  }
+
+}

@@ -1,0 +1,85 @@
+#directionsContainer {
+  position: relative;
+  inset: 0;
+  z-index: 2;
+  display: none;
+  flex-direction: column;
+  flex-shrink: 0;
+  flex-grow: 1;
+  flex-basis: 0;
+  overflow: hidden;
+  background-color: white;
+
+  #directionsInputs {
+    padding: 1.3rem;
+    background-color: $brand-color;
+    position: relative;
+
+    #directionsHeader {
+      position: relative;
+    }
+
+    #odInputs {
+      position: relative;
+      max-width: 96%;
+
+      #directionsOrigin,
+      #directionsDestination {
+        margin-top: 0.7rem;
+      }
+    }
+  }
+
+  #directionsResults {
+    display: flex;
+    flex-direction: column;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    z-index: 2;
+    overflow-y: auto;
+
+    ul {
+      margin: 0 !important;
+      padding: 0;
+      list-style: none;
+    }
+
+    button {
+      border: none;
+    }
+  }
+
+  .directionTrip {
+    position: relative;
+    padding: 1.3rem;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid #e6e6e6;
+    color: rgba(0, 0, 0, 0.54);
+    flex: none;
+  }
+
+  .closeDirections {
+    cursor: pointer;
+    background: url(https://images.woosmap.com/directions/close.png?v=2) center no-repeat;
+    background-size: 24px 24px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 48px;
+    width: 48px;
+    z-index: 1;
+  }
+
+}
+
+.markerLabel {
+  font-weight: 600 !important;
+  color: rgba(0, 0, 0, 0.75) !important;
+  text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+  font-size: 15px  !important;
+}
+

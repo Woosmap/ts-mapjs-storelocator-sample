@@ -1,0 +1,65 @@
+.directionTrip {
+  &__selected {
+    :before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-left: 5px solid $brand-color-light;
+      height: 100%;
+    }
+
+    .directionTrip__detailsMsg {
+      display: block;
+    }
+  }
+
+  &__detailsMsg {
+    display: none;
+  }
+
+  &__travelModeIcon {
+    position: absolute;
+    top: 18px;
+    width: 24px;
+    height: 24px;
+    opacity: 0.6;
+  }
+
+  &__description {
+    padding-left: 48px;
+  }
+
+  &__numbers {
+    float: right;
+    text-align: right;
+    padding-left: 10px;
+  }
+
+  &__duration, &__title {
+    color: rgba(0, 0, 0, 0.87);
+    font-size: 15px;
+    vertical-align: top;
+  }
+
+  &__duration {
+    color: #188038;
+  }
+
+  &__distance, &__summary {
+    line-height: 16px;
+    padding: 4px 0;
+    font-size: 13px;
+  }
+
+  &__detailsMsg {
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: #1a73e8;
+  }
+
+  &__empty {
+    padding: 1.3rem;
+  }
+}

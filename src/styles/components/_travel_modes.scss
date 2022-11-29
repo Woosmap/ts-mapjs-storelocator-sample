@@ -1,0 +1,94 @@
+.travelModeSelector {
+  display: flex;
+  align-content: flex-start;
+  justify-content: space-between;
+  max-width: 160px;
+  text-align: center;
+  height: 48px;
+
+  .travelMode {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    z-index: 0;
+
+    button {
+      display: flex;
+      cursor: pointer;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      font: inherit;
+      list-style: none;
+      margin: 0;
+      outline: 0;
+      overflow: visible;
+      padding: 0;
+      vertical-align: baseline;
+      position: relative;
+    }
+
+    .iconTravelMode {
+      width: 24px;
+      height: 24px;
+      margin: 12px 9px 11px 9px;
+
+      &__DRIVING,
+      &__WALKING,
+      &__CYCLING {
+        display: block;
+
+        &__selected {
+          display: none;
+        }
+
+        .travelMode__selected & {
+          display: none;
+        }
+      }
+    }
+
+    &__selected {
+      button {
+        cursor: default;
+      }
+
+      .iconTravelMode {
+        &__DRIVING,
+        &__WALKING,
+        &__CYCLING {
+          display: none;
+
+          &__selected {
+            display: block;
+          }
+        }
+      }
+
+      &::after {
+        background-color: rgba(0, 0, 0, 0.25);
+      }
+    }
+
+    &::after,
+    button::after {
+      content: "";
+      border-radius: 100%;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: -1;
+      margin: 6px 3px 5px 3px;
+      height: 36px;
+      width: 36px;
+    }
+
+    &:hover {
+      & button:after {
+        background-color: rgba(0, 0, 0, 0.15);
+      }
+    }
+  }
+}
