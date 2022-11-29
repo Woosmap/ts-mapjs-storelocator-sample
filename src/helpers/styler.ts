@@ -1,13 +1,13 @@
-type IconType = 'icon' | 'selectedIcon';
+type IconType = "icon" | "selectedIcon";
 
-export interface RuleOptions {
-    selected?: boolean,
-    types?: Array<string>
+interface RuleOptions {
+    selected?: boolean;
+    types?: Array<string>;
 }
 
-type StyledIcon = {
-    icon: woosmap.map.Icon,
-    type?: string
+interface StyledIcon {
+    icon: woosmap.map.Icon;
+    type?: string;
 }
 
 export default class Styler {
@@ -19,9 +19,9 @@ export default class Styler {
 
     getIconType(options: RuleOptions): IconType {
         if (options.selected) {
-            return 'selectedIcon';
+            return "selectedIcon";
         } else {
-            return 'icon';
+            return "icon";
         }
     }
 
@@ -46,7 +46,6 @@ export default class Styler {
                         }
                     }
                 }
-
             }
         }
 

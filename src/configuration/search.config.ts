@@ -1,4 +1,4 @@
-import {ParamsSearchRequest} from "../services/woosmap_stores";
+import {ParamsSearchRequest} from "../services/api/stores";
 
 export const LocalitiesConf: woosmap.localities.AutocompleteParameters = {
     minLength: 0,
