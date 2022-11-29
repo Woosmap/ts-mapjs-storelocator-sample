@@ -1,4 +1,4 @@
-# Woosmap Map StoreLocator Sample
+# Woosmap Map JS API Store Locator Sample
 
 Store Locator sample based on *Woosmap Map JS* using *Typescript* and *VanillaJS* (No framework / Library dependencies).
 
