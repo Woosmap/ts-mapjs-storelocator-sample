@@ -13,6 +13,7 @@ declare global {
     export interface DetailsResponseItem {
       public_id: string;
       name: string;
+      formatted_address: string;
       geometry: {
         location: woosmap.map.LatLngLiteral;
         viewport: woosmap.map.LatLngBounds;

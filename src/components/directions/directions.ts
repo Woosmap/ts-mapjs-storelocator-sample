@@ -96,7 +96,8 @@ export default class DirectionsComponent extends Component<IDirections> {
             }
             searchOriginComponent.on("selected_locality", (locality: woosmap.localities.DetailsResponseItem) => {
                     const location: woosmap.map.LatLngLiteral = locality.geometry.location;
-                    this.setState({origin: {location: location, name: locality.name}}, true, () => {
+                    console.log(locality);
+                    this.setState({origin: {location: location, name: locality.name || locality.formatted_address}}, true, () => {
                         routesSummaryComponent.setLoading();
                         this.computeRoute();
                     });
@@ -104,7 +105,7 @@ export default class DirectionsComponent extends Component<IDirections> {
             );
             searchDestinationComponent.on("selected_locality", (locality: woosmap.localities.DetailsResponseItem) => {
                     const location: woosmap.map.LatLngLiteral = locality.geometry.location;
-                    this.setState({destination: {location: location, name: locality.name}}, true, () => {
+                    this.setState({destination: {location: location, name: locality.name || locality.formatted_address}}, true, () => {
                         routesSummaryComponent.setLoading();
                         this.computeRoute();
                     });
@@ -272,9 +273,11 @@ export default class DirectionsComponent extends Component<IDirections> {
     }
 
     addMarkerLabel(positon: woosmap.map.LatLngLiteral, icon: woosmap.map.Icon, label: string) {
+        console.log(label)
         const iconWidth = (icon.scaledSize as woosmap.map.SizeLiteral).width;
-        const anchorPoint = new woosmap.map.Point(Math.ceil(getTextWidth(label) / 2 + iconWidth + 2), Math.round(iconWidth / 2));
-        icon.labelOrigin = anchorPoint,
+        const anchorLabelPoint = new woosmap.map.Point(Math.ceil(getTextWidth(label) / 2 + iconWidth + 2), Math.round(iconWidth / 2));
+        console.log(label, anchorLabelPoint)
+        icon.labelOrigin = anchorLabelPoint;
             this.directionMarkers.push(new woosmap.map.Marker({
                 label: {
                     text: label,
