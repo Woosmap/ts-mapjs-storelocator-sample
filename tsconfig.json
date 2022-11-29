@@ -7,19 +7,10 @@
     "esModuleInterop": true,
     "sourceMap": true,
     "allowJs": true,
-    "lib": [
-      "es6",
-      "dom",
-      "es2017.object"
-    ],
+    "lib": ["es6", "dom", "es2017.object", "es2018.promise"],
     "rootDir": "src",
     "moduleResolution": "node",
-    "typeRoots": [
-      "./src/types",
-      "./node_modules/@types"
-    ]
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"]
 }
