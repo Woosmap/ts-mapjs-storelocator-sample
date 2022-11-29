@@ -1,25 +1,25 @@
-import Component from '../component';
+import Component from "../component";
 import {availableServices} from "../../configuration/search.config";
 
 export interface IFilterComponent {
-    activeFilters?: string[]
+    activeFilters?: string[];
 }
 
 export default class FilterComponent extends Component<IFilterComponent> {
     init(): void {
-        this.$element = <HTMLDivElement>document.createElement('div');
-        this.$element.className = 'filterHeader collapsible';
-        this.$element.innerHTML = `<span class="collapsibleTitle">Services</span><div class="collapsibleIcon"></div>`
-        this.$element.addEventListener('click', () => this.toggleActive());
+        this.$element = <HTMLDivElement>document.createElement("div");
+        this.$element.className = "filterHeader collapsible";
+        this.$element.innerHTML = `<span class="collapsibleTitle">Services</span><div class="collapsibleIcon"></div>`;
+        this.$element.addEventListener("click", () => this.toggleActive());
         this.$target.appendChild(this.$element);
     }
 
     render(): void {
         if (this.state && this.$element) {
-            const $listServices: HTMLUListElement = document.createElement('ul');
-            $listServices.className = 'filterList collapsibleContent';
+            const $listServices: HTMLUListElement = document.createElement("ul");
+            $listServices.className = "filterList collapsibleContent";
             const servicesHTML: HTMLLIElement[] = availableServices.map((service) => {
-                const $service: HTMLLIElement = document.createElement('li');
+                const $service: HTMLLIElement = document.createElement("li");
                 $service.dataset.servicekey = service.serviceKey;
                 $service.dataset.servicename = service.serviceName;
                 $service.innerHTML = `
@@ -27,15 +27,15 @@ export default class FilterComponent extends Component<IFilterComponent> {
                     <div class='iconService iconService__${service.serviceKey}'></div>
                     <div class='filterList__serviceName'>${service.serviceName}</div>
                     <div class="filterList__iconWrapper"></div>
-                    </button>`
+                    </button>`;
                 $service.addEventListener("click", () => {
-                    $service.classList.toggle('active');
+                    $service.classList.toggle("active");
                     this.updateActiveFilters();
                 });
-                return $service
-            })
-            $listServices.replaceChildren(...servicesHTML)
-            this.$target.appendChild($listServices)
+                return $service;
+            });
+            $listServices.replaceChildren(...servicesHTML);
+            this.$target.appendChild($listServices);
         }
     }
 
@@ -51,13 +51,19 @@ export default class FilterComponent extends Component<IFilterComponent> {
 
     updateActiveFilters(): void {
         const filters: string[] = [];
-        const filterElements = document.querySelectorAll<HTMLLIElement>(".filterList .active");
-        filterElements.forEach($filterLI => {
+        const filterElements = document.querySelectorAll<HTMLLIElement>(
+            ".filterList .active"
+        );
+        filterElements.forEach(($filterLI) => {
             if ($filterLI.dataset && $filterLI.dataset.servicekey) {
                 filters.push($filterLI.dataset.servicekey);
             }
         });
-        const queryString: string = filters.map(serviceKey => `tag:${serviceKey}`).join(' and ');
-        this.setState({activeFilters: filters}, true, () => this.emit('filters_updated', queryString))
+        const queryString: string = filters
+            .map((serviceKey) => `tag:${serviceKey}`)
+            .join(" and ");
+        this.setState({activeFilters: filters}, true, () =>
+            this.emit("filters_updated", queryString)
+        );
     }
 }
