@@ -35,7 +35,6 @@ export default class StoreLocator extends Component<IStoreLocator> {
             Selectors.sidebarContentContainerID
         ) as HTMLElement;
         this.styleOnScroll();
-        this.managePadding();
         const searchComponent = new SearchComponent({
             $target: document.getElementById(
                 Selectors.searchWrapperID
@@ -185,6 +184,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
         window.addEventListener('resize', debounce(() => {
             this.managePadding();
         }, 100))
+        this.managePadding();
     }
 
     setDetailsView(): void {
@@ -216,6 +216,8 @@ export default class StoreLocator extends Component<IStoreLocator> {
 
     managePadding(): void {
         const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        //On Mobile, padding from bottom to 56% of Store Locator height
+        mapPaddings.mobile.bottom = Math.round((document.getElementById(Selectors.mapContainerID) as HTMLElement).clientHeight * 0.56);
         if (width >= mobileBreakPoint) {
             this.setState({padding: mapPaddings.full}, true, () => {
                 this.emit("padding_changed")
