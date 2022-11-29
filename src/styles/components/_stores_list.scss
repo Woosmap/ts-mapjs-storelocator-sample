@@ -5,21 +5,20 @@
   flex-direction: column;
   background: white;
 
-
-  ul, li {
+  ul,
+  li {
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-
   .summaryStore {
     font-size: 1rem;
-    padding: .8rem 1.4rem;
+    padding: 0.8rem 1.4rem;
     cursor: pointer;
     vertical-align: middle;
     line-height: 1.7em;
-    border-bottom: 1px solid rgba(0, 0, 0, .08);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 
     &:hover {
       background: $lighter-grey;

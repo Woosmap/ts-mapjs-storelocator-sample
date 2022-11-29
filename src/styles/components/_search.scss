@@ -15,31 +15,30 @@
     flex: 1;
     position: relative;
     justify-content: space-between;
-
-    #searchInput {
-      height: 48px;
-      width: 100%;
-      border: 0;
-      display: block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      padding-right: 2.5rem;
-      padding-left: 1em;
-      font-size: 17px !important;
-      border-bottom-color: transparent;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25), 0 -1px 0 rgba(0, 0, 0, 0.04);
-      border-radius: 6px;
-      transition-property: all;
-      transition-duration: 0.5s;
-    }
   }
 }
 
-
+.search {
+  height: 48px;
+  width: 100%;
+  border: 0;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 2.5rem;
+  padding-left: 1em;
+  font-size: 17px !important;
+  border-bottom-color: transparent;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25), 0 -1px 0 rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
+  transition-property: all;
+  transition-duration: 0.5s;
+}
 
 // override/customize some of woosmap.localities-widget class.
-.localities-input-wrapper, .localities-input-container {
+.localities-input-wrapper,
+.localities-input-container {
   width: 100%;
   position: relative;
 }
@@ -56,7 +55,7 @@
 .localities-empty-button {
   right: 12px;
   width: 24px;
-  background-color: #FFF;
+  background-color: #fff;
   z-index: 1;
   margin-top: 0;
   height: 42px;

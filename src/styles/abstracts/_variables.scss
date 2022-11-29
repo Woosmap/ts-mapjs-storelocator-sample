@@ -1,6 +1,8 @@
 /// Regular font family
 /// @type List
-$text-font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+$text-font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+  "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  sans-serif;
 
 /// Copy text color
 /// @type Color
@@ -32,23 +34,31 @@ $dark-grey: rgb(68, 68, 68) !default;
 /// @prop {String} keys - Keys are identifiers mapped to a given length
 /// @prop {Map} values - Values are actual breakpoints expressed in pixels
 $breakpoints: (
-        'small': (min-width: 320px),
-        'medium': (min-width: 768px),
-        'large': (min-width: 1024px),
+  "small": (
+    min-width: 320px,
+  ),
+  "medium": (
+    min-width: 768px,
+  ),
+  "large": (
+    min-width: 1024px,
+  ),
 ) !default;
 
 /// Relative or absolute URL where all assets are served from
 /// @type String
 /// @example scss - When using a CDN
 ///   $base-url: 'https://cdn.example.com/assets/';
-$base-url: '/assets/' !default;
-
+$base-url: "/assets/" !default;
 
 /// Selectors map
 /// @prop {String} keys - Keys are identifiers mapped to a given c
 /// @prop {Map} values - Values are actual selector ID
 $selectors: (
-        filterPanelContainerID : "#filterPanelContainer",
-        listStoresContainerID : "#listStoresContainer",
-        detailsStoreContainerID : "#detailsStoreContainer",
+  searchContainerID: "#searchContainer",
+  filterPanelContainerID: "#filterPanelContainer",
+  listStoresContainerID: "#listStoresContainer",
+  detailsStoreContainerID: "#detailsStoreContainer",
+  directionsContainerID: "#directionsContainer",
+  roadbookContainerID: "#directionsInstructionsContainer",
 );

@@ -17,7 +17,7 @@ $max-width: 390px !default;
   width: 100%;
   z-index: 2;
 
-  @include respond-to('medium') {
+  @include respond-to("medium") {
     min-width: $min-width;
     max-width: $max-width;
     left: 10px;
@@ -44,17 +44,13 @@ $max-width: 390px !default;
         box-shadow: inset 0 14px 10px -10px rgb(60 64 67 / 28%);
       }
     }
+  }
 
-    &.list_view {
-      @include show(filterPanelContainerID);
-      @include show(listStoresContainerID);
-      @include hide(detailsStoreContainerID);
-    }
+  #loader {
+    display: flex;
 
-    &.details_view {
-      @include hide(filterPanelContainerID);
-      @include hide(listStoresContainerID);
-      @include show(detailsStoreContainerID);
+    img {
+      margin: 1.3rem auto;
     }
   }
 }

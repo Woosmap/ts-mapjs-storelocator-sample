@@ -4,7 +4,7 @@
   flex-grow: 0;
   height: 100%;
   position: relative;
-  @include respond-to('medium') {
+  @include respond-to("medium") {
     flex-basis: 100%;
     order: 2;
     position: relative;

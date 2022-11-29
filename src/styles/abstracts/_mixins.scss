@@ -7,9 +7,9 @@
 
   @if $raw-query {
     $query: if(
-                    type-of($raw-query) == 'string',
-                    unquote($raw-query),
-                    inspect($raw-query)
+      type-of($raw-query) == "string",
+      unquote($raw-query),
+      inspect($raw-query)
     );
 
     @media #{$query} {
@@ -20,7 +20,6 @@
          + 'Please make sure it is defined in `$breakpoints` map.';
   }
 }
-
 
 /// prepend an image to a node
 /// @access public
@@ -42,7 +41,6 @@
     background-image: url($base64Image);
   }
 }
-
 
 @mixin hide($selector) {
   $selector: map-get($selectors, $selector);
