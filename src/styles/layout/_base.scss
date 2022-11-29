@@ -1,15 +1,54 @@
+body {
+  margin: 0;
+}
+
 #StoreLocator {
   display: flex;
   flex-direction: column;
   position: relative;
-  height: 92vh;
-  width: 92vw;
+  height: 100vh;
+  width: 100vw;
   min-height: 600px;
   min-width: 320px;
   margin: 0 auto;
-  margin-top: 4vh;
 
-  @include respond-to('medium') {
+  @include respond-to("medium") {
     flex-direction: row;
+  }
+
+  &.list_view {
+    @include show(filterPanelContainerID);
+    @include show(listStoresContainerID);
+    @include show(searchContainerID);
+    @include hide(detailsStoreContainerID);
+    @include hide(directionsContainerID);
+    @include hide(roadbookContainerID);
+  }
+
+  &.details_view {
+    @include hide(filterPanelContainerID);
+    @include hide(listStoresContainerID);
+    @include show(searchContainerID);
+    @include show(detailsStoreContainerID);
+    @include hide(directionsContainerID);
+    @include hide(roadbookContainerID);
+  }
+
+  &.directions_view {
+    @include hide(filterPanelContainerID);
+    @include hide(listStoresContainerID);
+    @include hide(searchContainerID);
+    @include hide(detailsStoreContainerID);
+    @include show(directionsContainerID);
+    @include hide(roadbookContainerID);
+  }
+
+  &.roadbook_view {
+    @include hide(filterPanelContainerID);
+    @include hide(listStoresContainerID);
+    @include hide(searchContainerID);
+    @include hide(detailsStoreContainerID);
+    @include hide(directionsContainerID);
+    @include show(roadbookContainerID);
   }
 }
