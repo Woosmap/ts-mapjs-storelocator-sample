@@ -44,7 +44,7 @@ export default class RoutesSummaryComponent extends Component<IRoutesSummary> {
                             <div>
                                 <div class="directionTrip__title">via ${summary}</div>
                                 <div class="directionTrip__summary">
-                                    <div >${duration} sans circulation</div>
+                                    <div >${duration} without traffic</div>
                                 </div>
                             </div>
                             <div class="directionTrip__detailsMsg" data-detailsindex="{{ rendererIndex }}">Details</div>
