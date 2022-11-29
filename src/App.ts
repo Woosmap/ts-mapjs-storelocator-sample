@@ -103,6 +103,11 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 storesListComponent.setState({nearbyLocation: location}, true, () =>
                     storesListComponent.emit("locality_changed")
                 );
+                directionsComponent.setState({
+                        origin: {location: location, name: locality.name || locality.formatted_address}
+                    }, true, () =>
+                        directionsComponent.emit("destination_changed")
+                );
                 this.setListView();
             }
         );
