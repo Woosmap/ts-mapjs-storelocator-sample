@@ -271,17 +271,16 @@ export default class DirectionsComponent extends Component<IDirections> {
         });
     }
 
-    addMarkerLabel(positon: woosmap.map.LatLngLiteral, icon: woosmap.map.Icon, label: string) {
+    addMarkerLabel(positon: woosmap.map.LatLngLiteral, icon: woosmap.map.Icon, label: string): void {
         const iconWidth = (icon.scaledSize as woosmap.map.SizeLiteral).width;
-        const anchorLabelPoint = new woosmap.map.Point(Math.ceil(getTextWidth(label) / 2 + iconWidth + 2), Math.round(iconWidth / 2));
-        icon.labelOrigin = anchorLabelPoint;
-            this.directionMarkers.push(new woosmap.map.Marker({
-                label: {
-                    text: label,
-                    className: "markerLabel",
-                },
-                position: positon,
-                icon: icon,
+        icon.labelOrigin = new woosmap.map.Point(Math.ceil(getTextWidth(label) / 2 + iconWidth + 2), Math.round(iconWidth / 2));
+        this.directionMarkers.push(new woosmap.map.Marker({
+            label: {
+                text: label,
+                className: "markerLabel",
+            },
+            position: positon,
+            icon: icon,
                 map: this.map
             }));
     }
