@@ -48,7 +48,6 @@ export default class DirectionsComponent extends Component<IDirections> {
             const $closeBtn: HTMLButtonElement = document.createElement("button");
             $closeBtn.className = "closeDirections"
             $closeBtn.addEventListener("click", () => {
-                this.cleanRoutes();
                 this.emit("close_directions")
             });
             (document.getElementById("directionsHeader") as HTMLDivElement).append($closeBtn);
@@ -184,6 +183,10 @@ export default class DirectionsComponent extends Component<IDirections> {
                 })
             });
 
+            this.on("close_directions", () => {
+                this.cleanRoutes(true);
+            })
+
         }
     }
 
@@ -221,8 +224,7 @@ export default class DirectionsComponent extends Component<IDirections> {
                         directionsResult: {routes: []},
                         selectedRouteIndex: 0
                     }, true);
-                    this.directionsRenderer.setMap(null);
-                    this.removeMarkers();
+                    this.cleanRoutes();
                 })
                 .finally(() => {
                     this.emit("routes_changed");
@@ -230,13 +232,17 @@ export default class DirectionsComponent extends Component<IDirections> {
         }
     }
 
-    cleanRoutes(): void {
+    cleanRoutes(preserveMarkers?: boolean): void {
         this.directionsRenderer.setMap(null);
         this.removeMarkers();
+        if (!preserveMarkers) {
+            this.directionMarkers = [];
+        }
     }
 
     updateRoutes(): void {
         if (this.state.directionsResult && this.state.directionsResult.routes && this.state.directionsResult.routes.length) {
+            this.cleanRoutes();
             this.bounds = new woosmap.map.LatLngBounds();
             for (let routeIndex = 0; routeIndex < this.state.directionsResult.routes.length; routeIndex++) {
                 const route = this.state.directionsResult.routes[routeIndex];
@@ -248,7 +254,6 @@ export default class DirectionsComponent extends Component<IDirections> {
                 }
             }
             this.directionsRenderer.setDirections(this.state.directionsResult);
-            this.removeMarkers();
             this.directionsRenderer.setMap(this.map);
             this.fitToRouteBounds(this.bounds);
             if (this.state.origin && this.state.destination) {
@@ -256,8 +261,7 @@ export default class DirectionsComponent extends Component<IDirections> {
                 this.addMarkerLabel(this.state.destination.location, iconsDirections.end, this.state.destination.name);
             }
         } else {
-            this.directionsRenderer.setMap(null);
-            this.removeMarkers();
+            this.cleanRoutes();
         }
     }
 
