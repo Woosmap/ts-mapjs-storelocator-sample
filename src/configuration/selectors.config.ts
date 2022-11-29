@@ -8,7 +8,10 @@ enum Selectors {
     searchInputID = "searchInput",
     filterPanelContainerID = "filterPanelContainer",
     listStoresContainerID = "listStoresContainer",
-    detailsStoreContainerID = "detailsStoreContainer"
+    detailsStoreContainerID = "detailsStoreContainer",
+    directionsContainerID = "directionsContainer",
+    travelModeContainerID = "travelModeContainer",
+    roadbookContainerID = "directionsInstructionsContainer",
 }
 
 export default Selectors;
