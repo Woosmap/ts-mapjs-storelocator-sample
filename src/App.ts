@@ -154,10 +154,13 @@ export default class StoreLocator extends Component<IStoreLocator> {
                         lng: selectedStore.geometry.coordinates[0],
                     },
                 };
-                directionsComponent.setState({destination: destination}, true, () =>
-                    directionsComponent.emit("destination_changed")
-                );
-                directionsComponent.emit("directions_show");
+                if (directionsComponent.checkNeedUpdate({destination: destination})) {
+                    directionsComponent.setState({destination: destination}, true, () =>
+                        directionsComponent.emit("destination_changed")
+                    );
+                } else {
+                    directionsComponent.emit("directions_show");
+                }
                 this.setDirectionsView();
             }
         );
