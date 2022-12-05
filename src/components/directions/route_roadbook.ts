@@ -66,6 +66,8 @@ export default class RouteRoadbookComponent extends Component<IRouteRoadbook> {
                 return `<div class="routeRoadbook__stepIcon routeRoadbook__stepIcon${className}">
                             <img alt="${stepIconObj.key}" src="${stepIconObj.icon}">
                         </div>`;
+            } else {
+                return `<div class="routeRoadbook__stepIcon routeRoadbook__stepIcon${action}"></div>`;
             }
         }
         return "";
