@@ -1,7 +1,7 @@
 import Component from "../component";
 import Selectors from "../../configuration/selectors.config";
 import TravelModeComponent from "./travel_mode";
-import SearchComponent from "../search/search";
+import SearchComponent, {SearchLocation} from "../search/search";
 import {WoosmapPublicKey} from "../../configuration/map.config";
 import {LocalitiesConf} from "../../configuration/search.config";
 import {WoosmapApiClient} from "../../services/woosmap_api";
@@ -9,21 +9,18 @@ import {decodePolyline, getTextWidth} from "../../utils/utils";
 import RoutesSummaryComponent from "./routes_summary";
 import RouteRoadbookComponent from "./route_roadbook";
 import {iconsDirections} from "../../configuration/directions.config";
-
-export interface IDirectionInput {
-    name: string;
-    location: woosmap.map.LatLngLiteral;
-}
+import DirectionsOptionsComponent from "./directions_options";
 
 export interface IDirections {
     travelMode: woosmap.map.TravelMode;
     provideRouteAlternatives: boolean;
     unitSystem: woosmap.map.UnitSystem;
-    origin?: IDirectionInput;
-    destination?: IDirectionInput;
+    origin?: SearchLocation;
+    destination?: SearchLocation;
     directionsResult?: woosmap.map.DirectionResult;
     selectedRouteIndex: number;
     padding: woosmap.map.Padding;
+    avoid: string[];
 }
 
 export default class DirectionsComponent extends Component<IDirections> {
@@ -32,7 +29,7 @@ export default class DirectionsComponent extends Component<IDirections> {
     private bounds!: woosmap.map.LatLngBounds;
     private api!: WoosmapApiClient;
     private directionMarkers: woosmap.map.Marker[] = [];
-
+    private routesSummaryComponent!: RoutesSummaryComponent;
 
     init(): void {
         this.$element = document.createElement("div");
@@ -66,6 +63,7 @@ export default class DirectionsComponent extends Component<IDirections> {
                     inputID: "originInput",
                     woosmapPublicKey: WoosmapPublicKey,
                     searchOptions: LocalitiesConf,
+                    featuresBtn: ["geolocate", "clear"]
                 },
             });
             const searchDestinationComponent = new SearchComponent({
@@ -76,9 +74,16 @@ export default class DirectionsComponent extends Component<IDirections> {
                     inputID: "destinationInput",
                     woosmapPublicKey: WoosmapPublicKey,
                     searchOptions: LocalitiesConf,
+                    featuresBtn: ["clear"]
                 },
             });
-            const routesSummaryComponent = new RoutesSummaryComponent({
+            const directionsOptionsComponent = new DirectionsOptionsComponent({
+                $target: document.getElementById(
+                    "directionsOptionsContainer"
+                ) as HTMLElement,
+                initialState: {},
+            });
+            this.routesSummaryComponent = new RoutesSummaryComponent({
                 $target: document.getElementById(
                     "directionsRoutesContainer"
                 ) as HTMLElement,
@@ -86,6 +91,9 @@ export default class DirectionsComponent extends Component<IDirections> {
                     routes: [],
                     travelMode: this.state.travelMode,
                     selectedRouteIndex: 0,
+                    avoid: this.state.avoid,
+                    unitSystem: this.state.unitSystem,
+                    isLoading: false
                 },
             });
             if (this.state.origin) {
@@ -94,25 +102,60 @@ export default class DirectionsComponent extends Component<IDirections> {
             if (this.state.destination) {
                 searchDestinationComponent.setLocality(this.state.destination.name);
             }
-            searchOriginComponent.on("selected_locality", (locality: woosmap.localities.DetailsResponseItem) => {
-                    const location: woosmap.map.LatLngLiteral = locality.geometry.location;
-                    this.setState({origin: {location: location, name: locality.name || locality.formatted_address}}, true, () => {
-                        routesSummaryComponent.setLoading();
+
+            directionsOptionsComponent.on("avoid_updated", (options) => {
+                this.setState({avoid: options}, true, () => {
+                    this.computeRoute();
+                })
+            })
+            directionsOptionsComponent.on("unit_updated", (unit) => {
+                this.setState({unitSystem: unit}, true, () => {
+                    this.computeRoute();
+                })
+            })
+
+            searchOriginComponent.on("selected_locality", (locality: SearchLocation) => {
+                    this.setState({
+                        origin: {
+                            location: locality.location,
+                            name: locality.name
+                        }
+                    }, true, () => {
+                        if (!this.state.destination) {
+                            (document.getElementById('destinationInput') as HTMLInputElement).focus();
+                        }
                         this.computeRoute();
                     });
                 }
             );
-            searchDestinationComponent.on("selected_locality", (locality: woosmap.localities.DetailsResponseItem) => {
-                    const location: woosmap.map.LatLngLiteral = locality.geometry.location;
-                    this.setState({destination: {location: location, name: locality.name || locality.formatted_address}}, true, () => {
-                        routesSummaryComponent.setLoading();
+            searchDestinationComponent.on("selected_locality", (locality: SearchLocation) => {
+                    this.setState({
+                        destination: {
+                            location: locality.location,
+                            name: locality.name
+                        }
+                    }, true, () => {
+                        if (!this.state.origin) {
+                            (document.getElementById('originInput') as HTMLInputElement).focus();
+                        }
                         this.computeRoute();
+                    });
+                }
+            );
+            searchOriginComponent.on("search_clear", () => {
+                    this.setState({origin: undefined}, true, () => {
+                        this.cleanRoutes()
+                    });
+                }
+            );
+            searchDestinationComponent.on("search_clear", () => {
+                    this.setState({destination: undefined}, true, () => {
+                        this.cleanRoutes()
                     });
                 }
             );
             travelModesComponent.on("travelmode_changed", (travelModeKey: woosmap.map.TravelMode) => {
                     this.setState({travelMode: travelModeKey}, true, () => {
-                        routesSummaryComponent.setLoading();
                         this.computeRoute();
                     });
                 }
@@ -123,7 +166,6 @@ export default class DirectionsComponent extends Component<IDirections> {
             });
             this.on("destination_changed", () => {
                 if (this.state.origin && this.state.destination) {
-                    routesSummaryComponent.setLoading();
                     this.computeRoute();
                 }
                 if (this.state.origin) {
@@ -143,7 +185,7 @@ export default class DirectionsComponent extends Component<IDirections> {
                 }
             });
             let routeRoadbookComponent: RouteRoadbookComponent;
-            routesSummaryComponent.on("roadbook_show", () => {
+            this.routesSummaryComponent.on("roadbook_show", () => {
                 if (this.state.directionsResult) {
                     if (!routeRoadbookComponent) {
                         routeRoadbookComponent = new RouteRoadbookComponent({
@@ -160,24 +202,28 @@ export default class DirectionsComponent extends Component<IDirections> {
                 this.emit("roadbook_show");
             });
             this.on("routes_changed", () => {
-                if (this.state.directionsResult) {
-                    routesSummaryComponent.setState({
-                        routes: this.state.directionsResult.routes,
-                        travelMode: this.state.travelMode,
-                        selectedRouteIndex: this.state.selectedRouteIndex,
-                        origin: this.state.origin?.name || "",
-                        destination: this.state.destination?.name || ""
-                    })
-                    this.emit("directions_show");
-                }
+                this.routesSummaryComponent.setState({
+                    routes: this.state.directionsResult?.routes || [],
+                    travelMode: this.state.travelMode,
+                    selectedRouteIndex: this.state.selectedRouteIndex,
+                    origin: this.state.origin?.name || "",
+                    destination: this.state.destination?.name || "",
+                    avoid: this.state.avoid,
+                    unitSystem: this.state.unitSystem,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    error: this.state.directionsResult?.error_message || "",
+                    isLoading: false
+                })
+                this.emit("directions_show");
             });
             this.on("selectedroute_changed", () => {
-                routesSummaryComponent.selectRoute(this.state.selectedRouteIndex)
+                this.routesSummaryComponent.selectRoute(this.state.selectedRouteIndex)
                 if (this.state.directionsResult && routeRoadbookComponent) {
                     routeRoadbookComponent.setState({route: this.state.directionsResult.routes[this.state.selectedRouteIndex]})
                 }
             });
-            routesSummaryComponent.on("routeIndex_changed", (selectedRouteIndex: number) => {
+            this.routesSummaryComponent.on("routeIndex_changed", (selectedRouteIndex: number) => {
                 this.setState({selectedRouteIndex: selectedRouteIndex}, true, () => {
                     this.directionsRenderer.setRouteIndex(this.state.selectedRouteIndex)
                 })
@@ -202,6 +248,7 @@ export default class DirectionsComponent extends Component<IDirections> {
 
     computeRoute(): void {
         if (this.state.origin && this.state.destination) {
+            this.routesSummaryComponent.setState({isLoading: true});
             this.api.distance.route(
                 {
                     origin: `${this.state.origin.location.lat},${this.state.origin.location.lng}`,
@@ -209,7 +256,8 @@ export default class DirectionsComponent extends Component<IDirections> {
                     mode: this.state.travelMode,
                     units: this.state.unitSystem,
                     alternatives: this.state.provideRouteAlternatives,
-                    details: "full"
+                    avoid: this.state.avoid.join("|"),
+                    details: "full",
                 })
                 .then((response) => {
                     this.setState({
@@ -220,6 +268,7 @@ export default class DirectionsComponent extends Component<IDirections> {
                     });
                 })
                 .catch((exception) => {
+                    console.error(exception);
                     this.setState({
                         directionsResult: {routes: []},
                         selectedRouteIndex: 0
@@ -296,14 +345,15 @@ export default class DirectionsComponent extends Component<IDirections> {
                 <div id="${Selectors.travelModeContainerID}"></div>
             </div>
             <div id="odInputs">
-                <form>
+                <div>
                     <div id="directionsOrigin">
                     </div>
                     <div id="directionsDestination">
                     </div>
-                </form>
+                </div>
             </div>
         </div>
+        <div id="directionsOptionsContainer"></div>
         <div id="directionsResults">
             <div id="directionsOptions"></div>
             <div id="directionsRoutesContainer"></div>

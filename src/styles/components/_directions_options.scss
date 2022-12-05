@@ -1,0 +1,48 @@
+#directionsOptionsContainer {
+  background: $brand-color;
+  flex-direction: column;
+  justify-content: space-between;
+  display: flex;
+  max-height: 350px;
+  padding: .8rem 0 .5rem;
+
+  .directionsOptionsHeader {
+    padding: 0.2rem 1.3rem 0.6rem;
+  }
+
+
+  .directionsOptions {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    height: 100%;
+    overflow: auto;
+    background: #fff;
+    display: flex;
+
+    &__list {
+      width: 165px;
+      height: 100%;
+      padding: 0 1.3rem;
+    }
+
+    & > div, & > span{
+      font-size: 0.9rem;
+    }
+
+    &__header {
+      font-weight: 500;
+      height: 28px;
+      display: flex;
+    }
+
+    &__input {
+      height: 28px;
+    }
+
+    &__content {
+      padding: 1rem 0;
+    }
+
+  }
+}

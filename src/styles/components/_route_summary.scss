@@ -62,4 +62,20 @@
   &__empty {
     padding: 1.3rem;
   }
+
+  &__error {
+    margin-top: 1rem;
+    font-size: .9rem;
+
+    &:before {
+      content: "";
+      display: inline-block;
+      background-size: cover;
+      width: 17px;
+      height: 15px;
+      padding-right: 5px;
+      overflow: hidden;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='48' width='48'%3E%3Cpath d='M2 42 24 4l22 38Zm22.2-5.85q.65 0 1.075-.425.425-.425.425-1.075 0-.65-.425-1.075-.425-.425-1.075-.425-.65 0-1.075.425Q22.7 34 22.7 34.65q0 .65.425 1.075.425.425 1.075.425Zm-1.5-5.55h3V19.4h-3Z' fill= '%23F29133' /%3E%3C/svg%3E");
+    }
+  }
 }

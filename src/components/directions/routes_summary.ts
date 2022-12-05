@@ -8,6 +8,10 @@ export interface IRoutesSummary {
     selectedRouteIndex: number;
     origin?: string;
     destination?: string;
+    avoid: string[],
+    unitSystem: woosmap.map.UnitSystem,
+    error?: string,
+    isLoading: boolean
 }
 
 export default class RoutesSummaryComponent extends Component<IRoutesSummary> {
@@ -19,7 +23,9 @@ export default class RoutesSummaryComponent extends Component<IRoutesSummary> {
 
     render(): void {
         if (this.state && this.$element) {
-            if (this.state.routes && this.state.routes.length) {
+            if (this.state.isLoading) {
+                this.setLoading();
+            } else if (this.state.routes && this.state.routes.length) {
                 const routesSummary: HTMLDivElement[] = this.state.routes.map(
                     (route: woosmap.map.DirectionRoute, index: number) => {
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -79,6 +85,9 @@ export default class RoutesSummaryComponent extends Component<IRoutesSummary> {
                             to "<strong>${this.state.destination}</strong>" 
                             for the travel mode: <strong>${this.state.travelMode}</strong>`;
         }
+        if (this.state.error) {
+            messageBody += `<div class="directionTrip__error">${this.state.error}</div>`;
+        }
         $emptyResult.innerHTML = `
                     <div class="directionTrip__empty">
                     <div>${messageBody}</div>
@@ -89,7 +98,7 @@ export default class RoutesSummaryComponent extends Component<IRoutesSummary> {
     setLoading(): void {
         const $loader: HTMLDivElement = document.createElement("div");
         $loader.id = "loader";
-        $loader.innerHTML = `<img al="loading..." src=${loaderImage}>`
+        $loader.innerHTML = `<img alt="loading..." src=${loaderImage}>`
         this.$element.replaceChildren($loader);
     }
 

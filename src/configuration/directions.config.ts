@@ -1,8 +1,20 @@
-export const directionsOptions: Record<string, string | boolean> = {
+export const directionsOptions: Record<string, string | boolean | string[]> = {
     travelMode: 'DRIVING',
     unitSystem: 'METRIC',
-    provideRouteAlternatives: true
+    provideRouteAlternatives: true,
+    avoid: []
 }
+
+export const avoidOptions: Record<string, string>[] = [
+    {paramKey: 'highways', paramTitle: 'Highways'},
+    {paramKey: 'tolls', paramTitle: 'Tolls'},
+    {paramKey: 'ferries', paramTitle: 'Ferries'}
+]
+export const unitOptions: Record<string, string>[] = [
+    {paramKey: 'METRIC', paramTitle: 'km'},
+    {paramKey: 'IMPERIAL', paramTitle: 'miles'}
+]
+
 
 export const travelModes: Record<string, string>[] = [
     {
