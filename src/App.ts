@@ -4,7 +4,7 @@ import {availableServices, LocalitiesConf,} from "./configuration/search.config"
 import {AssetFeatureResponse} from "./types/stores";
 import Component from "./components/component";
 import MapComponent from "./components/map/map";
-import SearchComponent from "./components/search/search";
+import SearchComponent, {SearchLocation} from "./components/search/search";
 import StoreDetailsComponent from "./components/storedetails/store_details";
 import StoresListComponent from "./components/storeslist/stores_list";
 import "./styles/main.scss";
@@ -43,6 +43,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 inputID: Selectors.searchInputID,
                 woosmapPublicKey: WoosmapPublicKey,
                 searchOptions: LocalitiesConf,
+                featuresBtn: ["search", "clear", "geolocate"]
             },
         });
         const mapComponent = new MapComponent({
@@ -63,6 +64,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 provideRouteAlternatives: directionsOptions.provideRouteAlternatives as boolean,
                 travelMode: directionsOptions.travelMode as woosmap.map.TravelMode,
                 unitSystem: directionsOptions.unitSystem as woosmap.map.UnitSystem,
+                avoid: directionsOptions.avoid as string[],
                 selectedRouteIndex: 0
             },
         });
@@ -95,19 +97,23 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 );
             });
         }
-        searchComponent.on(
-            "selected_locality",
-            (locality: woosmap.localities.DetailsResponseItem) => {
-                const location: woosmap.map.LatLngLiteral = locality.geometry.location;
+        searchComponent.on("selected_locality", (locality: SearchLocation) => {
                 storeDetailsComponent.setState({store: undefined});
-                storesListComponent.setState({nearbyLocation: location}, true, () =>
+                storesListComponent.setState({nearbyLocation: locality.location}, true, () =>
                     storesListComponent.emit("locality_changed")
                 );
                 directionsComponent.setState({
-                        origin: {location: location, name: locality.name || locality.formatted_address}
-                    }, true, () =>
-                        directionsComponent.emit("destination_changed")
+                    origin: {location: locality.location, name: locality.name}
+                }, true);
+                this.setListView();
+            }
+        );
+        searchComponent.on("search_clear", () => {
+                storesListComponent.setState({nearbyLocation: undefined, stores: []});
+                mapComponent.setState({selectedStore: undefined, stores: []}, true, () =>
+                    mapComponent.emit("stores_changed")
                 );
+                directionsComponent.setState({origin: undefined}, true);
                 this.setListView();
             }
         );
@@ -134,6 +140,11 @@ export default class StoreLocator extends Component<IStoreLocator> {
         });
         mapComponent.on("map_ready", () => {
             directionsComponent.emit("map_ready", mapComponent.map);
+        });
+        mapComponent.on("store_unselected", () => {
+            if (this.$target.className === "details_view") {
+                this.setListView();
+            }
         });
         storeDetailsComponent.on("directions_show", (selectedStore: AssetFeatureResponse) => {
                 const destination = {
