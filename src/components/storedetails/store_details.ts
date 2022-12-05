@@ -33,7 +33,7 @@ export default class StoreDetailsComponent extends Component<IStoreDetailsCompon
                 $storeDetails.className = "detailsStore";
                 $storeDetails.innerHTML = `
                              <div class="detailsStore__name">${properties.name}</div>
-                             ${properties.types?.length ? `<div class="detailsStore__types">${properties.types.join(" ,")}</div>` : ""}                             
+                             ${properties.types?.length && properties.types instanceof Array ? `<div class="detailsStore__types">${properties.types.join(" ,")}</div>` : ""}                             
                              ${properties.open ? `<div class="detailsStore__opening">${getOpeningLabel(properties)}</div>` : ""}
                              ${properties.address ? `<div class="detailsStore__address">${getReadableAddress(properties.address)}</div>` : ""}
                              ${properties.contact?.phone ? `<div class="detailsStore__phone">${getPhoneLink(properties.contact)}</div>` : ""}
