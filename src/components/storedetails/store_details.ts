@@ -13,6 +13,11 @@ export interface IStoreDetailsComponent {
     store?: AssetFeatureResponse;
 }
 
+export enum StoreDetailsComponentEvents {
+    DIRECTIONS_SHOW = "directions_show",
+    BACK = "back",
+}
+
 export default class StoreDetailsComponent extends Component<IStoreDetailsComponent> {
     init(): void {
         this.$element = document.createElement("div");
@@ -27,7 +32,7 @@ export default class StoreDetailsComponent extends Component<IStoreDetailsCompon
                 const htmlElements: HTMLElement[] = [];
                 const $backBtn: HTMLButtonElement = document.createElement("button");
                 $backBtn.className = "backButton";
-                $backBtn.addEventListener("click", () => this.emit("back"));
+                $backBtn.addEventListener("click", () => this.emit(StoreDetailsComponentEvents.BACK));
                 $backBtn.innerHTML = `<div class="backButton__icon">Back</div>`;
                 const $storeDetails: HTMLDivElement = document.createElement("div");
                 $storeDetails.className = "detailsStore";
@@ -45,7 +50,7 @@ export default class StoreDetailsComponent extends Component<IStoreDetailsCompon
                 this.$element.replaceChildren(...htmlElements);
 
                 (document.querySelector(".getDirections") as HTMLDivElement).addEventListener("click", () => {
-                    this.emit("directions_show", this.state.store)
+                    this.emit(StoreDetailsComponentEvents.DIRECTIONS_SHOW, this.state.store)
                 });
                 this.$target.scrollTo(0, 0);
             }

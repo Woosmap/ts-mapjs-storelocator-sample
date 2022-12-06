@@ -1,15 +1,15 @@
 import Component from "../component";
 import Selectors from "../../configuration/selectors.config";
-import TravelModeComponent from "./travel_mode";
-import SearchComponent, {SearchLocation} from "../search/search";
+import TravelModeComponent, {TravelModeComponentEvents} from "./travel_mode";
+import SearchComponent, {SearchComponentEvents, SearchLocation} from "../search/search";
 import {WoosmapPublicKey} from "../../configuration/map.config";
 import {LocalitiesConf} from "../../configuration/search.config";
 import {WoosmapApiClient} from "../../services/woosmap_api";
 import {decodePolyline, getTextWidth} from "../../utils/utils";
-import RoutesSummaryComponent from "./routes_summary";
-import RouteRoadbookComponent from "./route_roadbook";
+import RoutesSummaryComponent, {RoutesSummaryComponentEvents} from "./routes_summary";
+import RouteRoadbookComponent, {RouteRoadbookComponentEvents} from "./route_roadbook";
 import {iconsDirections} from "../../configuration/directions.config";
-import DirectionsOptionsComponent from "./directions_options";
+import DirectionsOptionsComponent, {DirectionsOptionsComponentEvents} from "./directions_options";
 
 export interface IDirections {
     travelMode: woosmap.map.TravelMode;
@@ -21,6 +21,16 @@ export interface IDirections {
     selectedRouteIndex: number;
     padding: woosmap.map.Padding;
     avoid: string[];
+}
+
+export enum DirectionsComponentEvents {
+    MAP_READY = "map_ready",
+    DIRECTIONS_SHOW = "directions_show",
+    DESTINATION_CHANGED = "destination_changed",
+    ROUTES_CHANGED = "routes_changed",
+    SELECTED_ROUTE_CHANGED = "selected_route_changed",
+    CLOSE_DIRECTIONS = 'close_directions',
+    ROADBOOK_SHOW = "roadbook_show"
 }
 
 export default class DirectionsComponent extends Component<IDirections> {
@@ -45,7 +55,7 @@ export default class DirectionsComponent extends Component<IDirections> {
             const $closeBtn: HTMLButtonElement = document.createElement("button");
             $closeBtn.className = "closeDirections"
             $closeBtn.addEventListener("click", () => {
-                this.emit("close_directions")
+                this.emit(DirectionsComponentEvents.CLOSE_DIRECTIONS)
             });
             (document.getElementById("directionsHeader") as HTMLDivElement).append($closeBtn);
 
@@ -103,18 +113,18 @@ export default class DirectionsComponent extends Component<IDirections> {
                 searchDestinationComponent.setLocality(this.state.destination.name);
             }
 
-            directionsOptionsComponent.on("avoid_updated", (options) => {
+            directionsOptionsComponent.on(DirectionsOptionsComponentEvents.AVOID_UPDATED, (options) => {
                 this.setState({avoid: options}, true, () => {
                     this.computeRoute();
                 })
             })
-            directionsOptionsComponent.on("unit_updated", (unit) => {
+            directionsOptionsComponent.on(DirectionsOptionsComponentEvents.UNIT_UPDATED, (unit) => {
                 this.setState({unitSystem: unit}, true, () => {
                     this.computeRoute();
                 })
             })
 
-            searchOriginComponent.on("selected_locality", (locality: SearchLocation) => {
+            searchOriginComponent.on(SearchComponentEvents.SELECTED_LOCALITY, (locality: SearchLocation) => {
                     this.setState({
                         origin: {
                             location: locality.location,
@@ -128,7 +138,7 @@ export default class DirectionsComponent extends Component<IDirections> {
                     });
                 }
             );
-            searchDestinationComponent.on("selected_locality", (locality: SearchLocation) => {
+            searchDestinationComponent.on(SearchComponentEvents.SELECTED_LOCALITY, (locality: SearchLocation) => {
                     this.setState({
                         destination: {
                             location: locality.location,
@@ -142,29 +152,29 @@ export default class DirectionsComponent extends Component<IDirections> {
                     });
                 }
             );
-            searchOriginComponent.on("search_clear", () => {
+            searchOriginComponent.on(SearchComponentEvents.SEARCH_CLEAR, () => {
                     this.setState({origin: undefined}, true, () => {
                         this.cleanRoutes()
                     });
                 }
             );
-            searchDestinationComponent.on("search_clear", () => {
+            searchDestinationComponent.on(SearchComponentEvents.SEARCH_CLEAR, () => {
                     this.setState({destination: undefined}, true, () => {
                         this.cleanRoutes()
                     });
                 }
             );
-            travelModesComponent.on("travelmode_changed", (travelModeKey: woosmap.map.TravelMode) => {
+            travelModesComponent.on(TravelModeComponentEvents.TRAVEL_MODE_CHANGED, (travelModeKey: woosmap.map.TravelMode) => {
                     this.setState({travelMode: travelModeKey}, true, () => {
                         this.computeRoute();
                     });
                 }
             );
-            this.on("map_ready", (map: woosmap.map.Map) => {
+            this.on(DirectionsComponentEvents.MAP_READY, (map: woosmap.map.Map) => {
                 this.map = map;
                 this.initDirectionRenderer();
             });
-            this.on("destination_changed", () => {
+            this.on(DirectionsComponentEvents.DESTINATION_CHANGED, () => {
                 if (this.state.origin && this.state.destination) {
                     this.computeRoute();
                 }
@@ -175,7 +185,7 @@ export default class DirectionsComponent extends Component<IDirections> {
                     searchDestinationComponent.setLocality(this.state.destination.name);
                 }
             });
-            this.on("directions_show", () => {
+            this.on(DirectionsComponentEvents.DIRECTIONS_SHOW, () => {
                 if (this.state.directionsResult && this.state.directionsResult.routes && this.state.directionsResult.routes.length) {
                     this.directionsRenderer.setMap(this.map);
                     this.directionMarkers.forEach((marker) => {
@@ -185,23 +195,23 @@ export default class DirectionsComponent extends Component<IDirections> {
                 }
             });
             let routeRoadbookComponent: RouteRoadbookComponent;
-            this.routesSummaryComponent.on("roadbook_show", () => {
+            this.routesSummaryComponent.on(RoutesSummaryComponentEvents.ROADBOOK_SHOW, () => {
                 if (this.state.directionsResult) {
                     if (!routeRoadbookComponent) {
                         routeRoadbookComponent = new RouteRoadbookComponent({
                             $target: document.getElementById(Selectors.roadbookContainerID) as HTMLElement,
                             initialState: {route: this.state.directionsResult.routes[this.state.selectedRouteIndex]},
                         });
-                        routeRoadbookComponent.on("back", () => {
-                            this.emit("directions_show");
+                        routeRoadbookComponent.on(RouteRoadbookComponentEvents.BACK, () => {
+                            this.emit(DirectionsComponentEvents.DIRECTIONS_SHOW);
                         });
                     } else {
                         routeRoadbookComponent.setState({route: this.state.directionsResult.routes[this.state.selectedRouteIndex]})
                     }
                 }
-                this.emit("roadbook_show");
+                this.emit(DirectionsComponentEvents.ROADBOOK_SHOW);
             });
-            this.on("routes_changed", () => {
+            this.on(DirectionsComponentEvents.ROUTES_CHANGED, () => {
                 this.routesSummaryComponent.setState({
                     routes: this.state.directionsResult?.routes || [],
                     travelMode: this.state.travelMode,
@@ -215,21 +225,21 @@ export default class DirectionsComponent extends Component<IDirections> {
                     error: this.state.directionsResult?.error_message || "",
                     isLoading: false
                 })
-                this.emit("directions_show");
+                this.emit(DirectionsComponentEvents.DIRECTIONS_SHOW);
             });
-            this.on("selectedroute_changed", () => {
+            this.on(DirectionsComponentEvents.SELECTED_ROUTE_CHANGED, () => {
                 this.routesSummaryComponent.selectRoute(this.state.selectedRouteIndex)
                 if (this.state.directionsResult && routeRoadbookComponent) {
                     routeRoadbookComponent.setState({route: this.state.directionsResult.routes[this.state.selectedRouteIndex]})
                 }
             });
-            this.routesSummaryComponent.on("routeIndex_changed", (selectedRouteIndex: number) => {
+            this.routesSummaryComponent.on(RoutesSummaryComponentEvents.ROUTE_INDEX_CHANGED, (selectedRouteIndex: number) => {
                 this.setState({selectedRouteIndex: selectedRouteIndex}, true, () => {
                     this.directionsRenderer.setRouteIndex(this.state.selectedRouteIndex)
                 })
             });
 
-            this.on("close_directions", () => {
+            this.on(DirectionsComponentEvents.CLOSE_DIRECTIONS, () => {
                 this.cleanRoutes(true);
             })
 
@@ -240,7 +250,7 @@ export default class DirectionsComponent extends Component<IDirections> {
         this.directionsRenderer = new woosmap.map.DirectionsRenderer({preserveViewport: true});
         this.directionsRenderer.addListener("routeIndex_changed", () => {
             this.setState({selectedRouteIndex: this.directionsRenderer.get("routeIndex")}, true, () => {
-                this.emit("selectedroute_changed")
+                this.emit(DirectionsComponentEvents.SELECTED_ROUTE_CHANGED)
             })
         });
         this.computeRoute();
@@ -276,7 +286,7 @@ export default class DirectionsComponent extends Component<IDirections> {
                     this.cleanRoutes();
                 })
                 .finally(() => {
-                    this.emit("routes_changed");
+                    this.emit(DirectionsComponentEvents.ROUTES_CHANGED);
                 })
         }
     }

@@ -3,20 +3,31 @@ import {WoosmapPublicKey, MapOptions, StoresStyle, mobileBreakPoint, mapPaddings
 import {availableServices, LocalitiesConf,} from "./configuration/search.config";
 import {AssetFeatureResponse} from "./types/stores";
 import Component from "./components/component";
-import MapComponent from "./components/map/map";
-import SearchComponent, {SearchLocation} from "./components/search/search";
-import StoreDetailsComponent from "./components/storedetails/store_details";
-import StoresListComponent from "./components/storeslist/stores_list";
+import MapComponent, {MapComponentEvents} from "./components/map/map";
+import SearchComponent, {SearchComponentEvents, SearchLocation} from "./components/search/search";
+import StoreDetailsComponent, {StoreDetailsComponentEvents} from "./components/storedetails/store_details";
+import StoresListComponent, {StoresListComponentEvents} from "./components/storeslist/stores_list";
 import "./styles/main.scss";
-import FilterComponent from "./components/filter/filter";
+import FilterComponent, {FilterComponentEvents} from "./components/filter/filter";
 import GeoJSONFeature = woosmap.map.GeoJSONFeature;
-import DirectionsComponent from "./components/directions/directions";
+import DirectionsComponent, {DirectionsComponentEvents} from "./components/directions/directions";
 import {directionsOptions} from "./configuration/directions.config";
 import {debounce} from "./utils/utils";
 
 export interface IStoreLocator {
     initialSearch?: string;
     padding: woosmap.map.Padding;
+}
+
+export enum StoreLocatorEvents {
+    PADDING_CHANGED = "padding_changed"
+}
+
+export enum StoreLocatorViews {
+    DETAILS_VIEW = "details_view",
+    LIST_VIEW = "list_view",
+    DIRECTIONS_VIEW = "directions_view",
+    ROADBOOK_VIEW = "roadbook_view",
 }
 
 export default class StoreLocator extends Component<IStoreLocator> {
@@ -88,19 +99,19 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 ) as HTMLElement,
                 initialState: {},
             });
-            filterComponent.on("filters_updated", (queryString) => {
+            filterComponent.on(FilterComponentEvents.FILTERS_UPDATED, (queryString) => {
                 storesListComponent.setState({query: queryString}, true, () =>
-                    storesListComponent.emit("query_changed")
+                    storesListComponent.emit(StoresListComponentEvents.QUERY_CHANGED)
                 );
                 mapComponent.setState({query: queryString}, true, () =>
-                    mapComponent.emit("filters_updated")
+                    mapComponent.emit(MapComponentEvents.FILTERS_UPDATED)
                 );
             });
         }
-        searchComponent.on("selected_locality", (locality: SearchLocation) => {
+        searchComponent.on(SearchComponentEvents.SELECTED_LOCALITY, (locality: SearchLocation) => {
                 storeDetailsComponent.setState({store: undefined});
                 storesListComponent.setState({nearbyLocation: locality.location}, true, () =>
-                    storesListComponent.emit("locality_changed")
+                    storesListComponent.emit(StoresListComponentEvents.LOCALITY_CHANGED)
                 );
                 directionsComponent.setState({
                     origin: {location: locality.location, name: locality.name}
@@ -108,23 +119,23 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 this.setListView();
             }
         );
-        searchComponent.on("search_clear", () => {
+        searchComponent.on(SearchComponentEvents.SEARCH_CLEAR, () => {
                 storesListComponent.setState({nearbyLocation: undefined, stores: []});
                 mapComponent.setState({selectedStore: undefined, stores: []}, true, () =>
-                    mapComponent.emit("stores_changed")
+                    mapComponent.emit(MapComponentEvents.STORES_CHANGED)
                 );
                 directionsComponent.setState({origin: undefined}, true);
                 this.setListView();
             }
         );
-        storesListComponent.on("stores_changed", (stores: GeoJSONFeature[]) => {
+        storesListComponent.on(StoresListComponentEvents.STORES_CHANGED, (stores: GeoJSONFeature[]) => {
             mapComponent.setState({selectedStore: undefined}, true);
             mapComponent.setState({stores: stores}, true, () =>
-                mapComponent.emit("stores_changed")
+                mapComponent.emit(MapComponentEvents.STORES_CHANGED)
             );
             this.setListView();
         });
-        storesListComponent.on("store_selected", (selectedStore: AssetFeatureResponse) => {
+        storesListComponent.on(StoresListComponentEvents.STORE_SELECTED, (selectedStore: AssetFeatureResponse) => {
                 storeDetailsComponent.setState({store: selectedStore});
                 mapComponent.setState({selectedStore: selectedStore}, true, () =>
                     mapComponent.selectStore()
@@ -132,21 +143,21 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 this.setDetailsView();
             }
         );
-        storeDetailsComponent.on("back", () => {
+        storeDetailsComponent.on(StoreDetailsComponentEvents.BACK, () => {
             mapComponent.setState({selectedStore: undefined}, true, () =>
-                mapComponent.emit("store_unselected")
+                mapComponent.emit(MapComponentEvents.STORE_UNSELECTED)
             );
             this.setListView();
         });
-        mapComponent.on("map_ready", () => {
-            directionsComponent.emit("map_ready", mapComponent.map);
+        mapComponent.on(MapComponentEvents.MAP_READY, () => {
+            directionsComponent.emit(DirectionsComponentEvents.MAP_READY, mapComponent.map);
         });
-        mapComponent.on("store_unselected", () => {
-            if (this.$target.className === "details_view") {
+        mapComponent.on(MapComponentEvents.STORE_UNSELECTED, () => {
+            if (this.$target.className === StoreLocatorViews.DETAILS_VIEW) {
                 this.setListView();
             }
         });
-        storeDetailsComponent.on("directions_show", (selectedStore: AssetFeatureResponse) => {
+        storeDetailsComponent.on(StoreDetailsComponentEvents.DIRECTIONS_SHOW, (selectedStore: AssetFeatureResponse) => {
                 const destination = {
                     name: selectedStore.properties.name,
                     location: {
@@ -156,18 +167,18 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 };
                 if (directionsComponent.checkNeedUpdate({destination: destination})) {
                     directionsComponent.setState({destination: destination}, true, () =>
-                        directionsComponent.emit("destination_changed")
+                        directionsComponent.emit(DirectionsComponentEvents.DESTINATION_CHANGED)
                     );
                 } else {
-                    directionsComponent.emit("directions_show");
+                    directionsComponent.emit(DirectionsComponentEvents.DIRECTIONS_SHOW);
                 }
                 this.setDirectionsView();
             }
         );
-        mapComponent.on("store_selected", (selectedStore: AssetFeatureResponse) => {
+        mapComponent.on(MapComponentEvents.STORE_SELECTED, (selectedStore: AssetFeatureResponse) => {
             if (selectedStore) {
                 storeDetailsComponent.setState({store: selectedStore});
-                if (this.$target.className === "directions_view" || this.$target.className === "roadbook_view") {
+                if (this.$target.className === StoreLocatorViews.DIRECTIONS_VIEW || this.$target.className === StoreLocatorViews.ROADBOOK_VIEW) {
                     const destination = {
                         name: selectedStore.properties.name,
                         location: {
@@ -176,7 +187,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
                         },
                     };
                     directionsComponent.setState({destination: destination}, true, () => {
-                            directionsComponent.emit("destination_changed")
+                            directionsComponent.emit(DirectionsComponentEvents.DESTINATION_CHANGED)
                         }
                     );
                 } else {
@@ -186,18 +197,18 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 this.setDetailsView();
             }
         });
-        this.on("padding_changed", () => {
+        this.on(StoreLocatorEvents.PADDING_CHANGED, () => {
             directionsComponent.setState({padding: this.state.padding}, true);
             mapComponent.setState({padding: this.state.padding}, true);
         });
 
-        directionsComponent.on("roadbook_show", () => {
+        directionsComponent.on(DirectionsComponentEvents.ROADBOOK_SHOW, () => {
             this.setRoadbookView();
         });
-        directionsComponent.on("directions_show", () => {
+        directionsComponent.on(DirectionsComponentEvents.DIRECTIONS_SHOW, () => {
             this.setDirectionsView();
         });
-        directionsComponent.on("close_directions", () => {
+        directionsComponent.on(DirectionsComponentEvents.CLOSE_DIRECTIONS, () => {
             this.setDetailsView();
         });
         window.addEventListener('resize', debounce(() => {
@@ -207,19 +218,19 @@ export default class StoreLocator extends Component<IStoreLocator> {
     }
 
     setDetailsView(): void {
-        this.$target.className = "details_view";
+        this.$target.className = StoreLocatorViews.DETAILS_VIEW;
     }
 
     setListView(): void {
-        this.$target.className = "list_view";
+        this.$target.className = StoreLocatorViews.LIST_VIEW;
     }
 
     setDirectionsView(): void {
-        this.$target.className = "directions_view";
+        this.$target.className = StoreLocatorViews.DIRECTIONS_VIEW;
     }
 
     setRoadbookView(): void {
-        this.$target.className = "roadbook_view";
+        this.$target.className = StoreLocatorViews.ROADBOOK_VIEW;
     }
 
     styleOnScroll(): void {
@@ -239,11 +250,11 @@ export default class StoreLocator extends Component<IStoreLocator> {
         mapPaddings.mobile.bottom = Math.round((document.getElementById(Selectors.mapContainerID) as HTMLElement).clientHeight * 0.56);
         if (width >= mobileBreakPoint) {
             this.setState({padding: mapPaddings.full}, true, () => {
-                this.emit("padding_changed")
+                this.emit(StoreLocatorEvents.PADDING_CHANGED)
             });
         } else {
             this.setState({padding: mapPaddings.mobile}, true, () => {
-                this.emit("padding_changed")
+                this.emit(StoreLocatorEvents.PADDING_CHANGED)
             });
         }
     }

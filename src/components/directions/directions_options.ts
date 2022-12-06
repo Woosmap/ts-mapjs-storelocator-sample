@@ -6,6 +6,11 @@ export interface IDirectionsOptionsComponent {
     distanceUnit?: woosmap.map.UnitSystem;
 }
 
+export enum DirectionsOptionsComponentEvents {
+    AVOID_UPDATED = "avoid_updated",
+    UNIT_UPDATED = "unit_updated",
+}
+
 export default class DirectionsOptionsComponent extends Component<IDirectionsOptionsComponent> {
     init(): void {
         this.$element = <HTMLDivElement>document.createElement("div");
@@ -88,14 +93,14 @@ export default class DirectionsOptionsComponent extends Component<IDirectionsOpt
             avoids.push($avoidCheckbox.value);
         });
         this.setState({avoidOptions: avoids}, true, () =>
-            this.emit("avoid_updated", avoids)
+            this.emit(DirectionsOptionsComponentEvents.AVOID_UPDATED, avoids)
         );
     }
 
     changeDistanceUnits(): void {
         const distanceUnit = (document.querySelector('input[name="distanceUnits"]:checked') as HTMLInputElement).value as woosmap.map.UnitSystem;
         this.setState({distanceUnit: distanceUnit}, true, () =>
-            this.emit("unit_updated", distanceUnit)
+            this.emit(DirectionsOptionsComponentEvents.UNIT_UPDATED, distanceUnit)
         );
     }
 }

@@ -14,6 +14,12 @@ export interface IRoutesSummary {
     isLoading: boolean
 }
 
+export enum RoutesSummaryComponentEvents {
+    ROUTE_INDEX_CHANGED = "route_index_changed",
+    ROADBOOK_SHOW = "roadbook_show",
+}
+
+
 export default class RoutesSummaryComponent extends Component<IRoutesSummary> {
     init(): void {
         this.$element = <HTMLDivElement>document.createElement("div");
@@ -59,7 +65,7 @@ export default class RoutesSummaryComponent extends Component<IRoutesSummary> {
                             if ($routeSummary.dataset && $routeSummary.dataset.index) {
                                 const routeIndex = Number($routeSummary.dataset.index)
                                 if (routeIndex === this.state.selectedRouteIndex) {
-                                    this.emit("roadbook_show");
+                                    this.emit(RoutesSummaryComponentEvents.ROADBOOK_SHOW);
                                 } else {
                                     this.selectRoute(routeIndex);
                                 }
@@ -114,7 +120,7 @@ export default class RoutesSummaryComponent extends Component<IRoutesSummary> {
                     .querySelectorAll(".directionTrip")
                     .forEach((el) => el.classList.remove("directionTrip__selected"));
                 $routeSummary.classList.add("directionTrip__selected");
-                this.emit("routeIndex_changed", this.state.selectedRouteIndex);
+                this.emit(RoutesSummaryComponentEvents.ROUTE_INDEX_CHANGED, this.state.selectedRouteIndex);
             }
         );
     }

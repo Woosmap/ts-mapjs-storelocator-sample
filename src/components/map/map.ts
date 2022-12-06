@@ -17,6 +17,14 @@ export interface IMapComponent {
     padding: woosmap.map.Padding;
 }
 
+export enum MapComponentEvents {
+    STORES_CHANGED = "stores_changed",
+    STORE_SELECTED = "store_selected",
+    STORE_UNSELECTED = "store_unselected",
+    FILTERS_UPDATED = "filters_updated",
+    MAP_READY = "map_ready"
+}
+
 export default class MapComponent extends Component<IMapComponent> {
     public map!: woosmap.map.Map;
     private storesOverlay!: woosmap.map.StoresOverlay;
@@ -78,24 +86,24 @@ export default class MapComponent extends Component<IMapComponent> {
             this.handleSelectedStore(store);
         });
 
-        this.on("stores_changed", () => {
+        this.on(MapComponentEvents.STORES_CHANGED, () => {
             this.handleStores();
         });
-        this.on("store_selected", () => {
+        this.on(MapComponentEvents.STORE_SELECTED, () => {
             this.selectStore();
         });
-        this.on("store_unselected", () => {
+        this.on(MapComponentEvents.STORE_UNSELECTED, () => {
             this.selectStore();
         });
-        this.on("filters_updated", () => {
+        this.on(MapComponentEvents.FILTERS_UPDATED, () => {
             this.updateFilters();
         });
-        this.emit("map_ready");
+        this.emit(MapComponentEvents.MAP_READY);
     }
 
     handleSelectedStore(store: AssetFeatureResponse): void {
         this.setState({selectedStore: store}, true, () => {
-            this.emit("store_selected", this.state.selectedStore);
+            this.emit(MapComponentEvents.STORE_SELECTED, this.state.selectedStore);
         });
     }
 
@@ -146,9 +154,7 @@ export default class MapComponent extends Component<IMapComponent> {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             this.data.revertStyle();
-            this.data.overrideStyle(
-                feature,
-                this.styler.getStyledIcon({
+            this.data.overrideStyle(feature, this.styler.getStyledIcon({
                     types: (feature as unknown as AssetFeatureResponse).properties.types,
                     selected: true,
                 })

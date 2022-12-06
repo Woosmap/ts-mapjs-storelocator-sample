@@ -6,6 +6,12 @@ export interface IGeolocateComponent {
     error?: GeolocationError | undefined;
 }
 
+export enum GeolocateComponentEvents {
+    GEOLOCATION_FOUND = "geolocation_found",
+    GEOLOCATION_ERROR = "geolocation_error",
+}
+
+
 export default class GeolocateComponent extends Component<IGeolocateComponent> {
     init(): void {
         this.$element = <HTMLDivElement>document.createElement("div");
@@ -37,7 +43,7 @@ export default class GeolocateComponent extends Component<IGeolocateComponent> {
                 accuracy
             }
         }, true, () => {
-            this.emit("geolocation_found", this.state.position)
+            this.emit(GeolocateComponentEvents.GEOLOCATION_FOUND, this.state.position)
         })
     }
 
@@ -52,7 +58,7 @@ export default class GeolocateComponent extends Component<IGeolocateComponent> {
 
     onGeolocationError(error: GeolocationError): void {
         this.setState({error: error, position: undefined}, true, () => {
-            this.emit("geolocation_error")
+            this.emit(GeolocateComponentEvents.GEOLOCATION_ERROR)
         })
     }
 }

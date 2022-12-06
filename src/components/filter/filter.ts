@@ -5,6 +5,11 @@ export interface IFilterComponent {
     activeFilters?: string[];
 }
 
+export enum FilterComponentEvents {
+    FILTERS_UPDATED = 'filters_updated'
+}
+
+
 export default class FilterComponent extends Component<IFilterComponent> {
     init(): void {
         this.$element = <HTMLDivElement>document.createElement("div");
@@ -63,7 +68,7 @@ export default class FilterComponent extends Component<IFilterComponent> {
             .map((serviceKey) => `tag:${serviceKey}`)
             .join(" and ");
         this.setState({activeFilters: filters}, true, () =>
-            this.emit("filters_updated", queryString)
+            this.emit(FilterComponentEvents.FILTERS_UPDATED, queryString)
         );
     }
 }

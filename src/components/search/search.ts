@@ -1,7 +1,7 @@
 import Component from "../component";
 import Urls from "../../configuration/urls.config";
 import {loadScript} from "../../utils/load_script";
-import GeolocateComponent from "./geolocate";
+import GeolocateComponent, {GeolocateComponentEvents} from "./geolocate";
 import {GenericPosition} from "../../services/geolocation";
 
 export interface SearchLocation {
@@ -15,6 +15,11 @@ export interface ISearchComponent {
     searchOptions: woosmap.localities.AutocompleteParameters;
     selectedLocality?: SearchLocation;
     featuresBtn: string[];
+}
+
+export enum SearchComponentEvents {
+    SELECTED_LOCALITY = "selected_locality",
+    SEARCH_CLEAR = "search_clear",
 }
 
 export default class SearchComponent extends Component<ISearchComponent> {
@@ -59,7 +64,7 @@ export default class SearchComponent extends Component<ISearchComponent> {
                 location: locality.geometry.location
             }
             this.setState({selectedLocality: searchLocation}, true)
-            this.emit("selected_locality", searchLocation);
+            this.emit(SearchComponentEvents.SELECTED_LOCALITY, searchLocation);
         });
         const $inputContainer = (document.getElementById(this.state.inputID) as HTMLElement).parentElement as HTMLElement;
         this.state.featuresBtn.forEach((feature: string) => {
@@ -81,7 +86,7 @@ export default class SearchComponent extends Component<ISearchComponent> {
         $searchBtn.innerHTML = `<button type="button" aria-label="Search"></button>`
         $searchBtn.addEventListener("click", () => {
             if (this.state.selectedLocality) {
-                this.emit("selected_locality", this.state.selectedLocality);
+                this.emit(SearchComponentEvents.SELECTED_LOCALITY, this.state.selectedLocality);
             } else {
                 this.$element.focus();
             }
@@ -103,7 +108,7 @@ export default class SearchComponent extends Component<ISearchComponent> {
                 $clearBtn.style.display = 'none';
                 this.$element.focus();
             }
-            this.emit("search_clear");
+            this.emit(SearchComponentEvents.SEARCH_CLEAR);
         });
         ['input', 'locality_changed'].forEach(evt =>
             this.$element.addEventListener(evt, () => {
@@ -123,7 +128,7 @@ export default class SearchComponent extends Component<ISearchComponent> {
             $target: $inputContainer,
             initialState: {},
         });
-        geolocateComponent.on("geolocation_found", (geolocation: GenericPosition) => {
+        geolocateComponent.on(GeolocateComponentEvents.GEOLOCATION_FOUND, (geolocation: GenericPosition) => {
             if (geolocation) {
                 const searchLocation: SearchLocation = {
                     name: geolocation.name,
@@ -134,7 +139,7 @@ export default class SearchComponent extends Component<ISearchComponent> {
                 }
                 this.setLocality("Your location");
                 this.setState({selectedLocality: searchLocation}, true)
-                this.emit("selected_locality", searchLocation);
+                this.emit(SearchComponentEvents.SELECTED_LOCALITY, searchLocation);
             }
         })
     }

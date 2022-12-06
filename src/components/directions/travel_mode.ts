@@ -5,6 +5,10 @@ export interface ITravelModeComponent {
     selectedTravelMode: woosmap.map.TravelMode;
 }
 
+export enum TravelModeComponentEvents {
+    TRAVEL_MODE_CHANGED = "travel_mode_changed",
+}
+
 export default class TravelModeComponent extends Component<ITravelModeComponent> {
     init(): void {
         this.$element = <HTMLDivElement>document.createElement("div");
@@ -42,17 +46,13 @@ export default class TravelModeComponent extends Component<ITravelModeComponent>
     }
 
     toggleTravelMode($travelMode: HTMLDivElement): void {
-        this.setState(
-            {
-                selectedTravelMode: $travelMode.dataset.mode as woosmap.map.TravelMode,
-            },
-            true,
+        this.setState({selectedTravelMode: $travelMode.dataset.mode as woosmap.map.TravelMode}, true,
             () => {
                 document
                     .querySelectorAll(".travelMode")
                     .forEach((el) => el.classList.remove("travelMode__selected"));
                 $travelMode.classList.add("travelMode__selected");
-                this.emit("travelmode_changed", this.state.selectedTravelMode);
+                this.emit(TravelModeComponentEvents.TRAVEL_MODE_CHANGED, this.state.selectedTravelMode);
             }
         );
     }

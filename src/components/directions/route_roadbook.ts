@@ -1,8 +1,12 @@
 import Component from "../component";
-import {stepsIcon, travelModes} from "../../configuration/directions.config";
+import {stepsIcon} from "../../configuration/directions.config";
 
 export interface IRouteRoadbook {
     route: woosmap.map.DirectionRoute;
+}
+
+export enum RouteRoadbookComponentEvents {
+    BACK = "back",
 }
 
 export default class RouteRoadbookComponent extends Component<IRouteRoadbook> {
@@ -46,7 +50,7 @@ export default class RouteRoadbookComponent extends Component<IRouteRoadbook> {
                                 </div>`;
             const $backBtn: HTMLButtonElement = document.createElement("button");
             $backBtn.className = "routeRoadbook__headerBack";
-            $backBtn.addEventListener("click", () => this.emit("back"));
+            $backBtn.addEventListener("click", () => this.emit(RouteRoadbookComponentEvents.BACK));
             $roadbookHeader.prepend($backBtn);
             $roadbookBody.appendChild(this.getHTMLInstructions());
             this.$element.replaceChildren(...[$roadbookHeader, $roadbookBody]);

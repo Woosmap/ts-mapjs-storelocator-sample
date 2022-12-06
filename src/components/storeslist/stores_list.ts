@@ -16,6 +16,13 @@ export interface IStoresListComponent {
     query?: string;
 }
 
+export enum StoresListComponentEvents {
+    STORES_CHANGED = "stores_changed",
+    LOCALITY_CHANGED = "locality_changed",
+    QUERY_CHANGED = "query_changed",
+    STORE_SELECTED = "store_selected",
+}
+
 export default class StoresListComponent extends Component<IStoresListComponent> {
     private api!: WoosmapApiClient;
 
@@ -23,10 +30,10 @@ export default class StoresListComponent extends Component<IStoresListComponent>
         this.api = new WoosmapApiClient({apiKey: WoosmapPublicKey});
         this.$element = document.createElement("ul");
         this.$target.appendChild(this.$element);
-        this.on("locality_changed", () => {
+        this.on(StoresListComponentEvents.LOCALITY_CHANGED, () => {
             this.searchStores();
         });
-        this.on("query_changed", () => {
+        this.on(StoresListComponentEvents.QUERY_CHANGED, () => {
             this.searchStores();
         });
     }
@@ -46,7 +53,7 @@ export default class StoresListComponent extends Component<IStoresListComponent>
                             ${properties.contact?.phone ? `<div class="summaryStore__phone">${getPhoneLink(properties.contact)}</div>` : ""}
                             ${properties.distance ? `<div class="summaryStore__distance">${getReadableDistance(properties.distance)}</div>` : ""}`;
                         $storeElement.addEventListener("click", () => {
-                            this.emit("store_selected", store);
+                            this.emit(StoresListComponentEvents.STORE_SELECTED, store);
                         });
                         return $storeElement;
                     }
@@ -89,8 +96,8 @@ export default class StoresListComponent extends Component<IStoresListComponent>
                 .searchStores(params)
                 .then((response) => {
                     const storesList = response?.features.map((store) => store);
-                    this.emit("stores_changed", storesList);
                     this.setState({stores: storesList});
+                    this.emit(StoresListComponentEvents.STORES_CHANGED, storesList);
                 })
                 .catch((exception) => {
                     console.error(exception);
