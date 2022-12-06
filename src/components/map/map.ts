@@ -142,10 +142,17 @@ export default class MapComponent extends Component<IMapComponent> {
         }
     }
 
-    selectStoreOnDataOverlay(): void {
-        const selectedStore: AssetFeatureResponse = JSON.parse(
-            JSON.stringify(this.state.selectedStore)
-        );
+    selectStoreOnDataOverlay(store?: AssetFeatureResponse): void {
+        let selectedStore: AssetFeatureResponse;
+        if (store) {
+            selectedStore = JSON.parse(
+                JSON.stringify(store)
+            );
+        } else {
+            selectedStore = JSON.parse(
+                JSON.stringify(this.state.selectedStore)
+            );
+        }
         const feature: woosmap.map.data.Feature | null = this.data.getFeatureById(
             selectedStore.properties.store_id
         );

@@ -52,7 +52,6 @@ export default class StoreDetailsComponent extends Component<IStoreDetailsCompon
                 (document.querySelector(".getDirections") as HTMLDivElement).addEventListener("click", () => {
                     this.emit(StoreDetailsComponentEvents.DIRECTIONS_SHOW, this.state.store)
                 });
-                this.$target.scrollTo(0, 0);
             }
         }
     }

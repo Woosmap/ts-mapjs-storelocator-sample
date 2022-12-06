@@ -21,6 +21,7 @@ export enum StoresListComponentEvents {
     LOCALITY_CHANGED = "locality_changed",
     QUERY_CHANGED = "query_changed",
     STORE_SELECTED = "store_selected",
+    STORE_HOVERED = "store_hovered",
 }
 
 export default class StoresListComponent extends Component<IStoresListComponent> {
@@ -55,10 +56,12 @@ export default class StoresListComponent extends Component<IStoresListComponent>
                         $storeElement.addEventListener("click", () => {
                             this.emit(StoresListComponentEvents.STORE_SELECTED, store);
                         });
+                        $storeElement.addEventListener('mouseover', () => {
+                            this.emit(StoresListComponentEvents.STORE_HOVERED, store);
+                        });
                         return $storeElement;
                     }
                 );
-                this.$target.scrollTo(0, 0);
                 this.$element.replaceChildren(...storesElements);
             } else {
                 const $emptyResults: HTMLDivElement = document.createElement("div");

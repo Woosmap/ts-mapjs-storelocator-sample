@@ -143,6 +143,10 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 this.setDetailsView();
             }
         );
+        storesListComponent.on(StoresListComponentEvents.STORE_HOVERED, (selectedStore: AssetFeatureResponse) => {
+                mapComponent.selectStoreOnDataOverlay(selectedStore);
+            }
+        );
         storeDetailsComponent.on(StoreDetailsComponentEvents.BACK, () => {
             mapComponent.setState({selectedStore: undefined}, true, () =>
                 mapComponent.emit(MapComponentEvents.STORE_UNSELECTED)
@@ -219,10 +223,12 @@ export default class StoreLocator extends Component<IStoreLocator> {
 
     setDetailsView(): void {
         this.$target.className = StoreLocatorViews.DETAILS_VIEW;
+        this.$sidebarContentContainer.scrollTo(0, 0);
     }
 
     setListView(): void {
         this.$target.className = StoreLocatorViews.LIST_VIEW;
+        this.$sidebarContentContainer.scrollTo(0, 0);
     }
 
     setDirectionsView(): void {
