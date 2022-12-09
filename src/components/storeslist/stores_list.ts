@@ -21,7 +21,8 @@ export enum StoresListComponentEvents {
     LOCALITY_CHANGED = "locality_changed",
     QUERY_CHANGED = "query_changed",
     STORE_SELECTED = "store_selected",
-    STORE_HOVERED = "store_hovered",
+    STORE_MOUSEENTER = "store_mouseenter",
+    STORE_MOUSELEAVE = "store_mouseleave",
 }
 
 export default class StoresListComponent extends Component<IStoresListComponent> {
@@ -53,11 +54,14 @@ export default class StoresListComponent extends Component<IStoresListComponent>
                             ${properties.address ? `<div class="summaryStore__address">${getReadableAddress(properties.address)}</div>` : ""}
                             ${properties.contact?.phone ? `<div class="summaryStore__phone">${getPhoneLink(properties.contact)}</div>` : ""}
                             ${properties.distance ? `<div class="summaryStore__distance">${getReadableDistance(properties.distance)}</div>` : ""}`;
-                        $storeElement.addEventListener("click", () => {
+                        $storeElement.addEventListener("click", (e) => {
                             this.emit(StoresListComponentEvents.STORE_SELECTED, store);
                         });
-                        $storeElement.addEventListener('mouseover', () => {
-                            this.emit(StoresListComponentEvents.STORE_HOVERED, store);
+                        $storeElement.addEventListener('mouseenter', () => {
+                            this.emit(StoresListComponentEvents.STORE_MOUSEENTER, store);
+                        });
+                        $storeElement.addEventListener('mouseleave', () => {
+                            this.emit(StoresListComponentEvents.STORE_MOUSELEAVE, store);
                         });
                         return $storeElement;
                     }
@@ -104,6 +108,7 @@ export default class StoresListComponent extends Component<IStoresListComponent>
                 })
                 .catch((exception) => {
                     console.error(exception);
+                    this.setState({stores: []});
                 });
         }
     }

@@ -5,6 +5,7 @@
   flex-direction: column;
   position: relative;
   background: white;
+  height: 100%;
 
   ul,
   li {
@@ -16,14 +17,58 @@
   .detailsStore {
     vertical-align: middle;
     line-height: 2em;
-    padding: 0.8rem 1.4rem;
+
+    &__content {
+      padding: 0 1rem;
+    }
+
+    &__thumbnail {
+      display: none;
+      position: relative;
+      padding-top: 60%;
+
+      @include respond-to("medium") {
+        display: block;
+      }
+    }
+
+    &__thumbnailImg {
+      display: inline-block;
+      width: 100%;
+      height: auto;
+      background-color: $lighter-grey;
+      background-size: cover;
+      background-position: 50% 50%;
+      background-repeat: no-repeat;
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url("../assets/default.jpg");
+    }
+
+    &__actions {
+      display: flex;
+      flex: none;
+      align-items: flex-start;
+      z-index: 2;
+      box-sizing: border-box;
+      width: 100%;
+      padding-top: .4rem;
+
+      & button {
+        margin-right: 5px;
+      }
+    }
 
     &__name {
       font-size: 1.6rem;
+      padding-top: .8rem;
     }
 
     &__listItems {
-      margin-top: 1.5rem;
+      padding-top: .4rem;
 
       ul {
         display: flex;
@@ -52,8 +97,9 @@
       border-bottom: 1px solid rgba(0, 0, 0, 0.25);
       padding: 0.5rem 0 0.2rem;
       line-height: 20px;
-      font-size: 0.95rem;
-      opacity: 0.68;
+      font-size: 0.875rem;
+      letter-spacing: .01em;
+      opacity: 0.55;
       font-weight: 600;
       text-transform: uppercase;
     }
@@ -64,9 +110,6 @@
 
     &__address {
       line-height: 1.6rem;
-      @include link-image(
-        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'%3E%3Cpath d='M0 0h24v24H0V0z' fill='none'/%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zM7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 2.88-2.88 7.19-5 9.88C9.92 16.21 7 11.85 7 9z'/%3E%3Ccircle cx='12' cy='9' r='2.5'/%3E%3C/svg%3E"
-      );
     }
 
     &__opening,

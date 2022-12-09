@@ -29,7 +29,7 @@ body {
   &.details_view {
     @include hide(filterPanelContainerID);
     @include hide(listStoresContainerID);
-    @include show(searchContainerID);
+    @include hide(searchContainerID);
     @include show(detailsStoreContainerID);
     @include hide(directionsContainerID);
     @include hide(roadbookContainerID);

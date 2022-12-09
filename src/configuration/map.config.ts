@@ -8,7 +8,7 @@ export const mapPaddings: { [key: string]: woosmap.map.Padding } = {
 };
 
 export const StoresStyle: woosmap.map.Style = {
-    breakPoint: 14,
+    breakPoint: 11,
     rules: [],
     default: {
         color: "#008a2f",

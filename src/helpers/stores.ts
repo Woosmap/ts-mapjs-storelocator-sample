@@ -157,9 +157,7 @@ export function getOpeningLabel(store: AssetResponse, locale = "en"): string {
     }
 }
 
-export function getOpeningWeekList(
-    weeklyOpening: AssetWeeklyOpeningResponse
-): string {
+export function getOpeningWeekList(weeklyOpening: AssetWeeklyOpeningResponse): string {
     interface IReadableOpeningHours {
         [key: string]: { dayName: string; hoursDay: string; today?: boolean };
     }
