@@ -52,6 +52,9 @@
     li.active {
       button {
         background-color: $lighter-grey;
+        &:hover{
+          color: $text-color;
+        }
       }
 
       .filterList__iconWrapper {
