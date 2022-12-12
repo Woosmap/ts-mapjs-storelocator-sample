@@ -1,11 +1,11 @@
 #detailsStoreContainer {
-  display: flex;
   overflow: auto;
   justify-content: space-between;
   flex-direction: column;
   position: relative;
   background: white;
   height: 100%;
+  display: none;
 
   ul,
   li {

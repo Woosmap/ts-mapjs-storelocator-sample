@@ -1,5 +1,4 @@
 #directionsInstructionsContainer {
-  display: flex;
   z-index: 2;
   background-color: #fff;
   flex-direction: column;
@@ -7,6 +6,7 @@
   position: relative;
   inset: 0;
   overflow: hidden;
+  display: none;
 }
 
 .routeRoadbook {
