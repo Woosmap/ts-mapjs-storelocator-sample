@@ -12,7 +12,6 @@
       "dom",
       "es2018.promise"
     ],
-    "rootDir": "src",
     "moduleResolution": "node",
     "typeRoots": [
       "./src/types",

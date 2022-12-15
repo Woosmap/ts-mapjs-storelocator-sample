@@ -31,7 +31,13 @@ export enum StoreLocatorViews {
 }
 
 export default class StoreLocator extends Component<IStoreLocator> {
-    $sidebarContentContainer!: HTMLElement;
+    public searchComponent!: SearchComponent;
+    public mapComponent!: MapComponent;
+    public directionsComponent!: DirectionsComponent;
+    public storesListComponent!: StoresListComponent;
+    public storeDetailsComponent!: StoreDetailsComponent;
+    public filterComponent!: FilterComponent;
+    private $sidebarContentContainer!: HTMLElement;
 
     init(): void {
         this.state = {
@@ -46,7 +52,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
             Selectors.sidebarContentContainerID
         ) as HTMLElement;
         this.styleOnScroll();
-        const searchComponent = new SearchComponent({
+        this.searchComponent = new SearchComponent({
             $target: document.getElementById(
                 Selectors.searchWrapperID
             ) as HTMLElement,
@@ -57,7 +63,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 featuresBtn: ["search", "clear", "geolocate"]
             },
         });
-        const mapComponent = new MapComponent({
+        this.mapComponent = new MapComponent({
             $target: document.getElementById(Selectors.mapContainerID) as HTMLElement,
             initialState: {
                 woosmapPublicKey: WoosmapPublicKey,
@@ -66,7 +72,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 padding: this.state.padding,
             },
         });
-        const directionsComponent = new DirectionsComponent({
+        this.directionsComponent = new DirectionsComponent({
             $target: document.getElementById(
                 Selectors.directionsContainerID
             ) as HTMLElement,
@@ -79,93 +85,92 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 selectedRouteIndex: 0
             },
         });
-        const storesListComponent = new StoresListComponent({
+        this.storesListComponent = new StoresListComponent({
             $target: document.getElementById(
                 Selectors.listStoresContainerID
             ) as HTMLElement,
             initialState: {},
         });
-        const storeDetailsComponent = new StoreDetailsComponent({
+        this.storeDetailsComponent = new StoreDetailsComponent({
             $target: document.getElementById(
                 Selectors.detailsStoreContainerID
             ) as HTMLElement,
             initialState: {},
         });
-        let filterComponent: FilterComponent;
         if (availableServices.length) {
-            filterComponent = new FilterComponent({
+            this.filterComponent = new FilterComponent({
                 $target: document.getElementById(
                     Selectors.filterPanelContainerID
                 ) as HTMLElement,
                 initialState: {},
             });
-            filterComponent.on(FilterComponentEvents.FILTERS_UPDATED, (queryString) => {
-                storesListComponent.setState({query: queryString}, true, () =>
-                    storesListComponent.emit(StoresListComponentEvents.QUERY_CHANGED)
+            this.filterComponent.on(FilterComponentEvents.FILTERS_UPDATED, (queryString) => {
+                this.storesListComponent.setState({query: queryString}, true, () =>
+                    this.storesListComponent.emit(StoresListComponentEvents.QUERY_CHANGED)
                 );
-                mapComponent.setState({query: queryString}, true, () =>
-                    mapComponent.emit(MapComponentEvents.FILTERS_UPDATED)
+                this.mapComponent.setState({query: queryString}, true, () =>
+                    this.mapComponent.emit(MapComponentEvents.FILTERS_UPDATED)
                 );
             });
         }
-        searchComponent.on(SearchComponentEvents.SELECTED_LOCALITY, (locality: SearchLocation) => {
-                storeDetailsComponent.setState({store: undefined});
-                storesListComponent.setState({nearbyLocation: locality.location}, true, () =>
-                    storesListComponent.emit(StoresListComponentEvents.LOCALITY_CHANGED)
+        this.searchComponent.on(SearchComponentEvents.SELECTED_LOCALITY, (locality: SearchLocation) => {
+                this.storeDetailsComponent.setState({store: undefined});
+                this.storesListComponent.setState({nearbyLocation: locality.location}, true, () =>
+                    this.storesListComponent.emit(StoresListComponentEvents.LOCALITY_CHANGED)
                 );
-                directionsComponent.setState({
+                this.directionsComponent.setState({
                     origin: {location: locality.location, name: locality.name}
                 }, true);
                 this.setListView();
             }
         );
-        searchComponent.on(SearchComponentEvents.SEARCH_CLEAR, () => {
-                storesListComponent.setState({nearbyLocation: undefined, stores: []});
-                mapComponent.setState({selectedStore: undefined, stores: []}, true, () =>
-                    mapComponent.emit(MapComponentEvents.STORES_CHANGED)
+        this.searchComponent.on(SearchComponentEvents.SEARCH_CLEAR, () => {
+                this.storesListComponent.setState({nearbyLocation: undefined, stores: []});
+                this.mapComponent.setState({selectedStore: undefined, stores: []}, true, () =>
+                    this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
                 );
-                directionsComponent.setState({origin: undefined}, true);
+                this.directionsComponent.setState({origin: undefined}, true);
                 this.setListView();
             }
         );
-        storesListComponent.on(StoresListComponentEvents.STORES_CHANGED, (stores: GeoJSONFeature[]) => {
-            mapComponent.setState({selectedStore: undefined}, true);
-            mapComponent.setState({stores: stores}, true, () =>
-                mapComponent.emit(MapComponentEvents.STORES_CHANGED)
+        this.storesListComponent.on(StoresListComponentEvents.STORES_CHANGED, (stores: GeoJSONFeature[]) => {
+            this.mapComponent.setState({selectedStore: undefined}, true);
+            this.mapComponent.setState({stores: stores}, true, () =>
+                this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
             );
             this.setListView();
         });
-        storesListComponent.on(StoresListComponentEvents.STORE_SELECTED, (selectedStore: AssetFeatureResponse) => {
-                storeDetailsComponent.setState({store: selectedStore});
-                mapComponent.setState({selectedStore: selectedStore}, true, () =>
-                    mapComponent.selectStore()
+        this.storesListComponent.on(StoresListComponentEvents.STORE_SELECTED, (selectedStore: AssetFeatureResponse) => {
+                this.storeDetailsComponent.setState({store: selectedStore});
+                this.mapComponent.setState({selectedStore: selectedStore}, true, () =>
+                    this.mapComponent.selectStore()
                 );
                 this.setDetailsView();
             }
         );
-        storesListComponent.on(StoresListComponentEvents.STORE_MOUSEENTER, debounce((selectedStore: AssetFeatureResponse) => {
-            mapComponent.selectStoreOnDataOverlay(selectedStore);
-        }, 100));
-        storesListComponent.on(StoresListComponentEvents.STORE_MOUSELEAVE, debounce(() => {
+        this.storesListComponent.on(StoresListComponentEvents.STORE_MOUSEENTER, debounce((selectedStore: AssetFeatureResponse) => {
+            this.mapComponent.selectStoreOnDataOverlay(selectedStore);
+        }, 50));
+        this.storesListComponent.on(StoresListComponentEvents.STORE_MOUSELEAVE, debounce(() => {
             if (this.$target.className !== StoreLocatorViews.DETAILS_VIEW) {
-                mapComponent.unselectStoreOnDataOverlay();
+                this.mapComponent.unselectStoreOnDataOverlay();
             }
-        }, 100));
-        storeDetailsComponent.on(StoreDetailsComponentEvents.BACK, () => {
-            mapComponent.setState({selectedStore: undefined}, true, () =>
-                mapComponent.emit(MapComponentEvents.STORE_UNSELECTED)
+        }, 50));
+        this.storeDetailsComponent.on(StoreDetailsComponentEvents.BACK, () => {
+            this.mapComponent.setState({selectedStore: undefined}, true, () =>
+                this.mapComponent.emit(MapComponentEvents.STORE_UNSELECTED)
             );
             this.setListView();
         });
-        mapComponent.on(MapComponentEvents.MAP_READY, () => {
-            directionsComponent.emit(DirectionsComponentEvents.MAP_READY, mapComponent.map);
+        this.mapComponent.on(MapComponentEvents.MAP_READY, () => {
+            this.directionsComponent.emit(DirectionsComponentEvents.MAP_READY, this.mapComponent.map);
         });
-        mapComponent.on(MapComponentEvents.STORE_UNSELECTED, () => {
+        this.mapComponent.on(MapComponentEvents.STORE_UNSELECTED, () => {
             if (this.$target.className === StoreLocatorViews.DETAILS_VIEW) {
                 this.setListView();
             }
         });
-        storeDetailsComponent.on(StoreDetailsComponentEvents.DIRECTIONS_SHOW, (selectedStore: AssetFeatureResponse) => {
+        this.storeDetailsComponent.on(StoreDetailsComponentEvents.DIRECTIONS_SHOW, (selectedStore: AssetFeatureResponse) => {
                 const destination = {
                     name: selectedStore.properties.name,
                     location: {
@@ -173,19 +178,19 @@ export default class StoreLocator extends Component<IStoreLocator> {
                         lng: selectedStore.geometry.coordinates[0],
                     },
                 };
-                if (directionsComponent.checkNeedUpdate({destination: destination})) {
-                    directionsComponent.setState({destination: destination}, true, () =>
-                        directionsComponent.emit(DirectionsComponentEvents.DESTINATION_CHANGED)
+                if (this.directionsComponent.checkNeedUpdate({destination: destination})) {
+                    this.directionsComponent.setState({destination: destination}, true, () =>
+                        this.directionsComponent.emit(DirectionsComponentEvents.DESTINATION_CHANGED)
                     );
                 } else {
-                    directionsComponent.emit(DirectionsComponentEvents.DIRECTIONS_SHOW);
+                    this.directionsComponent.emit(DirectionsComponentEvents.DIRECTIONS_SHOW);
                 }
                 this.setDirectionsView();
             }
         );
-        mapComponent.on(MapComponentEvents.STORE_SELECTED, (selectedStore: AssetFeatureResponse) => {
+        this.mapComponent.on(MapComponentEvents.STORE_SELECTED, (selectedStore: AssetFeatureResponse) => {
             if (selectedStore) {
-                storeDetailsComponent.setState({store: selectedStore});
+                this.storeDetailsComponent.setState({store: selectedStore});
                 if (this.$target.className === StoreLocatorViews.DIRECTIONS_VIEW || this.$target.className === StoreLocatorViews.ROADBOOK_VIEW) {
                     const destination = {
                         name: selectedStore.properties.name,
@@ -194,8 +199,8 @@ export default class StoreLocator extends Component<IStoreLocator> {
                             lng: selectedStore.geometry.coordinates[0],
                         },
                     };
-                    directionsComponent.setState({destination: destination}, true, () => {
-                            directionsComponent.emit(DirectionsComponentEvents.DESTINATION_CHANGED)
+                    this.directionsComponent.setState({destination: destination}, true, () => {
+                            this.directionsComponent.emit(DirectionsComponentEvents.DESTINATION_CHANGED)
                         }
                     );
                 } else {
@@ -206,17 +211,17 @@ export default class StoreLocator extends Component<IStoreLocator> {
             }
         });
         this.on(StoreLocatorEvents.PADDING_CHANGED, () => {
-            directionsComponent.setState({padding: this.state.padding}, true);
-            mapComponent.setState({padding: this.state.padding}, true);
+            this.directionsComponent.setState({padding: this.state.padding}, true);
+            this.mapComponent.setState({padding: this.state.padding}, true);
         });
 
-        directionsComponent.on(DirectionsComponentEvents.ROADBOOK_SHOW, () => {
+        this.directionsComponent.on(DirectionsComponentEvents.ROADBOOK_SHOW, () => {
             this.setRoadbookView();
         });
-        directionsComponent.on(DirectionsComponentEvents.DIRECTIONS_SHOW, () => {
+        this.directionsComponent.on(DirectionsComponentEvents.DIRECTIONS_SHOW, () => {
             this.setDirectionsView();
         });
-        directionsComponent.on(DirectionsComponentEvents.CLOSE_DIRECTIONS, () => {
+        this.directionsComponent.on(DirectionsComponentEvents.CLOSE_DIRECTIONS, () => {
             this.setDetailsView();
         });
         window.addEventListener('resize', debounce(() => {
