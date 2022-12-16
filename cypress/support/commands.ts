@@ -2,6 +2,10 @@
 
 import Selectors from "../../src/configuration/selectors.config";
 
+Cypress.Commands.add("getStoreLocator", () => {
+  return cy.window().its("woosmapStoreLocator");
+});
+
 Cypress.Commands.add("searchLocality", (input: string) => {
     cy.get(`#${Selectors.searchInputID}`)
         .type(input)

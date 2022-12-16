@@ -5,10 +5,17 @@ jobs:
   cypress-run:
     runs-on: ubuntu-latest
     steps:
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
       - name: Checkout
         uses: actions/checkout@v3
       - name: Cypress run
         uses: cypress-io/github-action@v5.0.0
+        env:
+          DEBUG: '@cypress/github-action'
         with:
+          browser: chrome
           build: npm run build
           start: npm start
