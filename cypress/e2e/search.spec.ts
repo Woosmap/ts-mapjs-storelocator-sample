@@ -8,9 +8,8 @@ describe('Searching for locality Use Case', () => {
         cy.visit('http://localhost:1234/')
     })
     it(`search for ${searchInput.london} in Localities Widget and display nearby stores`, () => {
-        cy.searchLocality(searchInput.london).then(() => {
-            cy.get(`#${Selectors.listStoresContainerID}`).should('be.visible')
-        })
+        cy.searchLocality(searchInput.london);
+        cy.get(`#${Selectors.listStoresContainerID}`).should('be.visible');
     })
 
 })
