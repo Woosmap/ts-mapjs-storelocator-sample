@@ -77,7 +77,7 @@ export function debounce<T extends (...args: any[]) => ReturnType<T>>(
 export function getTextWidth(text: string): number {
     const canvas: HTMLCanvasElement = document.getElementById("canvasMarkerWoosmap") as HTMLCanvasElement || document.createElement("canvas") as HTMLCanvasElement;
     canvas.id = "canvasMarkerWoosmap";
-    const context: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D;
+    const context: CanvasRenderingContext2D = canvas.getContext("2d", {willReadFrequently: true}) as CanvasRenderingContext2D;
     context.font = "bold 15px sans-serif";
     return context.measureText(text).width;
 }

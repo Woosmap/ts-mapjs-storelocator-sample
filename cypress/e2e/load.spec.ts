@@ -7,13 +7,15 @@ const mapJSUrl = `${Urls.mapJS}?key=${WoosmapPublicKey}`;
 const localitiesJSUrl = `${Urls.localitiesWidgetJS}?key=${WoosmapPublicKey}`;
 
 describe('Opening Store Locator', () => {
-    beforeEach(() => {
+    before(() => {
         cy.visit('http://localhost:1234/')
     })
-    it('Check the script of Map JS Library', () => {
-        cy.get(`head script[src="${mapJSUrl}"]`).should('exist');
-    })
-    it('Check the script of Localities JS Library', () => {
-        cy.get(`head script[src="${localitiesJSUrl}"]`).should('exist');
+    it('Check the scripts loading', () => {
+        it('Check Map JS Library'), () => {
+            cy.get(`head script[src="${mapJSUrl}"]`).should('exist');
+        }
+        it('Check Localities JS Library', () => {
+            cy.get(`head script[src="${localitiesJSUrl}"]`).should('exist');
+        })
     })
 })
