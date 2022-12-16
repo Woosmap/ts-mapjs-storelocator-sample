@@ -11,9 +11,7 @@ describe('Geolocation Use Cases', () => {
         cy.get(`#${Selectors.searchWrapperID}`)
             .find('.search__geolocateBtn')
             .click()
-            .then(() => {
-                cy.get(`#${Selectors.listStoresContainerID}`).should('be.visible')
-            });
+        cy.get(`#${Selectors.listStoresContainerID}`).should('be.visible')
     })
 })
 
