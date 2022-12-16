@@ -4,10 +4,10 @@ import Selectors from "../../src/configuration/selectors.config";
 
 Cypress.Commands.add("searchLocality", (input: string) => {
     cy.get(`#${Selectors.searchInputID}`)
-        .type(input, {delay: 50})
+        .type(input)
     cy.get(`.localities-container li[tabindex=1]`).should('be.visible')
     cy.get(`#${Selectors.searchInputID}`)
-        .type("{enter}", {delay: 100})
+        .type("{enter}")
 });
 
 
