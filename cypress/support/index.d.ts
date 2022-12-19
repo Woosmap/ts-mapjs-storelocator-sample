@@ -29,6 +29,11 @@ declare global {
              * Visit an URl with navigator geolocation stub for a user Position
              */
             visitWithGeolocation(url: string, coords: GeolocationCoordinates): Chainable<void>;
+
+            /**
+             * Visit an URl and wait for Map Tiles to be rendered
+             */
+            visitWaitingMap(url: string, options?: Partial<VisitOptions>): Chainable<void>;
         }
     }
 }

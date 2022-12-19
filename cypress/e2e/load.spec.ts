@@ -8,12 +8,12 @@ const localitiesJSUrl = `${Urls.localitiesWidgetJS}?key=${WoosmapPublicKey}`;
 
 describe('Opening Store Locator', () => {
     before(() => {
-        cy.visit('http://localhost:1234/')
+        cy.visitWaitingMap('http://localhost:1234/')
     })
     it('Check the scripts loading', () => {
-        it('Check Map JS Library'), () => {
+        it('Check Map JS Library', () => {
             cy.get(`head script[src="${mapJSUrl}"]`).should('exist');
-        }
+        })
         it('Check Localities JS Library', () => {
             cy.get(`head script[src="${localitiesJSUrl}"]`).should('exist');
         })
