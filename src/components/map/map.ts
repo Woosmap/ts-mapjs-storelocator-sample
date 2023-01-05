@@ -42,7 +42,7 @@ export default class MapComponent extends Component<IMapComponent> {
         if (this.state && this.$element) {
             loadScript({
                 url: Urls.mapJS,
-                attributes: {key: this.state.woosmapPublicKey},
+                params: {key: this.state.woosmapPublicKey},
             })
                 .then(() => {
                     this.initMapView();
