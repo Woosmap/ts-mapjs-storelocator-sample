@@ -3,6 +3,7 @@ import Urls from "../../configuration/urls.config";
 import {loadScript} from "../../utils/load_script";
 import GeolocateComponent, {GeolocateComponentEvents} from "./geolocate";
 import {GenericPosition} from "../../services/geolocation";
+import {loadCss} from "../../utils/load_css";
 
 export interface SearchLocation {
     name: string;
@@ -35,14 +36,9 @@ export default class SearchComponent extends Component<ISearchComponent> {
 
     render(): void {
         if (this.state && this.$element) {
-            loadScript({
-                url: Urls.localitiesWidgetJS,
-                attributes: {key: this.state.woosmapPublicKey},
-            })
-                .then(() => {
-                    this.initSearchView();
-                    this.loadWidgetStylesheet();
-                })
+            loadScript({url: Urls.localitiesWidgetJS, params: {key: this.state.woosmapPublicKey}})
+                .then(() => loadCss(Urls.localitiesWidgetCSS))
+                .then(() => this.initSearchView())
                 .catch((error) => {
                     console.error(
                         "failed to load the Woosmap Localities JS Widget script",
