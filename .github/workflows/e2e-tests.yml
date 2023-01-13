@@ -1,5 +1,5 @@
-name: Tests
-on: [push]
+name: E2E Tests
+on: [ push ]
 
 jobs:
   cypress-run:
