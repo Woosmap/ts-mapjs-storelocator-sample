@@ -2,7 +2,7 @@ name: Unit Tests
 on: [ push ]
 
 jobs:
-  cypress-run:
+  jest-run:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Node
