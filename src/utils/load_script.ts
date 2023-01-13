@@ -15,47 +15,54 @@ let cachedScripts: Record<string, Promise<void>> = {};
  * @return {Promise<void>} returns a promise to indicate if the script was successfully loaded.
  */
 export function loadScript(options: { url: string; params?: Record<string, string>; }): Promise<void> {
-  const {url, params} = options;
-  const src = `${url}?${objectToQueryString(params)}`;
-  const existing = cachedScripts[src];
-  if (existing) {
-    return existing;
-  }
-
-  const promise = new Promise<void>((resolve, reject) => {
-    if (findScript(src)) {
-      resolve();
+    const {url, params} = options;
+    if (!url || url.length === 0) {
+        throw new Error("Invalid url.");
+    }
+    if (typeof params !== "undefined" && typeof params !== "object") {
+        throw new Error("Expected params to be an object.");
     }
 
-    const script = createScriptElement(url, params);
-
-    const onScriptLoad = (): void => {
-      resolve();
-    };
-
-    const onScriptError = (): void => {
-      cleanup();
-      delete cachedScripts[src];
-      script.remove();
-
-      const defaultError = new Error(`The script "${src}" failed to load.`);
-      reject(defaultError);
-    };
-
-    script.addEventListener('load', onScriptLoad);
-    script.addEventListener('error', onScriptError);
-
-    document.head.insertBefore(script, document.head.firstElementChild);
-
-    function cleanup(): void {
-      script.removeEventListener('load', onScriptLoad);
-      script.removeEventListener('error', onScriptError);
+    const src = `${url}?${objectToQueryString(params)}`;
+    const existing = cachedScripts[src];
+    if (existing) {
+        return existing;
     }
-  });
 
-  cachedScripts[src] = promise;
+    const promise = new Promise<void>((resolve, reject) => {
+        if (findScript(src)) {
+            resolve();
+        }
 
-  return promise;
+        const script = createScriptElement(url, params);
+
+        const onScriptLoad = (): void => {
+            resolve();
+        };
+
+        const onScriptError = (): void => {
+            cleanup();
+            delete cachedScripts[src];
+            script.remove();
+
+            const defaultError = new Error(`The script "${src}" failed to load.`);
+            reject(defaultError);
+        };
+
+        script.addEventListener('load', onScriptLoad);
+        script.addEventListener('error', onScriptError);
+
+        document.head.insertBefore(script, document.head.firstElementChild);
+
+        function cleanup(): void {
+            script.removeEventListener('load', onScriptLoad);
+            script.removeEventListener('error', onScriptError);
+        }
+    });
+
+    cachedScripts[src] = promise;
+
+    return promise;
 }
 
 
@@ -65,11 +72,11 @@ export function loadScript(options: { url: string; params?: Record<string, strin
  * @return {boolean | null} returns `true` if script exist otherwise `null`.
  */
 function findScript(src: string): boolean | null {
-  const currentScript: HTMLScriptElement | null = document.querySelector(`script[src="${src}"]`);
-  if (currentScript === null) {
-    return null
-  }
-  return true;
+    const currentScript: HTMLScriptElement | null = document.querySelector(`script[src="${src}"]`);
+    if (currentScript === null) {
+        return null
+    }
+    return true;
 }
 
 
@@ -79,11 +86,11 @@ function findScript(src: string): boolean | null {
  * @param {StringMap} params - parameters to append to script url
  * @return {HTMLScriptElement} returns the newly created script.
  */
-function createScriptElement(url: string, params: StringMap = {}): HTMLScriptElement {
-  const newScript: HTMLScriptElement = document.createElement("script");
-  newScript.src = `${url}?${objectToQueryString(params)}`;
-  newScript.async = true;
-  return newScript;
+export function createScriptElement(url: string, params: StringMap = {}): HTMLScriptElement {
+    const newScript: HTMLScriptElement = document.createElement("script");
+    newScript.src = `${url}?${objectToQueryString(params)}`;
+    newScript.async = true;
+    return newScript;
 }
 
 
@@ -91,5 +98,5 @@ function createScriptElement(url: string, params: StringMap = {}): HTMLScriptEle
  * Clears the script cache. For testing purposes only.
  */
 export function clearScriptCache(): void {
-  cachedScripts = {};
+    cachedScripts = {};
 }

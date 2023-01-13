@@ -10,7 +10,8 @@
   "scripts": {
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "test": "start-server-and-test start http://localhost:1234 cypress:run",
+    "test": "jest src",
+    "test:e2e": "start-server-and-test start http://localhost:1234 cypress:run",
     "start": "parcel serve --no-cache ./index.html",
     "build": "parcel build ./index.html --dist-dir ./dist --public-url ./",
     "lint": "npx eslint --fix ./",
@@ -32,12 +33,15 @@
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.8.2",
+    "@types/jest": "29.2.5",
     "@types/woosmap.map": "^1.4.0",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "cypress": "^12.0.2",
+    "jest": "29.3.1",
     "lint-staged": "^13.0.3",
     "parcel": "^2.8.2",
-    "start-server-and-test": "^1.15.2"
+    "start-server-and-test": "^1.15.2",
+    "ts-jest": "29.0.4"
   }
 }

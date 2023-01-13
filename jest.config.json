@@ -1,0 +1,13 @@
+{
+  "preset": "ts-jest",
+  "roots": ["<rootDir>/src"],
+  "testEnvironment": "jsdom",
+  "coverageDirectory": "coverage",
+  "testMatch": [
+    "**/?(*.)+(test).+(ts|tsx|js)"
+  ],
+  "transform": {
+    "^.+\\.(ts|tsx)?$": "ts-jest"
+  },
+  "verbose": true
+}

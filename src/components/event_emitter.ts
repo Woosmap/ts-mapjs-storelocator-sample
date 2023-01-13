@@ -1,4 +1,4 @@
-namespace EventEmitter {
+export namespace EventEmitterNS {
     export type Listener = (...args: any[]) => void
 
     export interface Events {
@@ -24,12 +24,12 @@ namespace EventEmitter {
  * Simple EventEmitter to manage a set of listeners and publishing
  * events to them when it is told that such events happened.
  */
-export class EventEmitter implements EventEmitter.Emitter {
-    private readonly events: EventEmitter.Events = {
+export class EventEmitter implements EventEmitterNS.Emitter {
+    private readonly events: EventEmitterNS.Events = {
         '*': [],
     }
 
-    public on(event: string, listener: EventEmitter.Listener): () => void {
+    public on(event: string, listener: EventEmitterNS.Listener): () => void {
         if (typeof this.events[event] !== 'object') {
             this.events[event] = []
         }
@@ -39,7 +39,7 @@ export class EventEmitter implements EventEmitter.Emitter {
         return () => this.off(event, listener)
     }
 
-    public off(event: string, listener: EventEmitter.Listener): void {
+    public off(event: string, listener: EventEmitterNS.Listener): void {
         if (typeof this.events[event] !== 'object') {
             return
         }
@@ -65,7 +65,7 @@ export class EventEmitter implements EventEmitter.Emitter {
         )
     }
 
-    public once(event: string, listener: EventEmitter.Listener): () => void {
+    public once(event: string, listener: EventEmitterNS.Listener): () => void {
         const remove: () => void = this.on(event, (...args: any[]) => {
             remove()
             listener.apply(this, args)
