@@ -163,6 +163,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
             this.setListView();
         });
         this.mapComponent.on(MapComponentEvents.MAP_READY, () => {
+            this.managePadding();
             this.directionsComponent.emit(DirectionsComponentEvents.MAP_READY, this.mapComponent.map);
         });
         this.mapComponent.on(MapComponentEvents.STORE_UNSELECTED, () => {
@@ -226,8 +227,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
         });
         window.addEventListener('resize', debounce(() => {
             this.managePadding();
-        }, 100))
-        this.managePadding();
+        }, 100));
     }
 
     setDetailsView(): void {
@@ -267,13 +267,41 @@ export default class StoreLocator extends Component<IStoreLocator> {
             this.setState({padding: mapPaddings.full}, true, () => {
                 this.emit(StoreLocatorEvents.PADDING_CHANGED)
             });
+            this.setFullView();
         } else {
             this.setState({padding: mapPaddings.mobile}, true, () => {
                 this.emit(StoreLocatorEvents.PADDING_CHANGED)
             });
+            this.setMobileView();
         }
     }
-
+    setMobileView(): void{
+        const $mapContainer = document.getElementById(Selectors.mapContainerID) ;
+        const $searchContainer = document.getElementById(Selectors.searchContainerID);
+        const $mapBoxControl =  document.querySelector<HTMLDivElement>('.mapboxgl-ctrl-top-right') ;
+        if($mapBoxControl && $searchContainer){
+            $mapBoxControl.style.paddingTop = `${$searchContainer.clientHeight + 5}px`;
+        }
+        if ($mapContainer && $searchContainer && !$mapContainer.contains($searchContainer)) {
+            $mapContainer.insertBefore($searchContainer, $mapContainer.childNodes[0]);
+        }       
+    }
+    setFullView(): void {
+        const $mapContainer = document.getElementById(Selectors.mapContainerID) ;
+        const $searchContainer = document.getElementById(Selectors.searchContainerID);
+        const $sidebarContainer = document.getElementById(Selectors.sidebarContainerID);
+        const $mapBoxControl =  document.querySelector<HTMLDivElement>('.mapboxgl-ctrl-top-right') ;
+        if ($mapContainer && $searchContainer && $mapContainer.contains($searchContainer)) {
+            $mapContainer.removeChild($searchContainer);
+        }
+        if ($sidebarContainer && $searchContainer && !$sidebarContainer.contains($searchContainer)) {
+            $sidebarContainer.insertBefore($searchContainer, $sidebarContainer.childNodes[0]);
+        }
+        if($mapBoxControl){
+            $mapBoxControl.style.paddingTop = "0px";
+        }
+    }
+    
     getHTMLSkeleton(): string {
         return `
         <div id="${Selectors.mapContainerID}"></div>
