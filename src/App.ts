@@ -112,6 +112,20 @@ export default class StoreLocator extends Component<IStoreLocator> {
                     this.mapComponent.emit(MapComponentEvents.FILTERS_UPDATED)
                 );
             });
+            this.filterComponent.on(FilterComponentEvents.FILTER_PANEL_EXPANDED, (panelState) => {
+                const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                const $mapBoxControl =  document.querySelector<HTMLDivElement>('.mapboxgl-ctrl-top-right') ;
+                if (width >= mobileBreakPoint) {
+                    if($mapBoxControl){
+                        $mapBoxControl.style.display = "false";
+                    }               
+                }
+                else{
+                    if($mapBoxControl){
+                        $mapBoxControl.style.display = panelState ? 'none' : 'block';
+                    }                  
+                }
+            });
         }
         this.searchComponent.on(SearchComponentEvents.SELECTED_LOCALITY, (locality: SearchLocation) => {
                 this.storeDetailsComponent.setState({store: undefined});
@@ -219,7 +233,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
         this.directionsComponent.on(DirectionsComponentEvents.ROADBOOK_SHOW, () => {
             this.setRoadbookView();
         });
-        this.directionsComponent.on(DirectionsComponentEvents.DIRECTIONS_SHOW, () => {
+        this.directionsComponent.on(DirectionsComponentEvents.DIRECTIONS_SHOW, () => {ß
             this.setDirectionsView();
         });
         this.directionsComponent.on(DirectionsComponentEvents.CLOSE_DIRECTIONS, () => {
@@ -278,24 +292,35 @@ export default class StoreLocator extends Component<IStoreLocator> {
     setMobileView(): void{
         const $mapContainer = document.getElementById(Selectors.mapContainerID) ;
         const $searchContainer = document.getElementById(Selectors.searchContainerID);
+        const $filterContainer = document.getElementById(Selectors.filterPanelContainerID);
         const $mapBoxControl =  document.querySelector<HTMLDivElement>('.mapboxgl-ctrl-top-right') ;
-        if($mapBoxControl && $searchContainer){
-            $mapBoxControl.style.paddingTop = `${$searchContainer.clientHeight + 5}px`;
-        }
         if ($mapContainer && $searchContainer && !$mapContainer.contains($searchContainer)) {
             $mapContainer.insertBefore($searchContainer, $mapContainer.childNodes[0]);
-        }       
+        } 
+        if($mapBoxControl && $searchContainer && $filterContainer){
+            $mapBoxControl.style.paddingTop = `${$searchContainer.children[0].clientHeight + $filterContainer.clientHeight + 20}px`;
+        }
+        if ($searchContainer && $filterContainer && !$searchContainer.contains($filterContainer)) {
+            $searchContainer.appendChild($filterContainer);
+            $searchContainer.style.flexDirection = 'column';
+            $filterContainer.style.maxHeight = '300px';
+        }      
     }
     setFullView(): void {
         const $mapContainer = document.getElementById(Selectors.mapContainerID) ;
         const $searchContainer = document.getElementById(Selectors.searchContainerID);
         const $sidebarContainer = document.getElementById(Selectors.sidebarContainerID);
         const $mapBoxControl =  document.querySelector<HTMLDivElement>('.mapboxgl-ctrl-top-right') ;
+        const $filterContainer = document.getElementById(Selectors.filterPanelContainerID);
         if ($mapContainer && $searchContainer && $mapContainer.contains($searchContainer)) {
             $mapContainer.removeChild($searchContainer);
         }
         if ($sidebarContainer && $searchContainer && !$sidebarContainer.contains($searchContainer)) {
             $sidebarContainer.insertBefore($searchContainer, $sidebarContainer.childNodes[0]);
+        }
+        if ($sidebarContainer && $filterContainer && !$sidebarContainer.contains($filterContainer)) {
+            $sidebarContainer.insertBefore($filterContainer, $sidebarContainer.childNodes[1]);
+            $filterContainer.style.maxHeight = '350px';
         }
         if($mapBoxControl){
             $mapBoxControl.style.paddingTop = "0px";

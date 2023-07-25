@@ -6,7 +6,8 @@ export interface IFilterComponent {
 }
 
 export enum FilterComponentEvents {
-    FILTERS_UPDATED = 'filters_updated'
+    FILTERS_UPDATED = 'filters_updated',
+    FILTER_PANEL_EXPANDED = 'filter_panel_expanded'
 }
 
 
@@ -47,11 +48,15 @@ export default class FilterComponent extends Component<IFilterComponent> {
     toggleActive(): void {
         this.$element.classList.toggle("active");
         const content = this.$element.nextElementSibling as HTMLUListElement;
+        let panelOpened = false;
         if (content?.style.maxHeight && content?.style.maxHeight != "0px") {
+            panelOpened = false;
             content.style.maxHeight = "0px";
         } else {
+            panelOpened = true;
             content.style.maxHeight = content.scrollHeight + "px";
         }
+        this.emit(FilterComponentEvents.FILTER_PANEL_EXPANDED, panelOpened)
     }
 
     updateActiveFilters(): void {
