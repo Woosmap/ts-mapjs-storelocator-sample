@@ -34,7 +34,7 @@
   "devDependencies": {
     "@parcel/transformer-sass": "^2.8.2",
     "@types/jest": "29.2.5",
-    "@types/woosmap.map": "^1.4.0",
+    "@types/woosmap.map": "^1.4.1",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "cypress": "^12.0.2",

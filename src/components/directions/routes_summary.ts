@@ -34,8 +34,6 @@ export default class RoutesSummaryComponent extends Component<IRoutesSummary> {
             } else if (this.state.routes && this.state.routes.length) {
                 const routesSummary: HTMLDivElement[] = this.state.routes.map(
                     (route: woosmap.map.DirectionRoute, index: number) => {
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        // @ts-ignore
                         const summary = `${route.legs[0].start_address}`
                         const duration = `${route.legs[0].duration.text}`
                         const distance = `${route.legs[0].distance.text}`

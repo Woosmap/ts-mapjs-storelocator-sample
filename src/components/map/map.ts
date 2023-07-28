@@ -136,8 +136,6 @@ export default class MapComponent extends Component<IMapComponent> {
                     bounds.extend(LatLngPoint.get());
                 });
                 this.map.fitBounds(bounds, this.state.padding);
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
                 this.storesOverlay.setMap(null);
             } else {
                 this.storesOverlay.setMap(this.map);
@@ -148,8 +146,6 @@ export default class MapComponent extends Component<IMapComponent> {
     }
 
     unselectStoreOnDataOverlay(): void {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         this.data.revertStyle();
         this.dataSelected.forEach((feature) => this.dataSelected.remove(feature));
     }
@@ -160,8 +156,6 @@ export default class MapComponent extends Component<IMapComponent> {
             selectedStore.properties.store_id
         );
         if (feature) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
             this.data.revertStyle();
             this.data.overrideStyle(feature, {visible: false});
             this.dataSelected.forEach((feature) => this.dataSelected.remove(feature));
@@ -186,8 +180,6 @@ export default class MapComponent extends Component<IMapComponent> {
             }
         } else {
             this.storesOverlay.clearSelection();
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
             this.data.revertStyle();
             this.handleStores();
         }

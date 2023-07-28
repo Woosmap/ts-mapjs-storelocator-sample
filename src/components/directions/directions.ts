@@ -220,8 +220,6 @@ export default class DirectionsComponent extends Component<IDirections> {
                     destination: this.state.destination?.name || "",
                     avoid: this.state.avoid,
                     unitSystem: this.state.unitSystem,
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
                     error: this.state.directionsResult?.error_message || "",
                     isLoading: false
                 })

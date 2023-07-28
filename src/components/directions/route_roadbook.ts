@@ -18,11 +18,7 @@ export default class RouteRoadbookComponent extends Component<IRouteRoadbook> {
 
     render(): void {
         if (this.state && this.$element) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
             const originText = `${this.state.route.legs[0].start_address}`
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
             const destinationText = `${this.state.route.legs[0].end_address}`
             const duration = `${this.state.route.legs[0].duration.text}`
             const distance = `${this.state.route.legs[0].distance.text}`
@@ -77,7 +73,7 @@ export default class RouteRoadbookComponent extends Component<IRouteRoadbook> {
         return "";
     }
 
-    getDirectionInstructionStep(instructions?: Record<string, string>): string {
+    getDirectionInstructionStep(instructions?: woosmap.map.DirectionStepInstructions): string {
         if (instructions) {
             if (instructions.summary) {
                 return `<div class="routeRoadbook__stepBody">
@@ -109,24 +105,20 @@ export default class RouteRoadbookComponent extends Component<IRouteRoadbook> {
     getHTMLInstructions(): HTMLDivElement {
         const $instructions: HTMLDivElement = document.createElement("div");
         $instructions.className = "routeRoadbook__steps";
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const $instructionsSteps: HTMLDivElement[] = this.state.route.legs[0].steps.map((step) => {
-            const $step: HTMLDivElement = document.createElement("div");
-            const iconStep = this.getDirectionStepIcon(step.instructions.action);
-            const instructionStep = this.getDirectionInstructionStep(step.instructions);
-            const $distanceStep = this.getDirectionInstructionDistance(step.distance);
-            $step.innerHTML = `<div class="routeRoadbook__step">${iconStep}${instructionStep}</div>`;
-            $step.appendChild($distanceStep);
-            return $step;
-        })
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        $instructionsSteps.unshift(this.getWaypoint(this.state.route.legs[0].start_address));
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        $instructionsSteps.push(this.getWaypoint(this.state.route.legs[0].end_address));
-        $instructions.replaceChildren(...$instructionsSteps);
+        if (this.state.route.legs[0].steps) {
+            const $instructionsSteps: HTMLDivElement[] = this.state.route.legs[0].steps.map((step) => {
+                const $step: HTMLDivElement = document.createElement("div");
+                const iconStep = this.getDirectionStepIcon(step.instructions.action);
+                const instructionStep = this.getDirectionInstructionStep(step.instructions);
+                const $distanceStep = this.getDirectionInstructionDistance(step.distance);
+                $step.innerHTML = `<div class="routeRoadbook__step">${iconStep}${instructionStep}</div>`;
+                $step.appendChild($distanceStep);
+                return $step;
+            })
+            $instructionsSteps.unshift(this.getWaypoint(this.state.route.legs[0].start_address));
+            $instructionsSteps.push(this.getWaypoint(this.state.route.legs[0].end_address));
+            $instructions.replaceChildren(...$instructionsSteps);
+        }
         return $instructions;
     }
 
