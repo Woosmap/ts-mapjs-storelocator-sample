@@ -6,6 +6,7 @@ import {
     getReadableAddress,
     getServicesList,
 } from "../../helpers/stores";
+import {getLocale} from "../../helpers/locale";
 
 export interface IStoreDetailsComponent {
     store?: AssetFeatureResponse;
@@ -33,8 +34,8 @@ export default class StoreDetailsComponent extends Component<IStoreDetailsCompon
                 const $storeDetails: HTMLDivElement = document.createElement("div");
                 $storeDetails.className = "detailsStore";
                 $storeDetails.innerHTML = `
-                             ${properties.weekly_opening ? `<div class="detailsStore__content detailsStore__listItems"><div class="detailsStore__headerList">Opening hours</div>${getOpeningWeekList(properties.weekly_opening)}</div>` : ""}
-                             ${properties.tags?.length ? `<div class="detailsStore__content detailsStore__listItems"><div class="detailsStore__headerList">Services</div>${getServicesList(properties.tags)}</div>` : ""}`;
+                             ${properties.weekly_opening ? `<div class="detailsStore__content detailsStore__listItems"><div class="detailsStore__headerList">${getLocale().time.openingHoursTitle}</div>${getOpeningWeekList(properties.weekly_opening)}</div>` : ""}
+                             ${properties.tags?.length ? `<div class="detailsStore__content detailsStore__listItems"><div class="detailsStore__headerList">${getLocale().filtering.servicesTitle}</div>${getServicesList(properties.tags)}</div>` : ""}`;
                 htmlElements.push($backBtn, $storeDetailsHeader, $storeDetailsActions, $storeDetails);
                 this.$target.replaceChildren(...htmlElements);
             }
@@ -61,13 +62,13 @@ export default class StoreDetailsComponent extends Component<IStoreDetailsCompon
         const $directionsBtn: HTMLButtonElement = document.createElement("button");
         $directionsBtn.className = "button";
         $directionsBtn.addEventListener("click", () => this.emit(StoreDetailsComponentEvents.DIRECTIONS_SHOW, this.state.store));
-        $directionsBtn.innerHTML = `<div class="buttonIcon directionsButton"></div><span>Directions</span>`;
+        $directionsBtn.innerHTML = `<div class="buttonIcon directionsButton"></div><span>${getLocale().stores.cta.directions}</span>`;
         $storeDetailsActions.appendChild($directionsBtn)
 
         if (properties.contact?.phone) {
             const $phoneBtn: HTMLButtonElement = document.createElement("button");
             $phoneBtn.className = "button";
-            $phoneBtn.innerHTML = `<div class="buttonIcon phoneButton"></div><span>Call</span>`;
+            $phoneBtn.innerHTML = `<div class="buttonIcon phoneButton"></div><span>${getLocale().stores.cta.call}</span>`;
             $phoneBtn.addEventListener("click", () => {
                 window.open(`tel:${properties.contact?.phone}`, '_self');
             });
@@ -76,7 +77,7 @@ export default class StoreDetailsComponent extends Component<IStoreDetailsCompon
         if (properties.contact?.website) {
             const $websiteBtn: HTMLButtonElement = document.createElement("button");
             $websiteBtn.className = "button";
-            $websiteBtn.innerHTML = `<div class="buttonIcon websiteButton"></div><span>Website</span>`;
+            $websiteBtn.innerHTML = `<div class="buttonIcon websiteButton"></div><span>${getLocale().stores.cta.website}</span>`;
             $websiteBtn.addEventListener("click", () => {
                 window.open(`${properties.contact?.website}`, '_blank');
             });

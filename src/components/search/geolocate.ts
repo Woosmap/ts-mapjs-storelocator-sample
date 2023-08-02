@@ -1,5 +1,6 @@
 import Component from "../component";
 import {GenericPosition, GeolocationError, GeolocationService} from "../../services/geolocation";
+import {getLocale} from "../../helpers/locale";
 
 export interface IGeolocateComponent {
     position?: GenericPosition;
@@ -20,7 +21,7 @@ export default class GeolocateComponent extends Component<IGeolocateComponent> {
     render(): void {
         if (this.state && this.$element) {
             this.$element.className = "search__geolocateBtn";
-            this.$element.innerHTML = `<button type="button" aria-label="Your Location"></button>`
+            this.$element.innerHTML = `<button type="button" aria-label="${getLocale().search.yourLocation}"></button>`
             this.$element.addEventListener("click", async () => {
                 this.$element.classList.add("active");
                 await this.getLocation().then(() => {
@@ -35,7 +36,7 @@ export default class GeolocateComponent extends Component<IGeolocateComponent> {
         const {latitude, longitude, altitude, accuracy} = geoPosition.coords;
         this.setState({
             position: {
-                name: "Your location",
+                name: getLocale().search.yourLocation,
                 timestamp: Date.now(),
                 latitude,
                 longitude,

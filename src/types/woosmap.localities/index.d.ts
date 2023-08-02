@@ -23,7 +23,7 @@ declare global {
     interface AutocompleteParameters {
       minLength?: number;
       customDescription?: string;
-      component?: ComponentRestrictions;
+      components?: ComponentRestrictions;
       types?: string | string[];
       data?: string;
       extended?: string;

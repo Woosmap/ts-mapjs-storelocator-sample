@@ -4,6 +4,8 @@ import {loadScript} from "../../utils/load_script";
 import GeolocateComponent, {GeolocateComponentEvents} from "./geolocate";
 import {GenericPosition} from "../../services/geolocation";
 import {loadCss} from "../../utils/load_css";
+import {getLocale} from "../../helpers/locale";
+import {replace} from "../../utils/utils";
 
 export interface SearchLocation {
     name: string;
@@ -29,7 +31,7 @@ export default class SearchComponent extends Component<ISearchComponent> {
     init(): void {
         this.$element = <HTMLInputElement>document.createElement("input");
         this.$element.className = "search__input";
-        this.$element.setAttribute("placeholder", "Search an address...");
+        this.$element.setAttribute("placeholder", getLocale().search.placeholder);
         this.$element.id = this.state.inputID;
         this.$target.appendChild(this.$element);
     }
@@ -41,7 +43,7 @@ export default class SearchComponent extends Component<ISearchComponent> {
                 .then(() => this.initSearchView())
                 .catch((error) => {
                     console.error(
-                        "failed to load the Woosmap Localities JS Widget script",
+                        replace(getLocale().errors.loadingLibrary, {'library': "Woosmap Localities JS Widget"}),
                         error
                     );
                 });
@@ -51,7 +53,7 @@ export default class SearchComponent extends Component<ISearchComponent> {
     initSearchView(): void {
         this.localitiesWidget = new woosmap.localities.Autocomplete(
             this.state.inputID,
-            this.state?.searchOptions
+            this.state.searchOptions
         );
         this.localitiesWidget.addListener("selected_suggestion", () => {
             const locality: woosmap.localities.DetailsResponseItem = this.localitiesWidget.getSelectedSuggestionDetails();
@@ -79,7 +81,7 @@ export default class SearchComponent extends Component<ISearchComponent> {
     manageSearchButton($inputContainer: HTMLElement): void {
         const $searchBtn = document.createElement("div");
         $searchBtn.className = "search__searchBtn";
-        $searchBtn.innerHTML = `<button type="button" aria-label="Search"></button>`
+        $searchBtn.innerHTML = `<button type="button" aria-label="${getLocale().search.submitLabel}"></button>`
         $searchBtn.addEventListener("click", () => {
             if (this.state.selectedLocality) {
                 this.emit(SearchComponentEvents.SELECTED_LOCALITY, this.state.selectedLocality);
@@ -93,7 +95,7 @@ export default class SearchComponent extends Component<ISearchComponent> {
     manageClearButton($inputContainer: HTMLElement): void {
         const $clearBtn = document.createElement("div");
         $clearBtn.className = "search__clearBtn";
-        $clearBtn.innerHTML = `<button type="button" aria-label="Clear Search"></button>`
+        $clearBtn.innerHTML = `<button type="button" aria-label="${getLocale().search.clearLabel}"></button>`
         $clearBtn.addEventListener("click", (e) => {
             const $emptyButton = $inputContainer.querySelector(".localities-empty-button") as HTMLDivElement
             if ($emptyButton) {
@@ -133,7 +135,7 @@ export default class SearchComponent extends Component<ISearchComponent> {
                         lng: geolocation.longitude,
                     }
                 }
-                this.setLocality("Your location");
+                this.setLocality(getLocale().search.yourLocation);
                 this.setState({selectedLocality: searchLocation}, true)
                 this.emit(SearchComponentEvents.SELECTED_LOCALITY, searchLocation);
             }

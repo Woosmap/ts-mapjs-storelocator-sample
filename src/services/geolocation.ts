@@ -1,3 +1,5 @@
+import {getLocale} from "../helpers/locale";
+
 export enum GeolocationError {
     Unavailable = 'Unavailable',
     PermissionDenied = 'PermissionDenied',
@@ -45,8 +47,8 @@ export class GeolocationService {
         return typeof error === 'object' && 'PERMISSION_DENIED' in <GeolocationPositionError>error
     }
 
-    static getGeolocationError(error: GeolocationPositionError | Error ): GeolocationError {
-        console.error('Geolocation failed', error);
+    static getGeolocationError(error: GeolocationPositionError | Error): GeolocationError {
+        console.error(getLocale().errors.geolocationFailed, error);
         if (GeolocationService.isGeolocationError(error)) {
             switch (error.code) {
                 case error.PERMISSION_DENIED:

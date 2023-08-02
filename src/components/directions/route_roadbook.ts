@@ -1,5 +1,6 @@
 import Component from "../component";
 import {stepsIcon} from "../../configuration/directions.config";
+import {getLocale} from "../../helpers/locale";
 
 export interface IRouteRoadbook {
     route: woosmap.map.DirectionRoute;
@@ -28,21 +29,21 @@ export default class RouteRoadbookComponent extends Component<IRouteRoadbook> {
             $roadbookHeader.className = "routeRoadbook__header"
             $roadbookHeader.innerHTML = `
                                 <span class="routeRoadbook__headerFromTo">
-                                    <div class="routeRoadbook__headerWaypoint"> from <span class="routeRoadbook__headerFrom">${originText}</span></div>
-                                    <div class="routeRoadbook__headerWaypoint"> to <span class="routeRoadbook__headerTo">${destinationText}</span></div>
+                                    <div class="routeRoadbook__headerWaypoint"> ${getLocale().directions.messages.from} <span class="routeRoadbook__headerFrom">${originText}</span></div>
+                                    <div class="routeRoadbook__headerWaypoint"> ${getLocale().directions.messages.to} <span class="routeRoadbook__headerTo">${destinationText}</span></div>
                                 </span>`;
             const $roadbookBody: HTMLDivElement = document.createElement("div");
             $roadbookBody.className = "routeRoadbook__body"
             $roadbookBody.innerHTML = `
                                 <div class="routeRoadbook__actions">
-                                    <a href="${directionLink}" target="_blank" title="open in google maps"><button class="routeRoadbook__actionsButton"></button></a>
+                                    <a href="${directionLink}" target="_blank" title="${getLocale().directions.messages.openGoogleMaps}"><button class="routeRoadbook__actionsButton"></button></a>
                                 </div>
                                 <div class="routeRoadbook__summaryHeader">
                                   <span>
                                     <span class="delay" >${duration} </span>
                                     <span class="routeRoadbook__summarySubtitle">(<span >${distance}</span>)</span>
                                   </span>
-                                  <span class="routeRoadbook__summaryDescription">via ${originText}</span>
+                                  <span class="routeRoadbook__summaryDescription">${getLocale().directions.messages.via} ${originText}</span>
                                 </div>`;
             const $backBtn: HTMLButtonElement = document.createElement("button");
             $backBtn.className = "routeRoadbook__headerBack";

@@ -1,5 +1,6 @@
 import Component from "../component";
 import {availableServices} from "../../configuration/search.config";
+import {getLabel, getLocale} from "../../helpers/locale";
 
 export interface IFilterComponent {
     activeFilters?: string[];
@@ -14,7 +15,7 @@ export default class FilterComponent extends Component<IFilterComponent> {
     init(): void {
         this.$element = <HTMLDivElement>document.createElement("div");
         this.$element.className = "filterHeader collapsible";
-        this.$element.innerHTML = `<span class="collapsibleTitle">Services</span><div class="collapsibleIcon"></div>`;
+        this.$element.innerHTML = `<span class="collapsibleTitle">${getLocale().filtering.servicesTitle}</span><div class="collapsibleIcon"></div>`;
         this.$element.addEventListener("click", () => this.toggleActive());
         this.$target.appendChild(this.$element);
     }
@@ -26,11 +27,11 @@ export default class FilterComponent extends Component<IFilterComponent> {
             const servicesHTML: HTMLLIElement[] = availableServices.map((service) => {
                 const $service: HTMLLIElement = document.createElement("li");
                 $service.dataset.servicekey = service.serviceKey;
-                $service.dataset.servicename = service.serviceName;
+                $service.dataset.servicename = getLabel(getLocale().filtering.services,service.serviceKey);
                 $service.innerHTML = `
                     <button class="button">
                     <div class='iconService iconService__${service.serviceKey}'></div>
-                    <div class='filterList__serviceName'>${service.serviceName}</div>
+                    <div class='filterList__serviceName'>${getLabel(getLocale().filtering.services,service.serviceKey)}</div>
                     <div class="filterList__iconWrapper"></div>
                     </button>`;
                 $service.addEventListener("click", () => {
