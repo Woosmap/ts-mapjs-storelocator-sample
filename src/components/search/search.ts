@@ -4,7 +4,7 @@ import {loadScript} from "../../utils/load_script";
 import GeolocateComponent, {GeolocateComponentEvents} from "./geolocate";
 import {GenericPosition} from "../../services/geolocation";
 import {loadCss} from "../../utils/load_css";
-import {getLocale} from "../../helpers/locale";
+import {getLocale, getLocaleLang} from "../../helpers/locale";
 import {replace} from "../../utils/utils";
 
 export interface SearchLocation {
@@ -38,7 +38,10 @@ export default class SearchComponent extends Component<ISearchComponent> {
 
     render(): void {
         if (this.state && this.$element) {
-            loadScript({url: Urls.localitiesWidgetJS, params: {key: this.state.woosmapPublicKey}})
+            loadScript({
+                url: Urls.localitiesWidgetJS,
+                params: {key: this.state.woosmapPublicKey, language: getLocaleLang().toLowerCase()}
+            })
                 .then(() => loadCss(Urls.localitiesWidgetCSS))
                 .then(() => this.initSearchView())
                 .catch((error) => {

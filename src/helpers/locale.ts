@@ -14,7 +14,7 @@ export const SYSTEM_LANG = (function () {
     return DEFAULT_LOCALE;
 })();
 
-export function registerLocale(locale: string, localeObj: LocaleOption): void {
+function registerLocale(locale: string, localeObj: LocaleOption): void {
     locale = locale.toUpperCase();
     localeStorage[locale] = localeObj;
 }
