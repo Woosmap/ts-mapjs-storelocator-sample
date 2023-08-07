@@ -49,15 +49,28 @@ describe("loadScript()", () => {
         expect(second).toBe(first);
     });
 
+    it('should returns a different promise when same resource is re-requested with override to true', () => {
+        const first = ScriptManager.loadScript({url: getConfig().urls.mapJS});
+        const second = ScriptManager.loadScript({url: getConfig().urls.mapJS, override: true});
+
+        expect(second).not.toBe(first);
+    });
+
     it('should returns a different promise when different resources are requested', () => {
-        const first = ScriptManager.loadScript({url: getConfig().urls.mapJS, params: {key: getConfig().map.woosmapPublicKey}});
+        const first = ScriptManager.loadScript({
+            url: getConfig().urls.mapJS,
+            params: {key: getConfig().map.woosmapPublicKey}
+        });
         const second = ScriptManager.loadScript({url: getConfig().urls.mapJS, params: {key: "fake-key"}});
 
         expect(second).not.toBe(first);
     });
 
     it('should returns a different promise for the same resource when the first request fails', async () => {
-        const first = ScriptManager.loadScript({url: getConfig().urls.mapJS, params: {key: getConfig().map.woosmapPublicKey}});
+        const first = ScriptManager.loadScript({
+            url: getConfig().urls.mapJS,
+            params: {key: getConfig().map.woosmapPublicKey}
+        });
 
         scriptElement.dispatchEvent(new Event('error'));
 
@@ -67,7 +80,10 @@ describe("loadScript()", () => {
             expect((err as Error).message).toBe(`The script "${getConfig().urls.mapJS}?key=${getConfig().map.woosmapPublicKey}" failed to load.`);
         }
 
-        const second = ScriptManager.loadScript({url: getConfig().urls.mapJS, params: {key: getConfig().map.woosmapPublicKey}});
+        const second = ScriptManager.loadScript({
+            url: getConfig().urls.mapJS,
+            params: {key: getConfig().map.woosmapPublicKey}
+        });
 
         expect(second).not.toBe(first);
     });
