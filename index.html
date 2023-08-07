@@ -1,21 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Store Locator sample with Woosmap Map JS API</title>
-  <meta property="og:title" content="Store Locator sample with Woosmap Map JS API"/>
-  <meta property="og:locale" content="en_US"/>
-  <meta name="description"
-        content="Build powerful personalized Store Locator with Woosmap Map JS API."/>
-  <meta property="og:description"
-        content="Build powerful personalized Store Locator with Woosmap Map JS API."/>
-  <link rel="canonical" href="https://demo.woosmap.com/storelocator/mapjs/"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Locator sample with Woosmap Map JS API</title>
+    <meta property="og:title" content="Store Locator sample with Woosmap Map JS API"/>
+    <meta property="og:locale" content="en_US"/>
+    <meta name="description"
+          content="Build powerful personalized Store Locator with Woosmap Map JS API."/>
+    <meta property="og:description"
+          content="Build powerful personalized Store Locator with Woosmap Map JS API."/>
+    <link rel="canonical" href="https://demo.woosmap.com/storelocator/mapjs/"/>
     <meta property="og:url" content="https://demo.woosmap.com/storelocator/mapjs/"/>
     <meta property="og:site_name" content="Woosmap Map JS API"/>
-    <meta charset="UTF-8" />
-  </head>
-  <body>
-    <script type="module" src="./index.ts"></script>
-    <div id="StoreLocator"></div>
-  </body>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+<script type="module" src="./index.ts"></script>
+<div id="StoreLocator"></div>
+<script>
+    function init(localeLang = "") {
+        const container = document.querySelector("#StoreLocator");
+        if (container) {
+            const storeLocator = new woosmapLocator({
+                $target: container,
+                initialState: {locale: localeLang}
+            });
+        }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        init();
+    });
+</script>
+<div class="language-picker" style="position:absolute; z-index: 1;right: 50px;top: 10px;">
+    <div class="language-picker__form">
+        <select name="language-picker-select" id="language-picker-select">
+            <option lang="en" value="EN" selected>English</option>
+            <option lang="fr" value="FR">Français</option>
+        </select>
+    </div>
+    <script>
+        const langSelect = document.querySelector(`[id="language-picker-select"]`);
+        langSelect.addEventListener(`change`, (e) => {
+            const select = e.target;
+            const localeLang = select.value;
+            document.documentElement.setAttribute("lang", localeLang);
+            init(localeLang)
+        });
+    </script>
+</div>
+</body>
 </html>

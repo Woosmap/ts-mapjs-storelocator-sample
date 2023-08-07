@@ -12,10 +12,12 @@ import FilterComponent, {FilterComponentEvents} from "./components/filter/filter
 import GeoJSONFeature = woosmap.map.GeoJSONFeature;
 import DirectionsComponent, {DirectionsComponentEvents} from "./components/directions/directions";
 import {directionsOptions} from "./configuration/directions.config";
+import {SYSTEM_LANG, setUserLocale} from './helpers/locale';
 import {debounce} from "./utils/utils";
 
 export interface IStoreLocator {
     initialSearch?: string;
+    locale?: string;
     padding: woosmap.map.Padding;
 }
 
@@ -40,9 +42,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
     private $sidebarContentContainer!: HTMLElement;
 
     init(): void {
-        this.state = {
-            padding: mapPaddings.full
-        };
+        setUserLocale(this.state.locale || SYSTEM_LANG);
     }
 
     render(): void {

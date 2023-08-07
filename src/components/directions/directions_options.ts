@@ -1,5 +1,6 @@
 import Component from "../component";
 import {avoidOptions, directionsOptions, unitOptions} from "../../configuration/directions.config";
+import {getLabel, getLocale} from "../../helpers/locale";
 
 export interface IDirectionsOptionsComponent {
     avoidOptions?: string[];
@@ -15,7 +16,7 @@ export default class DirectionsOptionsComponent extends Component<IDirectionsOpt
     init(): void {
         this.$element = <HTMLDivElement>document.createElement("div");
         this.$element.className = "directionsOptionsHeader collapsible";
-        this.$element.innerHTML = `<span class="collapsibleTitle">Route options</span><div class="collapsibleIcon"></div>`;
+        this.$element.innerHTML = `<span class="collapsibleTitle">${getLocale().directions.options}</span><div class="collapsibleIcon"></div>`;
         this.$element.addEventListener("click", () => this.toggleActive());
         this.$target.appendChild(this.$element);
     }
@@ -26,15 +27,15 @@ export default class DirectionsOptionsComponent extends Component<IDirectionsOpt
             $avoidOptionsContainer.className = "directionsOptions__list";
             const $avoidOptionsContent: HTMLDivElement = document.createElement("div");
             $avoidOptionsContent.className = "directionsOptions__content";
-            $avoidOptionsContent.innerHTML = "<span class='directionsOptions__header'>Avoid</span>"
+            $avoidOptionsContent.innerHTML = `<span class='directionsOptions__header'>${getLocale().directions.avoid}</span>`
             const $avoidOptions: HTMLDivElement[] = avoidOptions.map((avoidOption) => {
                 const $avoidInput: HTMLDivElement = document.createElement("div");
                 $avoidInput.className = "directionsOptions__input";
                 const checked: string = (directionsOptions.avoid as string[]).includes(avoidOption.paramKey) ? 'checked' : '';
                 $avoidInput.innerHTML = `
-                    <input id="avoid${avoidOption.paramTitle}" aria-label="Avoid ${avoidOption.paramKey}" name="avoidParams" type="checkbox" 
+                    <input id="avoid${getLabel(getLocale().directions.avoidOptions, avoidOption.paramKey)}" aria-label="Avoid ${avoidOption.paramKey}" name="avoidParams" type="checkbox" 
                            value="${avoidOption.paramKey}" ${checked}>
-                    <label for="avoid${avoidOption.paramTitle}">${avoidOption.paramTitle}</label>`;
+                    <label for="avoid${getLabel(getLocale().directions.avoidOptions, avoidOption.paramKey)}">${getLabel(getLocale().directions.avoidOptions, avoidOption.paramKey)}</label>`;
                 $avoidInput.addEventListener("click", (event) => {
                     if ((event.target as HTMLElement).nodeName === "INPUT") {
                         this.updateAvoidPreferences();
@@ -49,15 +50,15 @@ export default class DirectionsOptionsComponent extends Component<IDirectionsOpt
             $unitOptionsContainer.className = "directionsOptions__list";
             const $unitOptionsContent: HTMLDivElement = document.createElement("div");
             $unitOptionsContent.className = "directionsOptions__content";
-            $unitOptionsContent.innerHTML = "<span class='directionsOptions__header'>Distance units</span>"
+            $unitOptionsContent.innerHTML = `<span class='directionsOptions__header'>${getLocale().directions.units}</span>`
             const $unitOptions: HTMLDivElement[] = unitOptions.map((unitOption) => {
                 const $unitInput: HTMLDivElement = document.createElement("div");
                 $unitInput.className = "directionsOptions__input";
                 const checked: string = unitOption.paramKey === directionsOptions.unitSystem ? 'checked' : '';
                 $unitInput.innerHTML = `
-                    <input id="unit${unitOption.paramTitle}" aria-label="Unit ${unitOption.paramKey}" name="distanceUnits" type="radio" 
+                    <input id="unit${getLabel(getLocale().directions.unitOptions, unitOption.paramKey)}" aria-label="Unit ${unitOption.paramKey}" name="distanceUnits" type="radio" 
                            value="${unitOption.paramKey}" ${checked}>
-                    <label for="unit${unitOption.paramTitle}">${unitOption.paramTitle}</label>`;
+                    <label for="unit${getLabel(getLocale().directions.unitOptions, unitOption.paramKey)}">${getLabel(getLocale().directions.unitOptions, unitOption.paramKey)}</label>`;
                 $unitInput.addEventListener("click", (event) => {
                     if ((event.target as HTMLElement).nodeName === "INPUT") {
                         this.changeDistanceUnits();

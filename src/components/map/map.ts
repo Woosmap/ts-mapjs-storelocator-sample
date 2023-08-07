@@ -5,6 +5,8 @@ import Selectors from "../../configuration/selectors.config";
 import {AssetFeatureResponse} from "../../types/stores";
 import GeoJSONFeature = woosmap.map.GeoJSONFeature;
 import Styler from "../../helpers/styler";
+import {replace} from "../../utils/utils";
+import {getLocale, getLocaleLang} from "../../helpers/locale";
 
 export interface IMapComponent {
     woosmapPublicKey: string;
@@ -42,13 +44,16 @@ export default class MapComponent extends Component<IMapComponent> {
         if (this.state && this.$element) {
             loadScript({
                 url: Urls.mapJS,
-                params: {key: this.state.woosmapPublicKey},
+                params: {key: this.state.woosmapPublicKey, language: getLocaleLang().toLowerCase()},
             })
                 .then(() => {
                     this.initMapView();
                 })
                 .catch((error) => {
-                    console.error("failed to load the Woosmap Map JS SDK script", error);
+                    console.error(
+                        replace(getLocale().errors.loadingLibrary, {'library': "Woosmap Map JS SDK script"}),
+                        error
+                    );
                 });
         }
     }

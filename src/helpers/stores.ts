@@ -6,6 +6,7 @@ import {
     AssetWeeklyOpeningResponse,
 } from "../types/stores";
 import {availableServices} from "../configuration/search.config";
+import {getLabel, getLocale, getLocaleLang} from "./locale";
 
 export function getReadableAddress(address: AssetAddress | undefined): string {
     if (!address) {
@@ -71,7 +72,7 @@ export function getWebsiteLink(contact: AssetContact | undefined): string {
     $websiteLink.className = "contactWebsite";
     $websiteLink.href = `${contact.website}`;
     $websiteLink.target = `_blank`;
-    $websiteLink.text = `Go to website`;
+    $websiteLink.text = getLocale().stores.cta.website;
     return $websiteLink.outerHTML;
 }
 
@@ -87,69 +88,51 @@ export function getServicesList(servicesList: string[]): string {
     const servicesHTML: HTMLLIElement[] = storeServices.map((service) => {
         const $service: HTMLLIElement = document.createElement("li");
         $service.dataset.servicekey = service.serviceKey;
-        $service.dataset.servicename = service.serviceName;
+        $service.dataset.servicename = getLabel(getLocale().filtering.services, service.serviceKey);
         $service.innerHTML = `
         <div class='iconService iconService__${service.serviceKey}'></div>
-        <div class='serviceName'>${service.serviceName}</div>`;
+        <div class='serviceName'>${getLabel(getLocale().filtering.services, service.serviceKey)}</div>`;
         return $service;
     });
     $storeServices.append(...servicesHTML);
     return $storeServices.outerHTML;
 }
 
-export function getOpeningLabel(store: AssetResponse, locale = "en"): string {
+export function getOpeningLabel(store: AssetResponse): string {
     let openLabel = "";
-
-    interface ILocale {
-        [key: string]: Record<string, string>;
-    }
-
-    const i18n: ILocale = {
-        en: {
-            at: "at",
-            opensToday: "Opens today",
-            opens: "Opens",
-            openUntil: "Open until",
-        },
-        fr: {
-            at: "à",
-            opensToday: "Ouvre aujourd'hui",
-            opens: "Ouvre",
-            openUntil: "Ouvert jusqu'à",
-        },
-    };
 
     function _convertTime(UNIX_timestamp: number) {
         const a = new Date(UNIX_timestamp * 1000);
-        const months = [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-        ];
-        return months[a.getMonth()] + " " + a.getDate() + ", " + a.getFullYear();
+        return a.toLocaleString(getLocaleLang(), {weekday: "long", day: "numeric", month: "short"});
     }
 
     try {
         if (store.open?.open_now) {
-            openLabel = `${i18n[locale].openUntil} ${store.open.current_slice.end}`;
+            openLabel = `${getLocale().time.openUntil} ${store.open.current_slice.end}`;
+            if (store.weekly_opening) {
+                if (store.open.current_slice.end) {
+                    openLabel = `${getLocale().time.openUntil} ${store.open.current_slice.end}`
+                } else if (store.open.current_slice["all-day"]) {
+                    openLabel = getLocale().time.open24_7
+                }
+            } else {
+                if (store.open.current_slice.end) {
+                    openLabel = `${getLocale().time.openUntil} ${store.open.current_slice.end}`
+                } else if (store.open.current_slice["all-day"]) {
+                    openLabel = getLocale().time.open24_7
+                }
+            }
         } else if (store.open?.next_opening) {
             if (isToday(new Date(store.open?.next_opening.day))) {
                 openLabel +=
-                    openLabel += `${i18n[locale].opensToday} ${i18n[locale].at} ${store.open.next_opening.start}`;
+                    openLabel += `${getLocale().time.opensToday} ${getLocale().time.at} ${store.open.next_opening.start}`;
             } else {
-                openLabel += `${i18n[locale].opens} ${_convertTime(
+                openLabel += `${getLocale().time.opens} ${_convertTime(
                     Date.parse(store.open.next_opening.day) / 1000
-                )} ${i18n[locale].at} ${store.open.next_opening.start}`;
+                )} ${getLocale().time.at} ${store.open.next_opening.start}`;
             }
+        } else {
+            openLabel = `${getLocale().time.closed}`;
         }
         return openLabel;
     } catch (error) {
@@ -157,34 +140,34 @@ export function getOpeningLabel(store: AssetResponse, locale = "en"): string {
     }
 }
 
+
 export function getOpeningWeekList(weeklyOpening: AssetWeeklyOpeningResponse): string {
     interface IReadableOpeningHours {
         [key: string]: { dayName: string; hoursDay: string; today?: boolean };
     }
 
     const readableOpeningHours: IReadableOpeningHours = {
-        "1": {dayName: "Monday", hoursDay: ""},
-        "2": {dayName: "Tuesday", hoursDay: ""},
-        "3": {dayName: "Wednesday", hoursDay: ""},
-        "4": {dayName: "Thursday", hoursDay: ""},
-        "5": {dayName: "Friday", hoursDay: ""},
-        "6": {dayName: "Saturday", hoursDay: ""},
-        "7": {dayName: "Sunday", hoursDay: ""},
+        "1": {dayName: getLocale().time.dayOfWeek[0], hoursDay: ""},
+        "2": {dayName: getLocale().time.dayOfWeek[1], hoursDay: ""},
+        "3": {dayName: getLocale().time.dayOfWeek[2], hoursDay: ""},
+        "4": {dayName: getLocale().time.dayOfWeek[3], hoursDay: ""},
+        "5": {dayName: getLocale().time.dayOfWeek[4], hoursDay: ""},
+        "6": {dayName: getLocale().time.dayOfWeek[5], hoursDay: ""},
+        "7": {dayName: getLocale().time.dayOfWeek[0], hoursDay: ""},
     };
 
     const $storeOpeningWeek: HTMLUListElement = document.createElement("ul");
     $storeOpeningWeek.className = "storeDetails__openingWeek";
-    const today = new Date().toLocaleString("en-us", {weekday: "long"});
-
+    const today = new Date().toLocaleString(getLocaleLang(), {weekday: "long"});
     Object.entries(weeklyOpening).forEach(([day, hoursPeriod]) => {
         if (!hoursPeriod || hoursPeriod.length === 0) {
-            readableOpeningHours[day].hoursDay = "Closed";
+            readableOpeningHours[day].hoursDay = getLocale().time.closed;
         } else if (readableOpeningHours[day]) {
             if (readableOpeningHours[day].dayName === today) {
                 readableOpeningHours[day].today = true;
             }
             if (hoursPeriod.hours?.length === 0) {
-                readableOpeningHours[day].hoursDay = "Closed";
+                readableOpeningHours[day].hoursDay = getLocale().time.closed;
             } else {
                 readableOpeningHours[day].hoursDay = concatenateStoreHours(
                     hoursPeriod.hours

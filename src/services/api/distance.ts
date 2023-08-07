@@ -1,4 +1,5 @@
 import HttpClient from "../http_client";
+import {getLocale} from "../../helpers/locale";
 
 export interface ParamsRouteRequest {
     origin: string;
@@ -42,15 +43,15 @@ export default class WoosmapDistanceApi {
                 return data;
             });
         } else if (status === 401) {
-            throw new Error("Unauthorized");
+            throw new Error(getLocale().errors.apiErrors["401"]);
         } else if (status === 403) {
-            throw new Error("Forbidden");
+            throw new Error(getLocale().errors.apiErrors["403"]);
         } else if (status === 429) {
-            throw new Error("Too many requests");
+            throw new Error(getLocale().errors.apiErrors["429"]);
         } else if (status === 500) {
-            throw new Error("Internal server error");
+            throw new Error(getLocale().errors.apiErrors["500"]);
         } else if (status !== 200 && status !== 204) {
-            throw new Error("An unexpected server error occurred.");
+            throw new Error(getLocale().errors.apiErrors.other);
         }
         return Promise.resolve<woosmap.map.DirectionResult>(null as any);
     }

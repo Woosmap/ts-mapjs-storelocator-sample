@@ -1,6 +1,7 @@
 import Component from "../component";
 import {travelModes} from "../../configuration/directions.config";
 import loaderImage from "../../assets/loader.svg";
+import {getLocale} from "../../helpers/locale";
 
 export interface IRoutesSummary {
     routes: woosmap.map.DirectionRoute[];
@@ -52,12 +53,12 @@ export default class RoutesSummaryComponent extends Component<IRoutesSummary> {
                                 <div class="directionTrip__distance"> ${distance}</div>
                             </div>
                             <div>
-                                <div class="directionTrip__title">via ${summary}</div>
+                                <div class="directionTrip__title">${getLocale().directions.messages.via} ${summary}</div>
                                 <div class="directionTrip__summary">
-                                    <div >${duration} without traffic</div>
+                                    <div >${duration} ${getLocale().directions.messages.withoutTraffic}</div>
                                 </div>
                             </div>
-                            <div class="directionTrip__detailsMsg" data-detailsindex="{{ rendererIndex }}">Details</div>
+                            <div class="directionTrip__detailsMsg" data-detailsindex="{{ rendererIndex }}">${getLocale().directions.messages.details}</div>
                         </div>`;
                         $routeSummary.addEventListener("click", () => {
                             if ($routeSummary.dataset && $routeSummary.dataset.index) {
@@ -82,12 +83,12 @@ export default class RoutesSummaryComponent extends Component<IRoutesSummary> {
     setEmptyResults(): void {
         let messageBody;
         const $emptyResult: HTMLDivElement = document.createElement("div");
-        messageBody = `Search an origin and destination to see available routes and time travel..`;
+        messageBody = getLocale().directions.messages.initialBody;
         if (this.state.origin && this.state.destination) {
-            messageBody = `Sorry, we could not calculate driving directions 
-                            from "<strong>${this.state.origin}</strong>" 
-                            to "<strong>${this.state.destination}</strong>" 
-                            for the travel mode: <strong>${this.state.travelMode}</strong>`;
+            messageBody = `${getLocale().directions.messages.error} 
+                            ${getLocale().directions.messages.from} "<strong>${this.state.origin}</strong>" 
+                            ${getLocale().directions.messages.to} "<strong>${this.state.destination}</strong>" 
+                            ${getLocale().directions.messages.forTravelMode} <strong>${this.state.travelMode}</strong>`;
         }
         if (this.state.error) {
             messageBody += `<div class="directionTrip__error">${this.state.error}</div>`;

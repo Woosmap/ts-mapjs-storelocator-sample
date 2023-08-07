@@ -6,13 +6,13 @@ export const directionsOptions: Record<string, string | boolean | string[]> = {
 }
 
 export const avoidOptions: Record<string, string>[] = [
-    {paramKey: 'highways', paramTitle: 'Highways'},
-    {paramKey: 'tolls', paramTitle: 'Tolls'},
-    {paramKey: 'ferries', paramTitle: 'Ferries'}
+    {paramKey: 'highways'},
+    {paramKey: 'tolls'},
+    {paramKey: 'ferries'}
 ]
 export const unitOptions: Record<string, string>[] = [
-    {paramKey: 'METRIC', paramTitle: 'km'},
-    {paramKey: 'IMPERIAL', paramTitle: 'miles'}
+    {paramKey: 'METRIC'},
+    {paramKey: 'IMPERIAL'}
 ]
 
 

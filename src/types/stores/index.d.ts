@@ -53,6 +53,7 @@ export interface AssetAddress {
 interface AssetOpeningHoursPeriod {
   start: string;
   end: string;
+  "all-day"?: boolean;
 }
 
 interface AssetOpeningHours {

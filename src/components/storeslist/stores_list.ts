@@ -9,6 +9,7 @@ import {SearchAPIParameters} from "../../configuration/search.config";
 import {WoosmapApiClient} from "../../services/woosmap_api";
 import {WoosmapPublicKey} from "../../configuration/map.config";
 import emptyListImage from "../../assets/empty.jpg";
+import {getLocale} from "../../helpers/locale";
 
 export interface IStoresListComponent {
     stores?: AssetFeatureResponse[];
@@ -70,11 +71,11 @@ export default class StoresListComponent extends Component<IStoresListComponent>
             } else {
                 const $emptyResults: HTMLDivElement = document.createElement("div");
                 const messageHeader = this.state.stores
-                    ? "No Stores Returned"
-                    : "Start by Searching a Locality";
+                    ? getLocale().stores.messages.emptyHeader
+                    : getLocale().stores.messages.initialHeader;
                 const messageBody = this.state.stores
-                    ? "Please Search a locality elsewhere or unselect your filters"
-                    : "Or click on the Map to select a store";
+                    ? getLocale().stores.messages.emptyBody
+                    : getLocale().stores.messages.initialBody;
                 $emptyResults.innerHTML = `
                 <div class="summaryStore__empty">
                     <div>
