@@ -45,6 +45,7 @@ export default class MapComponent extends Component<IMapComponent> {
             loadScript({
                 url: getConfig().urls.mapJS,
                 params: {key: this.state.woosmapPublicKey, language: getLocaleLang().toLowerCase()},
+                override: true
             })
                 .then(() => {
                     this.initMapView();
