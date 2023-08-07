@@ -1,11 +1,11 @@
 import Component from "../component";
-import Urls from "../../configuration/urls.config";
 import {loadScript} from "../../utils/load_script";
 import GeolocateComponent, {GeolocateComponentEvents} from "./geolocate";
 import {GenericPosition} from "../../services/geolocation";
 import {loadCss} from "../../utils/load_css";
 import {getLocale, getLocaleLang} from "../../helpers/locale";
 import {replace} from "../../utils/utils";
+import {getConfig} from "../../configuration/config";
 
 export interface SearchLocation {
     name: string;
@@ -39,10 +39,10 @@ export default class SearchComponent extends Component<ISearchComponent> {
     render(): void {
         if (this.state && this.$element) {
             loadScript({
-                url: Urls.localitiesWidgetJS,
+                url: getConfig().urls.localitiesWidgetJS,
                 params: {key: this.state.woosmapPublicKey, language: getLocaleLang().toLowerCase()}
             })
-                .then(() => loadCss(Urls.localitiesWidgetCSS))
+                .then(() => loadCss(getConfig().urls.localitiesWidgetCSS))
                 .then(() => this.initSearchView())
                 .catch((error) => {
                     console.error(
@@ -149,7 +149,7 @@ export default class SearchComponent extends Component<ISearchComponent> {
     loadWidgetStylesheet(): void {
         const newLink: HTMLLinkElement = document.createElement("link");
         newLink.rel = "stylesheet";
-        newLink.href = Urls.localitiesWidgetCSS;
+        newLink.href = getConfig().urls.localitiesWidgetCSS;
         document.head.insertBefore(newLink, document.head.firstElementChild);
     }
 

@@ -18,14 +18,51 @@
 <script type="module" src="./index.ts"></script>
 <div id="StoreLocator"></div>
 <script>
+    let storeLocator;
+
     function init(localeLang = "") {
         const container = document.querySelector("#StoreLocator");
         if (container) {
-            const storeLocator = new woosmapLocator({
+            storeLocator = new woosmapLocator({
                 $target: container,
-                initialState: {locale: localeLang}
+                initialState: {
+                    locale: localeLang,
+                    config: {
+                        map: {
+                            woosmapPublicKey: "woos-48c80350-88aa-333e-835a-07f4b658a9a4",
+                            storesStyle: {
+                                breakPoint: 11,
+                                default: {
+                                    color: "#008a2f",
+                                    size: 8,
+                                    minSize: 1,
+                                    icon: {
+                                        url: "https://images.woosmap.com/starbucks-marker.svg",
+                                        scaledSize: {
+                                            height: 40,
+                                            width: 34,
+                                        },
+                                    },
+                                    selectedIcon: {
+                                        url: "https://images.woosmap.com/starbucks-marker-selected.svg",
+                                        scaledSize: {
+                                            height: 50,
+                                            width: 43,
+                                        },
+                                    },
+                                },
+                            }
+                        }
+                    }
+                }
             });
         }
+    }
+
+    function changeLocale(localeLang = "") {
+        storeLocator.setState({
+            locale: localeLang,
+        }, false);
     }
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -45,7 +82,7 @@
             const select = e.target;
             const localeLang = select.value;
             document.documentElement.setAttribute("lang", localeLang);
-            init(localeLang)
+            changeLocale(localeLang)
         });
     </script>
 </div>

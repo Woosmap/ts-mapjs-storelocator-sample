@@ -1,19 +1,19 @@
 /// <reference types="cypress" />
 
-import Selectors from "../../src/configuration/selectors.config";
 import tiles from "../fixtures/tiles";
 import streets from "../fixtures/streets";
 import VisitOptions = Cypress.VisitOptions;
+import {getConfig} from "../../src/configuration/config";
 
 Cypress.Commands.add("getStoreLocator", () => {
     return cy.window().its("woosmapStoreLocator");
 });
 
 Cypress.Commands.add("searchLocality", (input: string) => {
-    cy.get(`#${Selectors.searchInputID}`).should('be.visible')
+    cy.get(`#${getConfig().selectors.searchInputID}`).should('be.visible')
         .type(input)
     cy.get(`.localities-container li[tabindex=1]`).should('be.visible')
-    cy.get(`#${Selectors.searchInputID}`)
+    cy.get(`#${getConfig().selectors.searchInputID}`)
         .type("{enter}")
 });
 

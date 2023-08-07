@@ -5,11 +5,10 @@ import {
     getReadableAddress,
     getReadableDistance,
 } from "../../helpers/stores";
-import {SearchAPIParameters} from "../../configuration/search.config";
 import {WoosmapApiClient} from "../../services/woosmap_api";
-import {WoosmapPublicKey} from "../../configuration/map.config";
 import emptyListImage from "../../assets/empty.jpg";
 import {getLocale} from "../../helpers/locale";
+import {getConfig} from "../../configuration/config";
 
 export interface IStoresListComponent {
     stores?: AssetFeatureResponse[];
@@ -30,7 +29,7 @@ export default class StoresListComponent extends Component<IStoresListComponent>
     private api!: WoosmapApiClient;
 
     init(): void {
-        this.api = new WoosmapApiClient({apiKey: WoosmapPublicKey});
+        this.api = new WoosmapApiClient({apiKey: getConfig().map.woosmapPublicKey});
         this.$element = document.createElement("ul");
         this.$target.appendChild(this.$element);
         this.on(StoresListComponentEvents.LOCALITY_CHANGED, () => {
@@ -91,7 +90,7 @@ export default class StoresListComponent extends Component<IStoresListComponent>
 
     searchStores(): void {
         if (this.state.nearbyLocation) {
-            let params = Object.assign({}, SearchAPIParameters, {
+            let params = Object.assign({}, getConfig().search.searchAPIParameters, {
                 lat: this.state.nearbyLocation.lat,
                 lng: this.state.nearbyLocation.lng,
             });

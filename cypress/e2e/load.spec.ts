@@ -1,10 +1,8 @@
 /// <reference types="cypress" />
+import {getConfig} from "../../src/configuration/config";
 
-import {WoosmapPublicKey} from "../../src/configuration/map.config";
-import Urls from "../../src/configuration/urls.config";
-
-const mapJSUrl = `${Urls.mapJS}?key=${WoosmapPublicKey}&language=en`;
-const localitiesJSUrl = `${Urls.localitiesWidgetJS}?key=${WoosmapPublicKey}&language=en`;
+const mapJSUrl = `${getConfig().urls.mapJS}?key=${getConfig().map.woosmapPublicKey}&language=en`;
+const localitiesJSUrl = `${getConfig().urls.localitiesWidgetJS}?key=${getConfig().map.woosmapPublicKey}&language=en`;
 
 describe('Opening Store Locator', () => {
     before(() => {

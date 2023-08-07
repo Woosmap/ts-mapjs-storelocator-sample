@@ -1,4 +1,4 @@
-enum Selectors {
+enum selectors {
     mapContainerID = "mapContainer",
     mapWrapperID = "mapWrapper",
     sidebarContainerID = "sidebarContainer",
@@ -14,4 +14,4 @@ enum Selectors {
     roadbookContainerID = "directionsInstructionsContainer",
 }
 
-export default Selectors;
+export default selectors;

@@ -1,6 +1,6 @@
 import Component from "../component";
-import {avoidOptions, directionsOptions, unitOptions} from "../../configuration/directions.config";
 import {getLabel, getLocale} from "../../helpers/locale";
+import {getConfig} from "../../configuration/config";
 
 export interface IDirectionsOptionsComponent {
     avoidOptions?: string[];
@@ -28,10 +28,10 @@ export default class DirectionsOptionsComponent extends Component<IDirectionsOpt
             const $avoidOptionsContent: HTMLDivElement = document.createElement("div");
             $avoidOptionsContent.className = "directionsOptions__content";
             $avoidOptionsContent.innerHTML = `<span class='directionsOptions__header'>${getLocale().directions.avoid}</span>`
-            const $avoidOptions: HTMLDivElement[] = avoidOptions.map((avoidOption) => {
+            const $avoidOptions: HTMLDivElement[] = getConfig().directions.avoidOptions.map((avoidOption) => {
                 const $avoidInput: HTMLDivElement = document.createElement("div");
                 $avoidInput.className = "directionsOptions__input";
-                const checked: string = (directionsOptions.avoid as string[]).includes(avoidOption.paramKey) ? 'checked' : '';
+                const checked: string = (getConfig().directions.directionsOptions.avoid as string[]).includes(avoidOption.paramKey) ? 'checked' : '';
                 $avoidInput.innerHTML = `
                     <input id="avoid${getLabel(getLocale().directions.avoidOptions, avoidOption.paramKey)}" aria-label="Avoid ${avoidOption.paramKey}" name="avoidParams" type="checkbox" 
                            value="${avoidOption.paramKey}" ${checked}>
@@ -51,10 +51,10 @@ export default class DirectionsOptionsComponent extends Component<IDirectionsOpt
             const $unitOptionsContent: HTMLDivElement = document.createElement("div");
             $unitOptionsContent.className = "directionsOptions__content";
             $unitOptionsContent.innerHTML = `<span class='directionsOptions__header'>${getLocale().directions.units}</span>`
-            const $unitOptions: HTMLDivElement[] = unitOptions.map((unitOption) => {
+            const $unitOptions: HTMLDivElement[] = getConfig().directions.unitOptions.map((unitOption) => {
                 const $unitInput: HTMLDivElement = document.createElement("div");
                 $unitInput.className = "directionsOptions__input";
-                const checked: string = unitOption.paramKey === directionsOptions.unitSystem ? 'checked' : '';
+                const checked: string = unitOption.paramKey === getConfig().directions.directionsOptions.unitSystem ? 'checked' : '';
                 $unitInput.innerHTML = `
                     <input id="unit${getLabel(getLocale().directions.unitOptions, unitOption.paramKey)}" aria-label="Unit ${unitOption.paramKey}" name="distanceUnits" type="radio" 
                            value="${unitOption.paramKey}" ${checked}>
