@@ -3,7 +3,7 @@
 import searchInput from "../fixtures/searchInput";
 import {getConfig} from "../../src/configuration/config";
 
-const localitiesJSUrl = `${getConfig().urls.localitiesWidgetJS}?key=${getConfig().map.woosmapPublicKey}&language=en`;
+const localitiesJSUrl = `${getConfig().urls.localitiesWidgetJS}?key=${getConfig().map.woosmapPublicKey}`;
 
 describe('Searching for locality Use Case', () => {
     before(() => {
