@@ -79,7 +79,7 @@ export default class StoreDetailsComponent extends Component<IStoreDetailsCompon
             $websiteBtn.className = "button";
             $websiteBtn.innerHTML = `<div class="buttonIcon websiteButton"></div><span>${getLocale().stores.cta.website}</span>`;
             $websiteBtn.addEventListener("click", () => {
-                window.open(`${properties.contact?.website}`, '_blank');
+                window.open(`${properties.contact?.website}`, '_self');
             });
             $storeDetailsActions.appendChild($websiteBtn)
         }

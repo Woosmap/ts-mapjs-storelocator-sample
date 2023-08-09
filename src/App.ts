@@ -19,10 +19,12 @@ export interface IStoreLocator {
     initialSearch?: string;
     locale?: string;
     padding: woosmap.map.Padding;
+    enableHistory?: boolean;
 }
 
 export enum StoreLocatorEvents {
-    PADDING_CHANGED = "padding_changed"
+    PADDING_CHANGED = "padding_changed",
+    STORES_RESULTS_CHANGED = "stores_results_changed"
 }
 
 export enum StoreLocatorViews {
@@ -40,9 +42,12 @@ export default class StoreLocator extends Component<IStoreLocator> {
     public storeDetailsComponent!: StoreDetailsComponent;
     public filterComponent!: FilterComponent;
     private $sidebarContentContainer!: HTMLElement;
+    private storesResults!: GeoJSONFeature[];
+    private selectedLocality!:string;
 
     init(): void {
         setUserLocale(this.state.locale || SYSTEM_LANG);
+
     }
 
     render(): void {
@@ -89,7 +94,8 @@ export default class StoreLocator extends Component<IStoreLocator> {
             $target: document.getElementById(
                 Selectors.listStoresContainerID
             ) as HTMLElement,
-            initialState: {},
+            initialState: {
+            },
         });
         this.storeDetailsComponent = new StoreDetailsComponent({
             $target: document.getElementById(
@@ -121,6 +127,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 this.directionsComponent.setState({
                     origin: {location: locality.location, name: locality.name}
                 }, true);
+                this.selectedLocality = locality.name;
                 this.setListView();
             }
         );
@@ -130,7 +137,11 @@ export default class StoreLocator extends Component<IStoreLocator> {
                     this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
                 );
                 this.directionsComponent.setState({origin: undefined}, true);
+                this.storesResults = [];
                 this.setListView();
+                if(this.state.enableHistory){
+                    this.setStoresHistory();
+                }
             }
         );
         this.storesListComponent.on(StoresListComponentEvents.STORES_CHANGED, (stores: GeoJSONFeature[]) => {
@@ -138,14 +149,24 @@ export default class StoreLocator extends Component<IStoreLocator> {
             this.mapComponent.setState({stores: stores}, true, () =>
                 this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
             );
+            this.storesResults = stores;
             this.setListView();
+            if(this.state.enableHistory){
+                this.setStoresHistory();
+            } 
+            this.emit(StoreLocatorEvents.STORES_RESULTS_CHANGED, stores);
+           
         });
         this.storesListComponent.on(StoresListComponentEvents.STORE_SELECTED, (selectedStore: AssetFeatureResponse) => {
                 this.storeDetailsComponent.setState({store: selectedStore});
                 this.mapComponent.setState({selectedStore: selectedStore}, true, () =>
                     this.mapComponent.selectStore()
                 );
-                this.setDetailsView();
+                this.setDetailsView();    
+                this.storesResults = [selectedStore];
+                if(this.state.enableHistory){
+                    this.setStoresHistory();
+                }       
             }
         );
         this.storesListComponent.on(StoresListComponentEvents.STORE_MOUSEENTER, debounce((selectedStore: AssetFeatureResponse) => {
@@ -160,7 +181,9 @@ export default class StoreLocator extends Component<IStoreLocator> {
             this.mapComponent.setState({selectedStore: undefined}, true, () =>
                 this.mapComponent.emit(MapComponentEvents.STORE_UNSELECTED)
             );
+            this.storesResults = [];
             this.setListView();
+            this.setStoresHistory();
         });
         this.mapComponent.on(MapComponentEvents.MAP_READY, () => {
             this.directionsComponent.emit(DirectionsComponentEvents.MAP_READY, this.mapComponent.map);
@@ -205,6 +228,10 @@ export default class StoreLocator extends Component<IStoreLocator> {
                     );
                 } else {
                     this.setDetailsView();
+                    this.storesResults = [selectedStore];
+                    if(this.state.enableHistory){
+                        this.setStoresHistory();
+                    }
                 }
             } else {
                 this.setDetailsView();
@@ -227,6 +254,26 @@ export default class StoreLocator extends Component<IStoreLocator> {
         window.addEventListener('resize', debounce(() => {
             this.managePadding();
         }, 100))
+        window.addEventListener('load', () => {
+            if(window.history && history.length > 1){
+                const storesFromHistory = history.state;
+                if(storesFromHistory && storesFromHistory.stores){
+                    if(JSON.parse(storesFromHistory.stores).length > 1){
+                        this.storesListComponent.setState({stores : JSON.parse(storesFromHistory.stores)})
+                        this.setListView();
+                        storesFromHistory.locality &&this.searchComponent.setLocality(storesFromHistory.locality);                       
+                    }
+                    else if (JSON.parse(storesFromHistory.stores).length === 1){
+                        const selectedStore = JSON.parse(storesFromHistory.stores)[0]
+                        this.storeDetailsComponent.setState({store : selectedStore});
+                        this.mapComponent.setState({selectedStore: selectedStore}, true, () =>
+                            this.mapComponent.selectStore()
+                        );
+                        this.setDetailsView();
+                    }
+                }
+            }
+        })
         this.managePadding();
     }
 
@@ -289,5 +336,14 @@ export default class StoreLocator extends Component<IStoreLocator> {
         <div id="${Selectors.directionsContainerID}"></div>   
         <div id="${Selectors.roadbookContainerID}"></div>
         </div>`;
+    }
+    setStoresHistory():void {
+        const storesHistory = { stores: JSON.stringify(this.storesResults), locality: this.selectedLocality };
+        if(window.history.state){
+            window.history.replaceState(storesHistory,'');
+        }
+        else{
+            window.history.pushState(storesHistory,'');
+        }       
     }
 }

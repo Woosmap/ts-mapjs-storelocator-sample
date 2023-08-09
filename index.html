@@ -23,14 +23,19 @@
         if (container) {
             const storeLocator = new woosmapLocator({
                 $target: container,
-                initialState: {locale: localeLang}
+                initialState: {locale: localeLang, enableHistory: true}
             });
+            storeLocator.on('stores_results_changed' ,(e) => {
+                console.log('Stores Results ', e);
+                // window.localStorage.setItem('stores', JSON.stringify(e));
+            })
         }
     }
 
     window.addEventListener("DOMContentLoaded", () => {
         init();
     });
+    
 </script>
 <div class="language-picker" style="position:absolute; z-index: 1;right: 50px;top: 10px;">
     <div class="language-picker__form">
