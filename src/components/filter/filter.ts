@@ -1,6 +1,6 @@
 import Component from "../component";
-import {availableServices} from "../../configuration/search.config";
 import {getLabel, getLocale} from "../../helpers/locale";
+import {getConfig} from "../../configuration/config";
 
 export interface IFilterComponent {
     activeFilters?: string[];
@@ -24,7 +24,7 @@ export default class FilterComponent extends Component<IFilterComponent> {
         if (this.state && this.$element) {
             const $listServices: HTMLUListElement = document.createElement("ul");
             $listServices.className = "filterList collapsibleContent";
-            const servicesHTML: HTMLLIElement[] = availableServices.map((service) => {
+            const servicesHTML: HTMLLIElement[] = getConfig().search.availableServices.map((service) => {
                 const $service: HTMLLIElement = document.createElement("li");
                 $service.dataset.servicekey = service.serviceKey;
                 $service.dataset.servicename = getLabel(getLocale().filtering.services,service.serviceKey);

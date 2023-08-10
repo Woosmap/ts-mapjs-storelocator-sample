@@ -1,4 +1,4 @@
-import {WoosmapPublicKey} from "../../src/configuration/map.config";
+import {getConfig} from "../../src/configuration/config";
 
 export default {
     "version": 8,
@@ -10,7 +10,7 @@ export default {
     "sources": {
         "openmaptiles": {
             "type": "vector",
-            "url": `https://api.woosmap.com/maps/tiles.json?key=${WoosmapPublicKey}`
+            "url": `https://api.woosmap.com/maps/tiles.json?key=${getConfig().map.woosmapPublicKey}`
         }
     },
     "sprite": "https://sdk.woosmap.com/map/assets/sprite",

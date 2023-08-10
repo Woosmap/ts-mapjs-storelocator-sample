@@ -1,15 +1,15 @@
 import {ParamsSearchRequest} from "../services/api/stores";
 
-export const LocalitiesConf: woosmap.localities.AutocompleteParameters = {
+const localitiesConf: woosmap.localities.AutocompleteParameters = {
     minLength: 0,
     data: 'advanced',
     types: ['locality', 'postal_code', 'address', 'admin_level', 'airport', 'train_station', 'metro_station', 'shopping', 'country']
 };
-export const SearchAPIParameters: ParamsSearchRequest = {
+const searchAPIParameters: ParamsSearchRequest = {
     stores_by_page: 15,
     radius: 500000
 };
-export const availableServices: Record<string, string>[] = [
+const availableServices: Record<string, string>[] = [
     {serviceKey: 'WF'},
     {serviceKey: 'CD'},
     {serviceKey: 'DT'},
@@ -22,3 +22,9 @@ export const availableServices: Record<string, string>[] = [
     {serviceKey: 'NB'},
     {serviceKey: 'CL'},
 ];
+
+export default {
+    availableServices: availableServices,
+    searchAPIParameters: searchAPIParameters,
+    localitiesConf: localitiesConf
+}

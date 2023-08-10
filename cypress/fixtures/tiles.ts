@@ -1,4 +1,4 @@
-import {WoosmapPublicKey} from "../../src/configuration/map.config";
+import {getConfig} from "../../src/configuration/config";
 
 export default {
     "tilejson": "2.0.0",
@@ -785,6 +785,6 @@ export default {
         20037471.20513706
     ],
     "tiles": [
-        `https://api.woosmap.com/maps/tiles/{z}/{x}/{y}?key=${WoosmapPublicKey}`
+        `https://api.woosmap.com/maps/tiles/{z}/{x}/{y}?key=${getConfig().map.woosmapPublicKey}`
     ]
 }

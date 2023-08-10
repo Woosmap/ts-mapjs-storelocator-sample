@@ -55,7 +55,7 @@ export default {
             website: "Website"
         },
         messages: {
-            initialHeader: "Start by searching a locality to display nearby srtores",
+            initialHeader: "Start by searching a locality to display nearby stores",
             emptyHeader: "No store returned",
             initialBody: "or click on the Map to select a store",
             emptyBody: "Please Search a locality elsewhere or unselect your filters"

@@ -1,12 +1,11 @@
 import Component from "../component";
-import Urls from "../../configuration/urls.config";
 import {loadScript} from "../../utils/load_script";
-import Selectors from "../../configuration/selectors.config";
 import {AssetFeatureResponse} from "../../types/stores";
 import GeoJSONFeature = woosmap.map.GeoJSONFeature;
 import Styler from "../../helpers/styler";
 import {replace} from "../../utils/utils";
 import {getLocale, getLocaleLang} from "../../helpers/locale";
+import {getConfig} from "../../configuration/config";
 
 export interface IMapComponent {
     woosmapPublicKey: string;
@@ -24,7 +23,8 @@ export enum MapComponentEvents {
     STORE_SELECTED = "store_selected",
     STORE_UNSELECTED = "store_unselected",
     FILTERS_UPDATED = "filters_updated",
-    MAP_READY = "map_ready"
+    MAP_READY = "map_ready",
+    MAP_IDLE = "map_idle"
 }
 
 export default class MapComponent extends Component<IMapComponent> {
@@ -36,15 +36,16 @@ export default class MapComponent extends Component<IMapComponent> {
 
     init(): void {
         this.$element = document.createElement("div");
-        this.$element.id = Selectors.mapWrapperID;
+        this.$element.id = getConfig().selectors.mapWrapperID;
         this.$target.appendChild(this.$element);
     }
 
     render(): void {
         if (this.state && this.$element) {
             loadScript({
-                url: Urls.mapJS,
+                url: getConfig().urls.mapJS,
                 params: {key: this.state.woosmapPublicKey, language: getLocaleLang().toLowerCase()},
+                override: true
             })
                 .then(() => {
                     this.initMapView();
@@ -60,7 +61,7 @@ export default class MapComponent extends Component<IMapComponent> {
 
     initMapView(): void {
         this.map = new woosmap.map.Map(
-            Selectors.mapWrapperID,
+            getConfig().selectors.mapWrapperID,
             this.state.mapOptions
         );
         this.styler = new Styler(this.state.storesStyle);
@@ -95,6 +96,9 @@ export default class MapComponent extends Component<IMapComponent> {
         woosmap.map.event.addListener(this.map, "store_selected", (store) => {
             this.handleSelectedStore(store);
         });
+        woosmap.map.event.addListenerOnce(this.map, 'idle', () => {
+            this.emit(MapComponentEvents.MAP_IDLE);
+        })
 
         this.on(MapComponentEvents.STORES_CHANGED, () => {
             this.handleStores();

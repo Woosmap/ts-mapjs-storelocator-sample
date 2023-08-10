@@ -2,9 +2,7 @@ import HttpClient from "./http_client";
 
 import WoosmapStoresApi from "./api/stores";
 import WoosmapDistanceApi from "./api/distance";
-
-import urlsConfig from "../configuration/urls.config";
-import { WoosmapPublicKey } from "../configuration/map.config";
+import {getConfig} from "../configuration/config";
 
 export class WoosmapApiClient {
   private readonly httpClient: HttpClient;
@@ -14,8 +12,8 @@ export class WoosmapApiClient {
   constructor(params: { apiKey?: string; baseUrl?: string }) {
     this.httpClient = new HttpClient({
       ...params,
-      baseUrl: params.baseUrl || urlsConfig.baseApiUrl,
-      apiKey: params.apiKey || WoosmapPublicKey,
+      baseUrl: params.baseUrl || getConfig().urls.baseApiUrl,
+      apiKey: params.apiKey || getConfig().map.woosmapPublicKey,
     });
 
     this._stores = new WoosmapStoresApi(this.httpClient);

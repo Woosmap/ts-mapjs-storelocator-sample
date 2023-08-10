@@ -5,8 +5,8 @@ import {
     AssetResponse,
     AssetWeeklyOpeningResponse,
 } from "../types/stores";
-import {availableServices} from "../configuration/search.config";
 import {getLabel, getLocale, getLocaleLang} from "./locale";
+import {getConfig} from "../configuration/config";
 
 export function getReadableAddress(address: AssetAddress | undefined): string {
     if (!address) {
@@ -80,7 +80,7 @@ export function getServicesList(servicesList: string[]): string {
     const storeServices = servicesList
         .map(
             (service) =>
-                availableServices.filter(({serviceKey}) => serviceKey === service)[0]
+                getConfig().search.availableServices.filter(({serviceKey}) => serviceKey === service)[0]
         )
         .filter((x) => x);
     const $storeServices: HTMLUListElement = document.createElement("ul");

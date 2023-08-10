@@ -11,11 +11,11 @@ let cachedScripts: Record<string, Promise<void>> = {};
  *
  * Multiple requests to the same resource will return the same promise.
  *
- * @param {Object} options - used to set the script url and query parameters.
+ * @param {Object} options - used to set the script url, query parameters and if the script should be overridden.
  * @return {Promise<void>} returns a promise to indicate if the script was successfully loaded.
  */
-export function loadScript(options: { url: string; params?: Record<string, string>; }): Promise<void> {
-    const {url, params} = options;
+export function loadScript(options: { url: string; params?: Record<string, string>; override?: boolean }): Promise<void> {
+    const {url, params, override} = options;
     if (!url || url.length === 0) {
         throw new Error("Invalid url.");
     }
@@ -26,7 +26,15 @@ export function loadScript(options: { url: string; params?: Record<string, strin
     const src = `${url}?${objectToQueryString(params)}`;
     const existing = cachedScripts[src];
     if (existing) {
-        return existing;
+        if (override) {
+            const script = getScriptElement(src);
+            if (script) {
+                delete cachedScripts[src];
+                script.remove();
+            }
+        } else {
+            return existing
+        }
     }
 
     const promise = new Promise<void>((resolve, reject) => {
@@ -79,6 +87,18 @@ function findScript(src: string): boolean | null {
     return true;
 }
 
+/**
+ * Get script by src in the DOM
+ * @param {string} src - used to set the script url and attributes.
+ * @return {HTMLScriptElement | null} returns existing `HTMLScriptElement` if script exist otherwise `null`.
+ */
+function getScriptElement(src: string): HTMLScriptElement | null {
+    const currentScript: HTMLScriptElement | null = document.querySelector(`script[src="${src}"]`);
+    if (currentScript === null) {
+        return null
+    }
+    return currentScript;
+}
 
 /**
  * Creates Script Element
