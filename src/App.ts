@@ -24,7 +24,7 @@ export interface IStoreLocator {
 
 export enum StoreLocatorEvents {
     PADDING_CHANGED = "padding_changed",
-    STORES_RESULTS_CHANGED = "stores_results_changed"
+    STORES_SEARCHED = "stores_searched"
 }
 
 export enum StoreLocatorViews {
@@ -43,6 +43,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
     public filterComponent!: FilterComponent;
     private $sidebarContentContainer!: HTMLElement;
     private storesResults!: GeoJSONFeature[];
+    private selectedStore!: AssetFeatureResponse;
     private selectedLocality!:string;
 
     init(): void {
@@ -132,12 +133,12 @@ export default class StoreLocator extends Component<IStoreLocator> {
             }
         );
         this.searchComponent.on(SearchComponentEvents.SEARCH_CLEAR, () => {
+                this.storesResults = [];
                 this.storesListComponent.setState({nearbyLocation: undefined, stores: []});
                 this.mapComponent.setState({selectedStore: undefined, stores: []}, true, () =>
                     this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
                 );
                 this.directionsComponent.setState({origin: undefined}, true);
-                this.storesResults = [];
                 this.setListView();
                 if(this.state.enableHistory){
                     this.setStoresHistory();
@@ -154,7 +155,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
             if(this.state.enableHistory){
                 this.setStoresHistory();
             } 
-            this.emit(StoreLocatorEvents.STORES_RESULTS_CHANGED, stores);
+            this.emit(StoreLocatorEvents.STORES_SEARCHED, stores);
            
         });
         this.storesListComponent.on(StoresListComponentEvents.STORE_SELECTED, (selectedStore: AssetFeatureResponse) => {
@@ -163,7 +164,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
                     this.mapComponent.selectStore()
                 );
                 this.setDetailsView();    
-                this.storesResults = [selectedStore];
+                this.selectedStore = selectedStore;
                 if(this.state.enableHistory){
                     this.setStoresHistory();
                 }       
@@ -228,7 +229,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
                     );
                 } else {
                     this.setDetailsView();
-                    this.storesResults = [selectedStore];
+                    this.selectedStore = selectedStore;
                     if(this.state.enableHistory){
                         this.setStoresHistory();
                     }
@@ -257,19 +258,26 @@ export default class StoreLocator extends Component<IStoreLocator> {
         window.addEventListener('load', () => {
             if(window.history && history.length > 1){
                 const storesFromHistory = history.state;
-                if(storesFromHistory && storesFromHistory.stores){
+                if(storesFromHistory && storesFromHistory.selectedStore){
+                    const selectedStore = JSON.parse(storesFromHistory.selectedStore)
+                    this.storeDetailsComponent.setState({store : selectedStore});
+                    this.mapComponent.setState({selectedStore: selectedStore}, true, () =>
+                        this.mapComponent.selectStore()
+                    );
+                    this.mapComponent.setState({stores: JSON.parse(storesFromHistory.stores)}, true, () =>
+                            this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
+                    );   
+                    this.mapComponent.selectStoreOnDataOverlay(selectedStore); 
+                    this.setDetailsView();
+                }
+                else {
                     if(JSON.parse(storesFromHistory.stores).length > 1){
                         this.storesListComponent.setState({stores : JSON.parse(storesFromHistory.stores)})
                         this.setListView();
-                        storesFromHistory.locality &&this.searchComponent.setLocality(storesFromHistory.locality);                       
-                    }
-                    else if (JSON.parse(storesFromHistory.stores).length === 1){
-                        const selectedStore = JSON.parse(storesFromHistory.stores)[0]
-                        this.storeDetailsComponent.setState({store : selectedStore});
-                        this.mapComponent.setState({selectedStore: selectedStore}, true, () =>
-                            this.mapComponent.selectStore()
-                        );
-                        this.setDetailsView();
+                        storesFromHistory.locality &&this.searchComponent.setLocality(storesFromHistory.locality);  
+                        this.mapComponent.setState({stores: JSON.parse(storesFromHistory.stores)}, true, () =>
+                            this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
+                        );                   
                     }
                 }
             }
@@ -338,12 +346,14 @@ export default class StoreLocator extends Component<IStoreLocator> {
         </div>`;
     }
     setStoresHistory():void {
-        const storesHistory = { stores: JSON.stringify(this.storesResults), locality: this.selectedLocality };
+        const storesHistory = { stores: JSON.stringify(this.storesResults), 
+                                locality: this.selectedLocality, 
+                                selectedStore: JSON.stringify(this.selectedStore) };
         if(window.history.state){
             window.history.replaceState(storesHistory,'');
         }
         else{
             window.history.pushState(storesHistory,'');
-        }       
+        }   
     }
 }

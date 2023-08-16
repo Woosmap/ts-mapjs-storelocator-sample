@@ -25,7 +25,7 @@
                 $target: container,
                 initialState: {locale: localeLang, enableHistory: true}
             });
-            storeLocator.on('stores_results_changed' ,(e) => {
+            storeLocator.on('stores_searched' ,(e) => {
                 console.log('Stores Results ', e);
                 // window.localStorage.setItem('stores', JSON.stringify(e));
             })
