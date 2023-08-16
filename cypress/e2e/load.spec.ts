@@ -3,8 +3,8 @@
 import {WoosmapPublicKey} from "../../src/configuration/map.config";
 import Urls from "../../src/configuration/urls.config";
 
-const mapJSUrl = `${Urls.mapJS}?key=${WoosmapPublicKey}&language=en`;
-const localitiesJSUrl = `${Urls.localitiesWidgetJS}?key=${WoosmapPublicKey}&language=en`;
+const mapJSUrl = `${Urls.mapJS}?key=${WoosmapPublicKey}`;
+const localitiesJSUrl = `${Urls.localitiesWidgetJS}?key=${WoosmapPublicKey}`;
 
 describe('Opening Store Locator', () => {
     before(() => {

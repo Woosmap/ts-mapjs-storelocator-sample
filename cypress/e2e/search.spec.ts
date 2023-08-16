@@ -5,7 +5,7 @@ import searchInput from "../fixtures/searchInput";
 import Urls from "../../src/configuration/urls.config";
 import {WoosmapPublicKey} from "../../src/configuration/map.config";
 
-const localitiesJSUrl = `${Urls.localitiesWidgetJS}?key=${WoosmapPublicKey}&language=en`;
+const localitiesJSUrl = `${Urls.localitiesWidgetJS}?key=${WoosmapPublicKey}`;
 
 describe('Searching for locality Use Case', () => {
     before(() => {
