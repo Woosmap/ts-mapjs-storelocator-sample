@@ -257,25 +257,27 @@ export default class StoreLocator extends Component<IStoreLocator> {
         }, 100))
         window.addEventListener('load', () => {
             if(window.history && history.length > 1){
-                const storesFromHistory = history.state;
-                if(storesFromHistory && storesFromHistory.selectedStore){
-                    const selectedStore = JSON.parse(storesFromHistory.selectedStore)
+                const searchHistory = history.state;
+                if(searchHistory && searchHistory.selectedStore){
+                    const selectedStore = JSON.parse(searchHistory.selectedStore)
                     this.storeDetailsComponent.setState({store : selectedStore});
                     this.mapComponent.setState({selectedStore: selectedStore}, true, () =>
                         this.mapComponent.selectStore()
                     );
-                    this.mapComponent.setState({stores: JSON.parse(storesFromHistory.stores)}, true, () =>
-                            this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
-                    );   
+                    if(searchHistory.stores){
+                        this.mapComponent.setState({stores: JSON.parse(searchHistory.stores)}, true, () =>
+                        this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
+                    );  
+                    } 
                     this.mapComponent.selectStoreOnDataOverlay(selectedStore); 
                     this.setDetailsView();
                 }
                 else {
-                    if(JSON.parse(storesFromHistory.stores).length > 1){
-                        this.storesListComponent.setState({stores : JSON.parse(storesFromHistory.stores)})
+                    if(searchHistory && searchHistory.stores && JSON.parse(searchHistory.stores).length > 1){
+                        this.storesListComponent.setState({stores : JSON.parse(searchHistory.stores)})
                         this.setListView();
-                        storesFromHistory.locality &&this.searchComponent.setLocality(storesFromHistory.locality);  
-                        this.mapComponent.setState({stores: JSON.parse(storesFromHistory.stores)}, true, () =>
+                        searchHistory.locality &&this.searchComponent.setLocality(searchHistory.locality);  
+                        this.mapComponent.setState({stores: JSON.parse(searchHistory.stores)}, true, () =>
                             this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
                         );                   
                     }
