@@ -1,15 +1,12 @@
 import Component from "../component";
-import Selectors from "../../configuration/selectors.config";
 import TravelModeComponent, {TravelModeComponentEvents} from "./travel_mode";
 import SearchComponent, {SearchComponentEvents, SearchLocation} from "../search/search";
-import {WoosmapPublicKey} from "../../configuration/map.config";
-import {LocalitiesConf} from "../../configuration/search.config";
 import {WoosmapApiClient} from "../../services/woosmap_api";
 import {decodePolyline, getTextWidth} from "../../utils/utils";
 import RoutesSummaryComponent, {RoutesSummaryComponentEvents} from "./routes_summary";
 import RouteRoadbookComponent, {RouteRoadbookComponentEvents} from "./route_roadbook";
-import {iconsDirections} from "../../configuration/directions.config";
 import DirectionsOptionsComponent, {DirectionsOptionsComponentEvents} from "./directions_options";
+import {getConfig} from "../../configuration/config";
 
 export interface IDirections {
     travelMode: woosmap.map.TravelMode;
@@ -44,7 +41,7 @@ export default class DirectionsComponent extends Component<IDirections> {
     init(): void {
         this.$element = document.createElement("div");
         this.$target.appendChild(this.$element);
-        this.api = new WoosmapApiClient({apiKey: WoosmapPublicKey});
+        this.api = new WoosmapApiClient({apiKey: getConfig().map.woosmapPublicKey});
     }
 
     render(): void {
@@ -61,7 +58,7 @@ export default class DirectionsComponent extends Component<IDirections> {
 
             const travelModesComponent = new TravelModeComponent({
                 $target: document.getElementById(
-                    Selectors.travelModeContainerID
+                    getConfig().selectors.travelModeContainerID
                 ) as HTMLElement,
                 initialState: {
                     selectedTravelMode: this.state.travelMode,
@@ -71,8 +68,8 @@ export default class DirectionsComponent extends Component<IDirections> {
                 $target: document.getElementById("directionsOrigin") as HTMLElement,
                 initialState: {
                     inputID: "originInput",
-                    woosmapPublicKey: WoosmapPublicKey,
-                    searchOptions: LocalitiesConf,
+                    woosmapPublicKey: getConfig().map.woosmapPublicKey,
+                    searchOptions: getConfig().search.localitiesConf,
                     featuresBtn: ["geolocate", "clear"]
                 },
             });
@@ -82,8 +79,8 @@ export default class DirectionsComponent extends Component<IDirections> {
                 ) as HTMLElement,
                 initialState: {
                     inputID: "destinationInput",
-                    woosmapPublicKey: WoosmapPublicKey,
-                    searchOptions: LocalitiesConf,
+                    woosmapPublicKey: getConfig().map.woosmapPublicKey,
+                    searchOptions: getConfig().search.localitiesConf,
                     featuresBtn: ["clear"]
                 },
             });
@@ -199,7 +196,7 @@ export default class DirectionsComponent extends Component<IDirections> {
                 if (this.state.directionsResult) {
                     if (!routeRoadbookComponent) {
                         routeRoadbookComponent = new RouteRoadbookComponent({
-                            $target: document.getElementById(Selectors.roadbookContainerID) as HTMLElement,
+                            $target: document.getElementById(getConfig().selectors.roadbookContainerID) as HTMLElement,
                             initialState: {route: this.state.directionsResult.routes[this.state.selectedRouteIndex]},
                         });
                         routeRoadbookComponent.on(RouteRoadbookComponentEvents.BACK, () => {
@@ -314,8 +311,8 @@ export default class DirectionsComponent extends Component<IDirections> {
             this.directionsRenderer.setMap(this.map);
             this.fitToRouteBounds(this.bounds);
             if (this.state.origin && this.state.destination) {
-                this.addMarkerLabel(this.state.origin.location, iconsDirections.start, this.state.origin.name);
-                this.addMarkerLabel(this.state.destination.location, iconsDirections.end, this.state.destination.name);
+                this.addMarkerLabel(this.state.origin.location, getConfig().directions.iconsDirections.start, this.state.origin.name);
+                this.addMarkerLabel(this.state.destination.location, getConfig().directions.iconsDirections.end, this.state.destination.name);
             }
         } else {
             this.cleanRoutes();
@@ -350,7 +347,7 @@ export default class DirectionsComponent extends Component<IDirections> {
         return `
         <div id="directionsInputs">
             <div id="directionsHeader">
-                <div id="${Selectors.travelModeContainerID}"></div>
+                <div id="${getConfig().selectors.travelModeContainerID}"></div>
             </div>
             <div id="odInputs">
                 <div>

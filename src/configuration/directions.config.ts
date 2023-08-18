@@ -1,22 +1,22 @@
-export const directionsOptions: Record<string, string | boolean | string[]> = {
+const directionsOptions: Record<string, string | boolean | string[]> = {
     travelMode: 'DRIVING',
     unitSystem: 'METRIC',
     provideRouteAlternatives: true,
     avoid: []
 }
 
-export const avoidOptions: Record<string, string>[] = [
+const avoidOptions: Record<string, string>[] = [
     {paramKey: 'highways'},
     {paramKey: 'tolls'},
     {paramKey: 'ferries'}
 ]
-export const unitOptions: Record<string, string>[] = [
+const unitOptions: Record<string, string>[] = [
     {paramKey: 'METRIC'},
     {paramKey: 'IMPERIAL'}
 ]
 
 
-export const travelModes: Record<string, string>[] = [
+const travelModes: Record<string, string>[] = [
     {
         modeKey: 'DRIVING',
         defaultIcon: 'https://images.woosmap.com/directions/drive.png',
@@ -37,7 +37,7 @@ export const travelModes: Record<string, string>[] = [
     }
 ];
 
-export const iconsDirections: Record<string, woosmap.map.Icon> = {
+const iconsDirections: Record<string, woosmap.map.Icon> = {
     start: {
         url: 'https://images.woosmap.com/directions/directions_start.png',
         scaledSize: {height: 14, width: 14}
@@ -48,7 +48,7 @@ export const iconsDirections: Record<string, woosmap.map.Icon> = {
     }
 };
 
-export const stepsIcon: Record<string, string | number>[] = [
+const stepsIcon: Record<string, string | number>[] = [
     {index: 1, key: 'Start', icon: 'https://images.woosmap.com/directions/straight_black.png'},
     {index: 2, key: 'StartRight', icon: 'https://images.woosmap.com/directions/turn_slight_left_black.png'},
     {index: 3, key: 'StartLeft', icon: 'https://images.woosmap.com/directions/turn_slight_left_black.png'},
@@ -80,3 +80,12 @@ export const stepsIcon: Record<string, string | number>[] = [
     {index: 37, key: 'MergeRight', icon: 'https://images.woosmap.com/directions/merge_left_black.png'},
     {index: 38, key: 'MergeLeft', icon: 'https://images.woosmap.com/directions/merge_left_black.png'},
 ]
+
+export default {
+    stepsIcon: stepsIcon,
+    iconsDirections: iconsDirections,
+    travelModes: travelModes,
+    unitOptions: unitOptions,
+    avoidOptions: avoidOptions,
+    directionsOptions: directionsOptions
+}

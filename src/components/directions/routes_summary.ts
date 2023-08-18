@@ -1,7 +1,7 @@
 import Component from "../component";
-import {travelModes} from "../../configuration/directions.config";
 import loaderImage from "../../assets/loader.svg";
 import {getLocale} from "../../helpers/locale";
+import {getConfig} from "../../configuration/config";
 
 export interface IRoutesSummary {
     routes: woosmap.map.DirectionRoute[];
@@ -38,7 +38,7 @@ export default class RoutesSummaryComponent extends Component<IRoutesSummary> {
                         const summary = `${route.legs[0].start_address}`
                         const duration = `${route.legs[0].duration.text}`
                         const distance = `${route.legs[0].distance.text}`
-                        const travelModeIcon = travelModes.filter(({modeKey}) => modeKey === this.state.travelMode)[0].darkIcon
+                        const travelModeIcon = getConfig().directions.travelModes.filter(({modeKey}) => modeKey === this.state.travelMode)[0].darkIcon
                         const $routeSummary: HTMLDivElement = document.createElement("div");
                         $routeSummary.className =
                             index === this.state.selectedRouteIndex

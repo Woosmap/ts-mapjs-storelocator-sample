@@ -1,11 +1,9 @@
 /// <reference types="cypress" />
 
-import Selectors from "../../src/configuration/selectors.config";
 import searchInput from "../fixtures/searchInput";
-import Urls from "../../src/configuration/urls.config";
-import {WoosmapPublicKey} from "../../src/configuration/map.config";
+import {getConfig} from "../../src/configuration/config";
 
-const localitiesJSUrl = `${Urls.localitiesWidgetJS}?key=${WoosmapPublicKey}&language=en`;
+const localitiesJSUrl = `${getConfig().urls.localitiesWidgetJS}?key=${getConfig().map.woosmapPublicKey}`;
 
 describe('Searching for locality Use Case', () => {
     before(() => {
@@ -26,7 +24,7 @@ describe('Searching for locality Use Case', () => {
             .then((interception) => {
                 expect(interception.response?.statusCode).to.equal(200);
             });
-        cy.get(`#${Selectors.listStoresContainerID}`).should('be.visible');
+        cy.get(`#${getConfig().selectors.listStoresContainerID}`).should('be.visible');
     })
 
 })

@@ -1,6 +1,3 @@
-import Selectors from "./configuration/selectors.config";
-import {WoosmapPublicKey, MapOptions, StoresStyle, mobileBreakPoint, mapPaddings,} from "./configuration/map.config";
-import {availableServices, LocalitiesConf,} from "./configuration/search.config";
 import {AssetFeatureResponse} from "./types/stores";
 import Component from "./components/component";
 import MapComponent, {MapComponentEvents} from "./components/map/map";
@@ -11,15 +8,16 @@ import "./styles/main.scss";
 import FilterComponent, {FilterComponentEvents} from "./components/filter/filter";
 import GeoJSONFeature = woosmap.map.GeoJSONFeature;
 import DirectionsComponent, {DirectionsComponentEvents} from "./components/directions/directions";
-import {directionsOptions} from "./configuration/directions.config";
 import {SYSTEM_LANG, setUserLocale} from './helpers/locale';
 import {debounce} from "./utils/utils";
+import {Configuration, getConfig, setConfig} from "./configuration/config";
 
 export interface IStoreLocator {
     initialSearch?: string;
     locale?: string;
     padding: woosmap.map.Padding;
     enableHistory?: boolean;
+    config?: Configuration;
 }
 
 export enum StoreLocatorEvents {
@@ -47,67 +45,67 @@ export default class StoreLocator extends Component<IStoreLocator> {
     private selectedLocality!:string;
 
     init(): void {
-        setUserLocale(this.state.locale || SYSTEM_LANG);
-
     }
 
     render(): void {
+        setUserLocale(this.state.locale || SYSTEM_LANG);
+        setConfig(this.state.config);
         this.$target.innerHTML = "";
         this.$target.insertAdjacentHTML("afterbegin", this.getHTMLSkeleton());
         this.$sidebarContentContainer = document.getElementById(
-            Selectors.sidebarContentContainerID
+            getConfig().selectors.sidebarContentContainerID
         ) as HTMLElement;
         this.styleOnScroll();
         this.searchComponent = new SearchComponent({
             $target: document.getElementById(
-                Selectors.searchWrapperID
+                getConfig().selectors.searchWrapperID
             ) as HTMLElement,
             initialState: {
-                inputID: Selectors.searchInputID,
-                woosmapPublicKey: WoosmapPublicKey,
-                searchOptions: LocalitiesConf,
+                inputID: getConfig().selectors.searchInputID,
+                woosmapPublicKey: getConfig().map.woosmapPublicKey,
+                searchOptions: getConfig().search.localitiesConf,
                 featuresBtn: ["search", "clear", "geolocate"]
             },
         });
         this.mapComponent = new MapComponent({
-            $target: document.getElementById(Selectors.mapContainerID) as HTMLElement,
+            $target: document.getElementById(getConfig().selectors.mapContainerID) as HTMLElement,
             initialState: {
-                woosmapPublicKey: WoosmapPublicKey,
-                mapOptions: MapOptions,
-                storesStyle: StoresStyle,
+                woosmapPublicKey: getConfig().map.woosmapPublicKey,
+                mapOptions: getConfig().map.mapOptions,
+                storesStyle: getConfig().map.storesStyle,
                 padding: this.state.padding,
             },
         });
         this.directionsComponent = new DirectionsComponent({
             $target: document.getElementById(
-                Selectors.directionsContainerID
+                getConfig().selectors.directionsContainerID
             ) as HTMLElement,
             initialState: {
                 padding: this.state.padding,
-                provideRouteAlternatives: directionsOptions.provideRouteAlternatives as boolean,
-                travelMode: directionsOptions.travelMode as woosmap.map.TravelMode,
-                unitSystem: directionsOptions.unitSystem as woosmap.map.UnitSystem,
-                avoid: directionsOptions.avoid as string[],
+                provideRouteAlternatives: getConfig().directions.directionsOptions.provideRouteAlternatives as boolean,
+                travelMode: getConfig().directions.directionsOptions.travelMode as woosmap.map.TravelMode,
+                unitSystem: getConfig().directions.directionsOptions.unitSystem as woosmap.map.UnitSystem,
+                avoid: getConfig().directions.directionsOptions.avoid as string[],
                 selectedRouteIndex: 0
             },
         });
         this.storesListComponent = new StoresListComponent({
             $target: document.getElementById(
-                Selectors.listStoresContainerID
+                getConfig().selectors.listStoresContainerID
             ) as HTMLElement,
             initialState: {
             },
         });
         this.storeDetailsComponent = new StoreDetailsComponent({
             $target: document.getElementById(
-                Selectors.detailsStoreContainerID
+                getConfig().selectors.detailsStoreContainerID
             ) as HTMLElement,
             initialState: {},
         });
-        if (availableServices.length) {
+        if (getConfig().search.availableServices.length) {
             this.filterComponent = new FilterComponent({
                 $target: document.getElementById(
-                    Selectors.filterPanelContainerID
+                    getConfig().selectors.filterPanelContainerID
                 ) as HTMLElement,
                 initialState: {},
             });
@@ -191,6 +189,9 @@ export default class StoreLocator extends Component<IStoreLocator> {
             if(this.state.enableHistory){
                 this.getUserHistory();
             }
+        });
+        this.mapComponent.on(MapComponentEvents.MAP_IDLE, () => {
+            this.emit(MapComponentEvents.MAP_IDLE)
         });
         this.mapComponent.on(MapComponentEvents.STORE_UNSELECTED, () => {
             if (this.$target.className === StoreLocatorViews.DETAILS_VIEW) {
@@ -292,13 +293,13 @@ export default class StoreLocator extends Component<IStoreLocator> {
     managePadding(): void {
         const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
         //On Mobile, padding from bottom to 56% of Store Locator height
-        mapPaddings.mobile.bottom = Math.round((document.getElementById(Selectors.mapContainerID) as HTMLElement).clientHeight * 0.56);
-        if (width >= mobileBreakPoint) {
-            this.setState({padding: mapPaddings.full}, true, () => {
+        getConfig().map.mapPaddings.mobile.bottom = Math.round((document.getElementById(getConfig().selectors.mapContainerID) as HTMLElement).clientHeight * 0.56);
+        if (width >= getConfig().map.mobileBreakPoint) {
+            this.setState({padding: getConfig().map.mapPaddings.full}, true, () => {
                 this.emit(StoreLocatorEvents.PADDING_CHANGED)
             });
         } else {
-            this.setState({padding: mapPaddings.mobile}, true, () => {
+            this.setState({padding: getConfig().map.mapPaddings.mobile}, true, () => {
                 this.emit(StoreLocatorEvents.PADDING_CHANGED)
             });
         }
@@ -306,18 +307,18 @@ export default class StoreLocator extends Component<IStoreLocator> {
 
     getHTMLSkeleton(): string {
         return `
-        <div id="${Selectors.mapContainerID}"></div>
-        <div id="${Selectors.sidebarContainerID}">
-           <div id="${Selectors.searchContainerID}">
-              <div id="${Selectors.searchWrapperID}"></div>
+        <div id="${getConfig().selectors.mapContainerID}"></div>
+        <div id="${getConfig().selectors.sidebarContainerID}">
+           <div id="${getConfig().selectors.searchContainerID}">
+              <div id="${getConfig().selectors.searchWrapperID}"></div>
            </div>
-           <div id="${Selectors.sidebarContentContainerID}">
-               <div id="${Selectors.filterPanelContainerID}"></div>
-               <div id="${Selectors.listStoresContainerID}"></div>
-               <div id="${Selectors.detailsStoreContainerID}"></div>
+           <div id="${getConfig().selectors.sidebarContentContainerID}">
+               <div id="${getConfig().selectors.filterPanelContainerID}"></div>
+               <div id="${getConfig().selectors.listStoresContainerID}"></div>
+               <div id="${getConfig().selectors.detailsStoreContainerID}"></div>
            </div>
-        <div id="${Selectors.directionsContainerID}"></div>   
-        <div id="${Selectors.roadbookContainerID}"></div>
+        <div id="${getConfig().selectors.directionsContainerID}"></div>   
+        <div id="${getConfig().selectors.roadbookContainerID}"></div>
         </div>`;
     }
     setUserHistory():void {

@@ -1,13 +1,13 @@
-export const WoosmapPublicKey = "woos-48c80350-88aa-333e-835a-07f4b658a9a4";
+const woosmapPublicKey = "woos-48c80350-88aa-333e-835a-07f4b658a9a4";
 
-export const mobileBreakPoint = 768;
+const mobileBreakPoint = 768;
 
-export const mapPaddings: { [key: string]: woosmap.map.Padding } = {
+const mapPaddings: { [key: string]: woosmap.map.Padding } = {
     mobile: {left: 50, right: 50, top: 50, bottom: 550},
     full: {left: 450, right: 50, top: 50, bottom: 50},
 };
 
-export const StoresStyle: woosmap.map.Style = {
+const storesStyle: woosmap.map.Style = {
     breakPoint: 11,
     rules: [],
     default: {
@@ -30,7 +30,7 @@ export const StoresStyle: woosmap.map.Style = {
         },
     },
 };
-export const MapOptions: woosmap.map.MapOptions = {
+const mapOptions: woosmap.map.MapOptions = {
     center: {lat: 46.2, lng: 3.2},
     zoom: 6,
     styles: [
@@ -46,3 +46,12 @@ export const MapOptions: woosmap.map.MapOptions = {
     ],
     gestureHandling: "greedy",
 };
+
+
+export default {
+    mapOptions: mapOptions,
+    storesStyle: storesStyle,
+    mapPaddings: mapPaddings,
+    mobileBreakPoint: mobileBreakPoint,
+    woosmapPublicKey: woosmapPublicKey
+}

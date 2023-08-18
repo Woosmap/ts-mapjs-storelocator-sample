@@ -1,6 +1,6 @@
 import Component from "../component";
-import {stepsIcon} from "../../configuration/directions.config";
 import {getLocale} from "../../helpers/locale";
+import {getConfig} from "../../configuration/config";
 
 export interface IRouteRoadbook {
     route: woosmap.map.DirectionRoute;
@@ -61,7 +61,7 @@ export default class RouteRoadbookComponent extends Component<IRouteRoadbook> {
 
     getDirectionStepIcon(action?: number): string {
         if (action) {
-            const stepIconObj = stepsIcon.filter(({index}) => index === action)[0];
+            const stepIconObj = getConfig().directions.stepsIcon.filter(({index}) => index === action)[0];
             if (stepIconObj) {
                 const className = (stepIconObj.key as string).endsWith('Right') ? "reverse" : "";
                 return `<div class="routeRoadbook__stepIcon routeRoadbook__stepIcon${className}">

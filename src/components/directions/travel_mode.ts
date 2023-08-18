@@ -1,6 +1,5 @@
 import Component from "../component";
-import {travelModes} from "../../configuration/directions.config";
-
+import {getConfig} from "../../configuration/config";
 export interface ITravelModeComponent {
     selectedTravelMode: woosmap.map.TravelMode;
 }
@@ -18,7 +17,7 @@ export default class TravelModeComponent extends Component<ITravelModeComponent>
 
     render(): void {
         if (this.state && this.$element) {
-            const travelModesHTML: HTMLDivElement[] = travelModes.map(
+            const travelModesHTML: HTMLDivElement[] = getConfig().directions.travelModes.map(
                 (travelMode) => {
                     const $travelMode: HTMLDivElement = document.createElement("div");
                     $travelMode.dataset.mode = travelMode.modeKey;
