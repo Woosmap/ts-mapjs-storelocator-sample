@@ -230,6 +230,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
         window.addEventListener('resize', debounce(() => {
             this.managePadding();
         }, 100))
+        this.setListView();
         this.managePadding();
     }
 
