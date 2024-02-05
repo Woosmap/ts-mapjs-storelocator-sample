@@ -785,6 +785,6 @@ export default {
         20037471.20513706
     ],
     "tiles": [
-        `https://api.woosmap.com/maps/tiles/{z}/{x}/{y}?key=${getConfig().map.woosmapPublicKey}`
+        `https://api.woosmap.com/maps/tiles/osm-wgs-2023-12-04/{z}/{x}/{y}?key=${getConfig().map.woosmapPublicKey}`
     ]
 }

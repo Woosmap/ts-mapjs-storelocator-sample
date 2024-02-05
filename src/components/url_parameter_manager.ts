@@ -8,7 +8,7 @@ export interface AllowedParameters {
     direction?: Direction;
 }
 
-interface Direction {
+export interface Direction {
     from?: SearchLocation;
     to?: SearchLocation;
 }
