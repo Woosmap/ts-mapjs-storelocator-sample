@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "src",
     "strict": true,
-    "target": "ES5",
+    "target": "ES6",
     "module": "commonjs",
     "jsx": "preserve",
     "esModuleInterop": true,
