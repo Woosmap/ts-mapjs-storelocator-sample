@@ -1,11 +1,11 @@
 import Component from "../component";
 import {loadScript} from "../../utils/load_script";
 import {AssetFeatureResponse} from "../../types/stores";
-import GeoJSONFeature = woosmap.map.GeoJSONFeature;
 import Styler from "../../helpers/styler";
-import {replace} from "../../utils/utils";
+import {debounce, replace} from "../../utils/utils";
 import {getLocale, getLocaleLang} from "../../helpers/locale";
 import {getConfig} from "../../configuration/config";
+import GeoJSONFeature = woosmap.map.GeoJSONFeature;
 
 export interface IMapComponent {
     woosmapPublicKey: string;
@@ -16,6 +16,13 @@ export interface IMapComponent {
     stores?: woosmap.map.GeoJSONFeature[];
     query?: string;
     padding: woosmap.map.Padding;
+    location?: MapLocation
+}
+
+export interface MapLocation {
+    latitude: number;
+    longitude: number;
+    zoom: number;
 }
 
 export enum MapComponentEvents {
@@ -24,7 +31,8 @@ export enum MapComponentEvents {
     STORE_UNSELECTED = "store_unselected",
     FILTERS_UPDATED = "filters_updated",
     MAP_READY = "map_ready",
-    MAP_IDLE = "map_idle"
+    MAP_IDLE = "map_idle",
+    LOCATION_CHANGED = "location_changed"
 }
 
 export default class MapComponent extends Component<IMapComponent> {
@@ -82,6 +90,11 @@ export default class MapComponent extends Component<IMapComponent> {
             });
         });
 
+        if (this.state.location) {
+            this.map.setCenter({lat: this.state.location.latitude, lng: this.state.location.longitude})
+            this.map.setZoom(this.state.location.zoom)
+        }
+
         // No style option allows to put a data feature on top of the others (zIndex StyleOptions not implemented yet)
         // Create a second data Layer to handle the selected Store.
         this.dataSelected = new woosmap.map.Data();
@@ -99,6 +112,10 @@ export default class MapComponent extends Component<IMapComponent> {
         woosmap.map.event.addListenerOnce(this.map, 'idle', () => {
             this.emit(MapComponentEvents.MAP_IDLE);
         })
+
+        this.map.addListener('center_changed', debounce(() => {
+            this.handleLocationChanged();
+        }, 150));
 
         this.on(MapComponentEvents.STORES_CHANGED, () => {
             this.handleStores();
@@ -118,6 +135,18 @@ export default class MapComponent extends Component<IMapComponent> {
     handleSelectedStore(store: AssetFeatureResponse): void {
         this.setState({selectedStore: store}, true, () => {
             this.emit(MapComponentEvents.STORE_SELECTED, this.state.selectedStore);
+        });
+    }
+
+    handleLocationChanged(): void {
+        this.setState({
+            location: {
+                zoom: this.map.getZoom(),
+                latitude: this.map.getCenter().lat(),
+                longitude: this.map.getCenter().lng()
+            }
+        }, true, () => {
+            this.emit(MapComponentEvents.LOCATION_CHANGED, this.state.location);
         });
     }
 
@@ -161,15 +190,20 @@ export default class MapComponent extends Component<IMapComponent> {
 
     selectStoreOnDataOverlay(store?: AssetFeatureResponse): void {
         const selectedStore = store ? JSON.parse(JSON.stringify(store)) : JSON.parse(JSON.stringify(this.state.selectedStore));
-        const feature: woosmap.map.data.Feature | null = this.data.getFeatureById(
-            selectedStore.properties.store_id
-        );
+        let feature: woosmap.map.data.Feature | null = null;
+        if (this.data) {
+            feature = this.data.getFeatureById(
+                selectedStore.properties.store_id
+            );
+        }
         if (feature) {
             this.data.revertStyle();
             this.data.overrideStyle(feature, {visible: false});
             this.dataSelected.forEach((feature) => this.dataSelected.remove(feature));
             this.dataSelected.add(feature);
             this.dataSelected.setMap(this.map);
+        } else {
+            this.storesOverlay.setSelection(selectedStore)
         }
     }
 
