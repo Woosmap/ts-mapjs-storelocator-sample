@@ -26,7 +26,7 @@ const LOCALITY_DATA_REGEX = /loc=!pid(.+?)!lat([-\d.]+)!lng([-\d.]+)/;
  */
 export class URLParameterManager<T extends AllowedParameters> {
     private parameters: T;
-    private baseURL: string = '/storelocator/mapjs/'
+    private baseURL: string = '/storelocator/mapjs/#!/'
 
     /**
      * Constructs a new URLParameterManager and loads parameters from the URL.
@@ -108,6 +108,11 @@ export class URLParameterManager<T extends AllowedParameters> {
      * @param {(match: RegExpMatchArray) => void} processMatch - The function to process the match.
      */
     private parseValueFromPath(path: string, regex: RegExp, processMatch: (match: RegExpMatchArray) => void): void {
+        // If the URL contains a hashbang, use location.hash instead of location.pathname
+        if (window.location.href.includes('#!')) {
+            path = window.location.hash.replace('#!', '');
+        }
+
         const match = regex.exec(path);
         if (match) {
             try {
