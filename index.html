@@ -17,57 +17,6 @@
 <body>
 <script type="module" src="./index.ts"></script>
 <div id="StoreLocator"></div>
-<script>
-    let storeLocator;
-
-    function init(localeLang = "") {
-        const container = document.querySelector("#StoreLocator");
-        if (container) {
-            storeLocator = new woosmapLocator({
-                $target: container,
-                initialState: {
-                    locale: localeLang,
-                    config: {
-                        map: {
-                            storesStyle: {
-                                breakPoint: 11,
-                                default: {
-                                    color: "#008a2f",
-                                    size: 8,
-                                    minSize: 1,
-                                    icon: {
-                                        url: "https://images.woosmap.com/starbucks-marker.svg",
-                                        scaledSize: {
-                                            height: 40,
-                                            width: 34,
-                                        },
-                                    },
-                                    selectedIcon: {
-                                        url: "https://images.woosmap.com/starbucks-marker-selected.svg",
-                                        scaledSize: {
-                                            height: 50,
-                                            width: 43,
-                                        },
-                                    },
-                                },
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    }
-
-    function changeLocale(localeLang = "") {
-        storeLocator.setState({
-            locale: localeLang,
-        }, false);
-    }
-
-    window.addEventListener("DOMContentLoaded", () => {
-        init();
-    });
-</script>
 <div class="language-picker" style="position:absolute; z-index: 1;right: 50px;top: 10px;">
     <div class="language-picker__form">
         <select name="language-picker-select" id="language-picker-select">
@@ -75,7 +24,55 @@
             <option lang="fr" value="FR">Français</option>
         </select>
     </div>
-    <script>
+</div>
+<script>
+    window.addEventListener("DOMContentLoaded", () => {
+        let storeLocator;
+
+        function init(localeLang = "") {
+            const container = document.querySelector("#StoreLocator");
+            if (container) {
+                storeLocator = new woosmapLocator({
+                    $target: container,
+                    initialState: {
+                        locale: localeLang,
+                        config: {
+                            map: {
+                                storesStyle: {
+                                    breakPoint: 11,
+                                    default: {
+                                        color: "#008a2f",
+                                        size: 8,
+                                        minSize: 1,
+                                        icon: {
+                                            url: "https://images.woosmap.com/starbucks-marker.svg",
+                                            scaledSize: {
+                                                height: 40,
+                                                width: 34,
+                                            },
+                                        },
+                                        selectedIcon: {
+                                            url: "https://images.woosmap.com/starbucks-marker-selected.svg",
+                                            scaledSize: {
+                                                height: 50,
+                                                width: 43,
+                                            },
+                                        },
+                                    },
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function changeLocale(localeLang = "") {
+            storeLocator.setState({
+                locale: localeLang,
+            }, false);
+        }
+
         const langSelect = document.querySelector(`[id="language-picker-select"]`);
         langSelect.addEventListener(`change`, (e) => {
             const select = e.target;
@@ -83,7 +80,9 @@
             document.documentElement.setAttribute("lang", localeLang);
             changeLocale(localeLang)
         });
-    </script>
-</div>
+        init();
+    });
+</script>
+
 </body>
 </html>
