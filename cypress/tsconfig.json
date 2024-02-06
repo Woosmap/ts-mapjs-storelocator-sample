@@ -3,11 +3,12 @@
     "compilerOptions": {
         "baseUrl": ".",
         "lib": [
-            "es2015",
+            "es2016",
             "dom"
         ],
         "isolatedModules": false,
         "allowJs": true,
+        "sourceMap": false,
         "noEmit": true,
         "types": [
             "cypress",

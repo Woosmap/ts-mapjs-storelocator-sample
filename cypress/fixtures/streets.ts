@@ -3,17 +3,13 @@ import {getConfig} from "../../src/configuration/config";
 export default {
     "version": 8,
     "name": "Streets",
-    "metadata": {
-        "mapbox:type": "template",
-        "openmaptiles:version": "3.x"
-    },
     "sources": {
         "openmaptiles": {
             "type": "vector",
             "url": `https://api.woosmap.com/maps/tiles.json?key=${getConfig().map.woosmapPublicKey}`
         }
     },
-    "sprite": "https://sdk.woosmap.com/map/assets/sprite",
+    "sprite": "https://sdk.woosmap.com/map/assets/styles/streets-v1/sprites/sprite",
     "glyphs": "https://sdk.woosmap.com/map/assets/{fontstack}/{range}.pbf",
     "layers": [
         {
@@ -36,7 +32,7 @@ export default {
             "id": "landuse_hospital",
             "type": "fill",
             "metadata": {
-                "featureType": "poi.medical",
+                "featureType": "point_of_interest.medical",
                 "elementTypes": [
                     "geometry"
                 ]
@@ -56,7 +52,7 @@ export default {
             "id": "landuse_school",
             "type": "fill",
             "metadata": {
-                "featureType": "poi.school",
+                "featureType": "point_of_interest.education",
                 "elementTypes": [
                     "geometry"
                 ]
@@ -76,7 +72,7 @@ export default {
             "id": "landuse_university",
             "type": "fill",
             "metadata": {
-                "featureType": "poi.school",
+                "featureType": "point_of_interest.education",
                 "elementTypes": [
                     "geometry"
                 ]
@@ -96,7 +92,7 @@ export default {
             "id": "landuse_stadium",
             "type": "fill",
             "metadata": {
-                "featureType": "poi.sports_complex",
+                "featureType": "point_of_interest.sports_complex",
                 "elementTypes": [
                     "geometry"
                 ]
@@ -115,6 +111,58 @@ export default {
             ],
             "paint": {
                 "fill-color": "rgb(236,238,204)"
+            }
+        },
+        {
+            "id": "national_park",
+            "type": "fill",
+            "source": "openmaptiles",
+            "source-layer": "park",
+            "metadata": {
+                "featureType": "point_of_interest.park"
+            },
+            "filter": [
+                "in",
+                "class",
+                "parc_naturel_r\u00e9gional"
+            ],
+            "paint": {
+                "fill-antialias": false,
+                "fill-color": "hsla(98, 61%, 72%, 0.7)",
+                "fill-opacity": 0.2
+            },
+            "layout": {
+                "visibility": "visible"
+            }
+        },
+        {
+            "id": "landcover_park",
+            "type": "fill",
+            "source": "openmaptiles",
+            "source-layer": "landcover",
+            "metadata": {
+                "featureType": "point_of_interest.park"
+            },
+            "filter": [
+                "all",
+                [
+                    "==",
+                    "class",
+                    "grass"
+                ],
+                [
+                    "==",
+                    "subclass",
+                    "park"
+                ]
+            ],
+            "paint": {
+                "fill-antialias": false,
+                "fill-color": "hsla(98, 61%, 72%, 0.7)",
+                "fill-opacity": 0.2
+            },
+            "layout": {
+                "visibility": "visible"
             }
         },
         {
@@ -713,58 +761,6 @@ export default {
                     "==",
                     "subclass",
                     "grassland"
-                ]
-            ],
-            "paint": {
-                "fill-antialias": false,
-                "fill-color": "hsla(98, 61%, 72%, 0.7)",
-                "fill-opacity": 0.2
-            },
-            "layout": {
-                "visibility": "visible"
-            }
-        },
-        {
-            "id": "national_park",
-            "type": "fill",
-            "source": "openmaptiles",
-            "source-layer": "park",
-            "metadata": {
-                "featureType": "poi.park"
-            },
-            "filter": [
-                "in",
-                "class",
-                "parc_naturel_r\u00e9gional"
-            ],
-            "paint": {
-                "fill-antialias": false,
-                "fill-color": "hsla(98, 61%, 72%, 0.7)",
-                "fill-opacity": 0.2
-            },
-            "layout": {
-                "visibility": "visible"
-            }
-        },
-        {
-            "id": "landcover_park",
-            "type": "fill",
-            "source": "openmaptiles",
-            "source-layer": "landcover",
-            "metadata": {
-                "featureType": "poi.park"
-            },
-            "filter": [
-                "all",
-                [
-                    "==",
-                    "class",
-                    "grass"
-                ],
-                [
-                    "==",
-                    "subclass",
-                    "park"
                 ]
             ],
             "paint": {
@@ -3294,6 +3290,88 @@ export default {
             }
         },
         {
+            "id": "roads.pedestrian.aerialway.stroke",
+            "metadata": {
+                "featureType": "roads.pedestrian.aerialway",
+                "elementTypes": [
+                    "geometry.stroke"
+                ]
+            },
+            "minzoom": 5.0,
+            "filter": [
+                "all",
+                [
+                    "==",
+                    [
+                        "geometry-type"
+                    ],
+                    "LineString"
+                ],
+                [
+                    "in",
+                    [
+                        "get",
+                        "class"
+                    ],
+                    [
+                        "literal",
+                        [
+                            "aerialway"
+                        ]
+                    ]
+                ],
+                [
+                    "!",
+                    [
+                        "in",
+                        [
+                            "get",
+                            "brunnel"
+                        ],
+                        [
+                            "literal",
+                            [
+                                "bridge",
+                                "tunnel"
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            "source-layer": "transportation",
+            "source": "openmaptiles",
+            "type": "line",
+            "paint": {
+                "line-color": "#bbb",
+                "line-dasharray": [
+                    2.0,
+                    2.0
+                ],
+                "line-width": {
+                    "base": 1.2,
+                    "stops": [
+                        [
+                            13.0,
+                            0.5
+                        ],
+                        [
+                            14.0,
+                            1.0
+                        ],
+                        [
+                            20.0,
+                            2.0
+                        ]
+                    ]
+                }
+            },
+            "layout": {
+                "visibility": "visible",
+                "line-cap": "round",
+                "line-join": "miter"
+            }
+        },
+        {
             "id": "building",
             "type": "fill",
             "metadata": {
@@ -3349,7 +3427,10 @@ export default {
                     15,
                     0,
                     15.05,
-                    0
+                    [
+                        "get",
+                        "render_min_height"
+                    ]
                 ],
                 "fill-extrusion-opacity": 0.3
             },
@@ -5087,7 +5168,7 @@ export default {
                 ]
             ],
             "layout": {
-                "icon-image": "{class}_11",
+                "icon-image": "bus_11",
                 "visibility": "visible",
                 "icon-size": 0.9,
                 "symbol-sort-key": [
@@ -5096,1035 +5177,6 @@ export default {
                 ]
             },
             "minzoom": 16
-        },
-        {
-            "id": "poi.attraction",
-            "type": "symbol",
-            "metadata": {
-                "featureType": "poi.attraction"
-            },
-            "source": "openmaptiles",
-            "source-layer": "poi",
-            "minzoom": 14,
-            "filter": [
-                "all",
-                [
-                    "==",
-                    "$type",
-                    "Point"
-                ],
-                [
-                    "has",
-                    "name"
-                ],
-                [
-                    "any",
-                    [
-                        "in",
-                        "class",
-                        "museum",
-                        "monument"
-                    ],
-                    [
-                        "all",
-                        [
-                            "==",
-                            "class",
-                            "attraction"
-                        ],
-                        [
-                            "==",
-                            "subclass",
-                            "attraction"
-                        ],
-                        [
-                            "!has",
-                            "level"
-                        ]
-                    ]
-                ]
-            ],
-            "layout": {
-                "icon-image": "{class}_15",
-                "text-anchor": "top",
-                "text-field": [
-                    "let",
-                    "localized_name",
-                    [
-                        "coalesce",
-                        [
-                            "get",
-                            "name:en"
-                        ],
-                        [
-                            "get",
-                            "name_int"
-                        ]
-                    ],
-                    [
-                        "case",
-                        [
-                            "all",
-                            [
-                                "has",
-                                "name:nonlatin"
-                            ],
-                            [
-                                "!=",
-                                [
-                                    "var",
-                                    "localized_name"
-                                ],
-                                [
-                                    "get",
-                                    "name:nonlatin"
-                                ]
-                            ]
-                        ],
-                        [
-                            "concat",
-                            [
-                                "var",
-                                "localized_name"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "has",
-                            "name:nonlatin"
-                        ],
-                        [
-                            "concat",
-                            [
-                                "get",
-                                "name:latin"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "var",
-                            "localized_name"
-                        ]
-                    ]
-                ],
-                "text-font": [
-                    "Noto Sans Regular"
-                ],
-                "text-max-width": 9,
-                "text-offset": [
-                    0,
-                    0.6
-                ],
-                "text-padding": 2,
-                "text-size": 12,
-                "icon-size": 0.9,
-                "visibility": "none",
-                "symbol-sort-key": [
-                    "get",
-                    "rank"
-                ]
-            },
-            "paint": {
-                "text-color": "#666",
-                "text-halo-blur": 0.5,
-                "text-halo-color": "#ffffff",
-                "text-halo-width": 1
-            }
-        },
-        {
-            "id": "poi.park",
-            "type": "symbol",
-            "metadata": {
-                "featureType": "poi.park"
-            },
-            "source": "openmaptiles",
-            "source-layer": "poi",
-            "minzoom": 14,
-            "filter": [
-                "all",
-                [
-                    "==",
-                    "$type",
-                    "Point"
-                ],
-                [
-                    "has",
-                    "name"
-                ],
-                [
-                    "in",
-                    "class",
-                    "park"
-                ]
-            ],
-            "layout": {
-                "icon-image": {
-                    "stops": [
-                        [
-                            14,
-                            ""
-                        ],
-                        [
-                            16,
-                            "{class}_15"
-                        ]
-                    ]
-                },
-                "text-anchor": "top",
-                "text-field": [
-                    "let",
-                    "localized_name",
-                    [
-                        "coalesce",
-                        [
-                            "get",
-                            "name:en"
-                        ],
-                        [
-                            "get",
-                            "name_int"
-                        ]
-                    ],
-                    [
-                        "case",
-                        [
-                            "all",
-                            [
-                                "has",
-                                "name:nonlatin"
-                            ],
-                            [
-                                "!=",
-                                [
-                                    "var",
-                                    "localized_name"
-                                ],
-                                [
-                                    "get",
-                                    "name:nonlatin"
-                                ]
-                            ]
-                        ],
-                        [
-                            "concat",
-                            [
-                                "var",
-                                "localized_name"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "has",
-                            "name:nonlatin"
-                        ],
-                        [
-                            "concat",
-                            [
-                                "get",
-                                "name:latin"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "var",
-                            "localized_name"
-                        ]
-                    ]
-                ],
-                "text-font": [
-                    "Noto Sans Regular"
-                ],
-                "text-max-width": 9,
-                "text-offset": [
-                    0,
-                    0.6
-                ],
-                "text-padding": 2,
-                "text-size": 12,
-                "icon-size": 0.9,
-                "visibility": "none",
-                "symbol-sort-key": [
-                    "get",
-                    "rank"
-                ]
-            },
-            "paint": {
-                "text-color": "rgb(67, 115, 72)",
-                "text-halo-blur": 0.5,
-                "text-halo-color": "#ffffff",
-                "text-halo-width": 1
-            }
-        },
-        {
-            "id": "poi.parking",
-            "type": "symbol",
-            "metadata": {
-                "featureType": "poi.business"
-            },
-            "source": "openmaptiles",
-            "source-layer": "poi",
-            "minzoom": 14,
-            "filter": [
-                "all",
-                [
-                    "==",
-                    "$type",
-                    "Point"
-                ],
-                [
-                    "has",
-                    "name"
-                ],
-                [
-                    "in",
-                    "class",
-                    "parking"
-                ]
-            ],
-            "layout": {
-                "icon-image": "{class}_15",
-                "text-anchor": "top",
-                "text-field": [
-                    "let",
-                    "localized_name",
-                    [
-                        "coalesce",
-                        [
-                            "get",
-                            "name:en"
-                        ],
-                        [
-                            "get",
-                            "name_int"
-                        ]
-                    ],
-                    [
-                        "case",
-                        [
-                            "all",
-                            [
-                                "has",
-                                "name:nonlatin"
-                            ],
-                            [
-                                "!=",
-                                [
-                                    "var",
-                                    "localized_name"
-                                ],
-                                [
-                                    "get",
-                                    "name:nonlatin"
-                                ]
-                            ]
-                        ],
-                        [
-                            "concat",
-                            [
-                                "var",
-                                "localized_name"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "has",
-                            "name:nonlatin"
-                        ],
-                        [
-                            "concat",
-                            [
-                                "get",
-                                "name:latin"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "var",
-                            "localized_name"
-                        ]
-                    ]
-                ],
-                "text-font": [
-                    "Noto Sans Regular"
-                ],
-                "text-max-width": 9,
-                "text-offset": [
-                    0,
-                    0.6
-                ],
-                "text-padding": 2,
-                "text-size": 12,
-                "text-optional": true,
-                "icon-size": {
-                    "stops": [
-                        [
-                            14,
-                            0.7
-                        ],
-                        [
-                            17,
-                            0.9
-                        ]
-                    ]
-                },
-                "visibility": "none"
-            },
-            "paint": {
-                "text-color": "#666",
-                "text-halo-blur": 0.5,
-                "text-halo-color": "#ffffff",
-                "text-halo-width": 1
-            }
-        },
-        {
-            "id": "poi.place_of_worship",
-            "type": "symbol",
-            "metadata": {
-                "featureType": "poi.place_of_worship"
-            },
-            "source": "openmaptiles",
-            "source-layer": "poi",
-            "minzoom": 14,
-            "filter": [
-                "all",
-                [
-                    "==",
-                    "$type",
-                    "Point"
-                ],
-                [
-                    "has",
-                    "name"
-                ],
-                [
-                    "in",
-                    "class",
-                    "place_of_worship"
-                ],
-                [
-                    "has",
-                    "subclass"
-                ]
-            ],
-            "layout": {
-                "icon-image": "{class}_15",
-                "text-anchor": "top",
-                "text-field": [
-                    "let",
-                    "localized_name",
-                    [
-                        "coalesce",
-                        [
-                            "get",
-                            "name:en"
-                        ],
-                        [
-                            "get",
-                            "name_int"
-                        ]
-                    ],
-                    [
-                        "case",
-                        [
-                            "all",
-                            [
-                                "has",
-                                "name:nonlatin"
-                            ],
-                            [
-                                "!=",
-                                [
-                                    "var",
-                                    "localized_name"
-                                ],
-                                [
-                                    "get",
-                                    "name:nonlatin"
-                                ]
-                            ]
-                        ],
-                        [
-                            "concat",
-                            [
-                                "var",
-                                "localized_name"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "has",
-                            "name:nonlatin"
-                        ],
-                        [
-                            "concat",
-                            [
-                                "get",
-                                "name:latin"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "var",
-                            "localized_name"
-                        ]
-                    ]
-                ],
-                "text-font": [
-                    "Noto Sans Regular"
-                ],
-                "text-max-width": 9,
-                "text-offset": [
-                    0,
-                    0.6
-                ],
-                "text-padding": 2,
-                "text-size": 12,
-                "text-optional": true,
-                "icon-size": 0.9,
-                "visibility": "none",
-                "symbol-sort-key": [
-                    "get",
-                    "rank"
-                ]
-            },
-            "paint": {
-                "text-color": "#666",
-                "text-halo-blur": 0.5,
-                "text-halo-color": "#ffffff",
-                "text-halo-width": 1
-            }
-        },
-        {
-            "id": "poi.medical",
-            "type": "symbol",
-            "metadata": {
-                "featureType": "poi.medical",
-                "elementTypes": [
-                    "labels"
-                ]
-            },
-            "source": "openmaptiles",
-            "source-layer": "poi",
-            "minzoom": 14,
-            "filter": [
-                "all",
-                [
-                    "==",
-                    "$type",
-                    "Point"
-                ],
-                [
-                    "has",
-                    "name"
-                ],
-                [
-                    "any",
-                    [
-                        "in",
-                        "class",
-                        "police"
-                    ],
-                    [
-                        "all",
-                        [
-                            "==",
-                            "class",
-                            "hospital"
-                        ],
-                        [
-                            "==",
-                            "subclass",
-                            "hospital"
-                        ]
-                    ]
-                ]
-            ],
-            "layout": {
-                "icon-image": "{class}_15",
-                "text-anchor": "top",
-                "text-field": [
-                    "let",
-                    "localized_name",
-                    [
-                        "coalesce",
-                        [
-                            "get",
-                            "name:en"
-                        ],
-                        [
-                            "get",
-                            "name_int"
-                        ]
-                    ],
-                    [
-                        "case",
-                        [
-                            "all",
-                            [
-                                "has",
-                                "name:nonlatin"
-                            ],
-                            [
-                                "!=",
-                                [
-                                    "var",
-                                    "localized_name"
-                                ],
-                                [
-                                    "get",
-                                    "name:nonlatin"
-                                ]
-                            ]
-                        ],
-                        [
-                            "concat",
-                            [
-                                "var",
-                                "localized_name"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "has",
-                            "name:nonlatin"
-                        ],
-                        [
-                            "concat",
-                            [
-                                "get",
-                                "name:latin"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "var",
-                            "localized_name"
-                        ]
-                    ]
-                ],
-                "text-font": [
-                    "Noto Sans Regular"
-                ],
-                "text-max-width": 9,
-                "text-offset": [
-                    0,
-                    0.6
-                ],
-                "text-padding": 2,
-                "text-size": 12,
-                "icon-size": 0.9,
-                "visibility": "none"
-            },
-            "paint": {
-                "text-color": "#666",
-                "text-halo-blur": 0.5,
-                "text-halo-color": "#ffffff",
-                "text-halo-width": 1
-            }
-        },
-        {
-            "id": "poi.school",
-            "type": "symbol",
-            "metadata": {
-                "featureType": "poi.school"
-            },
-            "source": "openmaptiles",
-            "source-layer": "poi",
-            "minzoom": 14,
-            "filter": [
-                "all",
-                [
-                    "==",
-                    "$type",
-                    "Point"
-                ],
-                [
-                    "has",
-                    "name"
-                ],
-                [
-                    "in",
-                    "class",
-                    "college"
-                ]
-            ],
-            "layout": {
-                "icon-image": "{class}_15",
-                "text-anchor": "top",
-                "text-field": [
-                    "let",
-                    "localized_name",
-                    [
-                        "coalesce",
-                        [
-                            "get",
-                            "name:en"
-                        ],
-                        [
-                            "get",
-                            "name_int"
-                        ]
-                    ],
-                    [
-                        "case",
-                        [
-                            "all",
-                            [
-                                "has",
-                                "name:nonlatin"
-                            ],
-                            [
-                                "!=",
-                                [
-                                    "var",
-                                    "localized_name"
-                                ],
-                                [
-                                    "get",
-                                    "name:nonlatin"
-                                ]
-                            ]
-                        ],
-                        [
-                            "concat",
-                            [
-                                "var",
-                                "localized_name"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "has",
-                            "name:nonlatin"
-                        ],
-                        [
-                            "concat",
-                            [
-                                "get",
-                                "name:latin"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "var",
-                            "localized_name"
-                        ]
-                    ]
-                ],
-                "text-font": [
-                    "Noto Sans Regular"
-                ],
-                "text-max-width": 9,
-                "text-offset": [
-                    0,
-                    0.6
-                ],
-                "text-padding": 2,
-                "text-size": 12,
-                "icon-size": 0.9,
-                "visibility": "none",
-                "symbol-sort-key": [
-                    "get",
-                    "rank"
-                ]
-            },
-            "paint": {
-                "text-color": "#666",
-                "text-halo-blur": 0.5,
-                "text-halo-color": "#ffffff",
-                "text-halo-width": 1
-            }
-        },
-        {
-            "id": "poi.sports_complex",
-            "type": "symbol",
-            "metadata": {
-                "featureType": "poi.sports_complex"
-            },
-            "source": "openmaptiles",
-            "source-layer": "poi",
-            "minzoom": 14,
-            "filter": [
-                "all",
-                [
-                    "==",
-                    "$type",
-                    "Point"
-                ],
-                [
-                    "has",
-                    "name"
-                ],
-                [
-                    "in",
-                    "class",
-                    "sports_centre",
-                    "stadium"
-                ]
-            ],
-            "layout": {
-                "icon-image": "{class}_15",
-                "text-anchor": "top",
-                "text-field": [
-                    "let",
-                    "localized_name",
-                    [
-                        "coalesce",
-                        [
-                            "get",
-                            "name:en"
-                        ],
-                        [
-                            "get",
-                            "name_int"
-                        ]
-                    ],
-                    [
-                        "case",
-                        [
-                            "all",
-                            [
-                                "has",
-                                "name:nonlatin"
-                            ],
-                            [
-                                "!=",
-                                [
-                                    "var",
-                                    "localized_name"
-                                ],
-                                [
-                                    "get",
-                                    "name:nonlatin"
-                                ]
-                            ]
-                        ],
-                        [
-                            "concat",
-                            [
-                                "var",
-                                "localized_name"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "has",
-                            "name:nonlatin"
-                        ],
-                        [
-                            "concat",
-                            [
-                                "get",
-                                "name:latin"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "var",
-                            "localized_name"
-                        ]
-                    ]
-                ],
-                "text-font": [
-                    "Noto Sans Regular"
-                ],
-                "text-max-width": 9,
-                "text-offset": [
-                    0,
-                    0.6
-                ],
-                "text-padding": 2,
-                "text-size": 12,
-                "icon-size": 0.9,
-                "visibility": "none",
-                "symbol-sort-key": [
-                    "get",
-                    "rank"
-                ]
-            },
-            "paint": {
-                "text-color": "#666",
-                "text-halo-blur": 0.5,
-                "text-halo-color": "#ffffff",
-                "text-halo-width": 1
-            }
-        },
-        {
-            "id": "poi_government",
-            "type": "symbol",
-            "metadata": {
-                "featureType": "poi.government"
-            },
-            "source": "openmaptiles",
-            "source-layer": "poi",
-            "minzoom": 14,
-            "filter": [
-                "all",
-                [
-                    "==",
-                    "$type",
-                    "Point"
-                ],
-                [
-                    "has",
-                    "name"
-                ],
-                [
-                    "==",
-                    "subclass",
-                    "townhall"
-                ]
-            ],
-            "layout": {
-                "icon-image": "town-hall_11",
-                "text-anchor": "top",
-                "text-field": [
-                    "let",
-                    "localized_name",
-                    [
-                        "coalesce",
-                        [
-                            "get",
-                            "name:en"
-                        ],
-                        [
-                            "get",
-                            "name_int"
-                        ]
-                    ],
-                    [
-                        "case",
-                        [
-                            "all",
-                            [
-                                "has",
-                                "name:nonlatin"
-                            ],
-                            [
-                                "!=",
-                                [
-                                    "var",
-                                    "localized_name"
-                                ],
-                                [
-                                    "get",
-                                    "name:nonlatin"
-                                ]
-                            ]
-                        ],
-                        [
-                            "concat",
-                            [
-                                "var",
-                                "localized_name"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "has",
-                            "name:nonlatin"
-                        ],
-                        [
-                            "concat",
-                            [
-                                "get",
-                                "name:latin"
-                            ],
-                            " \n",
-                            [
-                                "get",
-                                "name:nonlatin"
-                            ]
-                        ],
-                        [
-                            "var",
-                            "localized_name"
-                        ]
-                    ]
-                ],
-                "text-font": [
-                    "Noto Sans Regular"
-                ],
-                "text-max-width": 9,
-                "text-offset": [
-                    0,
-                    0.6
-                ],
-                "text-padding": 2,
-                "text-size": 12,
-                "icon-size": 0.9,
-                "visibility": "none",
-                "symbol-sort-key": [
-                    "get",
-                    "rank"
-                ]
-            },
-            "paint": {
-                "text-color": "#666",
-                "text-halo-blur": 0.5,
-                "text-halo-color": "#ffffff",
-                "text-halo-width": 1
-            }
         },
         {
             "id": "road_oneway",
@@ -6579,6 +5631,91 @@ export default {
             }
         },
         {
+            "id": "labels_roads.roads.pedestrian.aerialway",
+            "metadata": {
+                "featureType": "roads.pedestrian.aerialway",
+                "elementTypes": [
+                    "labels"
+                ]
+            },
+            "filter": [
+                "all",
+                [
+                    "==",
+                    [
+                        "geometry-type"
+                    ],
+                    "LineString"
+                ],
+                [
+                    "in",
+                    [
+                        "get",
+                        "class"
+                    ],
+                    [
+                        "literal",
+                        [
+                            "aerialway"
+                        ]
+                    ]
+                ],
+                [
+                    "!",
+                    [
+                        "in",
+                        [
+                            "get",
+                            "brunnel"
+                        ],
+                        [
+                            "literal",
+                            [
+                                "bridge",
+                                "tunnel"
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            "source-layer": "transportation_name",
+            "source": "openmaptiles",
+            "type": "symbol",
+            "paint": {
+                "text-color": "#666",
+                "text-halo-blur": 0.2,
+                "text-halo-color": "rgba(255,255,255,1)",
+                "text-halo-width": 1.2
+            },
+            "layout": {
+                "visibility": "visible",
+                "text-allow-overlap": false,
+                "symbol-placement": "line",
+                "symbol-spacing": 400.0,
+                "text-field": [
+                    "get",
+                    "name"
+                ],
+                "text-font": [
+                    "Noto Sans Regular"
+                ],
+                "text-size": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    8,
+                    10,
+                    14,
+                    13
+                ],
+                "text-max-width": 6.25
+            }
+        },
+        {
             "id": "highway-shield",
             "type": "symbol",
             "metadata": {
@@ -6610,7 +5747,8 @@ export default {
             ],
             "layout": {
                 "text-size": 10,
-                "icon-image": "road_{ref_length}",
+                "icon-image": "road",
+                "icon-text-fit": "both",
                 "icon-rotation-alignment": "viewport",
                 "symbol-spacing": 200,
                 "text-font": [
@@ -6752,6 +5890,4426 @@ export default {
             }
         },
         {
+            "id": "point_of_interest",
+            "metadata": {
+                "featureType": "point_of_interest",
+                "elementTypes": [
+                    "labels"
+                ],
+                "poiMetadata": {
+                    "park": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "park"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "green",
+                        "text_color": "rgb(0, 89, 0)",
+                        "icon": "park",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "place_of_worship": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "place_of_worship"
+                            ],
+                            [
+                                "has",
+                                "subclass"
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "grey",
+                        "text_color": "rgb(89, 89, 89)",
+                        "icon": "place-of-worship",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "medical.hospital": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "hospital"
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                "hospital"
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "rgb(255, 25, 25)",
+                        "text_color": "rgb(196, 0, 0)",
+                        "icon": "hospital",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "medical.pharmacy": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "pharmacy"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "rgb(255, 25, 25)",
+                        "text_color": "rgb(196, 0, 0)",
+                        "icon": "pharmacy",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "police": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "police"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#0056d6",
+                        "text_color": "rgb(0, 60, 149)",
+                        "icon": "police",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "education.university": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "college"
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                "university"
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "brown",
+                        "text_color": "rgb(115, 29, 29)",
+                        "icon": "college",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "education.school": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "school"
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                "school"
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "brown",
+                        "text_color": "rgb(115, 29, 29)",
+                        "icon": "school",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "sports_complex": {
+                        "filter": [
+                            "in",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            [
+                                "literal",
+                                [
+                                    "sports_centre",
+                                    "stadium"
+                                ]
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "green",
+                        "text_color": "rgb(0, 89, 0)",
+                        "icon": "pitch",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "government": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "townhall"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "grey",
+                        "text_color": "rgb(89, 89, 89)",
+                        "icon": "town-hall",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "post": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "post"
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                "post_office"
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "grey",
+                        "text_color": "rgb(89, 89, 89)",
+                        "icon": "post",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "tourism.monument.castle": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "castle"
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                "castle"
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "grey",
+                        "text_color": "rgb(89, 89, 89)",
+                        "icon": "castle",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "tourism.museum": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "museum"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "grey",
+                        "text_color": "rgb(89, 89, 89)",
+                        "icon": "museum",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "tourism.monument": {
+                        "filter": [
+                            "all",
+                            [
+                                "!",
+                                [
+                                    "has",
+                                    "level"
+                                ]
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "monument"
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "grey",
+                        "text_color": "rgb(89, 89, 89)",
+                        "icon": "monument",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "tourism.attraction": {
+                        "filter": [
+                            "all",
+                            [
+                                "!",
+                                [
+                                    "has",
+                                    "level"
+                                ]
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "attraction"
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                "attraction"
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "grey",
+                        "text_color": "rgb(89, 89, 89)",
+                        "icon": "attraction",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "tourism.attraction.zoo": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "zoo"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "green",
+                        "text_color": "rgb(0, 89, 0)",
+                        "icon": "zoo",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "hospitality.hotels": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "hotel"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "purple",
+                        "text_color": "rgb(89, 0, 89)",
+                        "icon": "lodging",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.mall": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "mall"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "shop",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.cinema": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "cinema"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "cinema",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.finance.bank": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "bank"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "grey",
+                        "text_color": "rgb(89, 89, 89)",
+                        "icon": "building",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.finance.atm": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "atm"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "grey",
+                        "text_color": "rgb(89, 89, 89)",
+                        "icon": "bank",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.shop.grocery": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "grocery"
+                            ],
+                            [
+                                "!",
+                                [
+                                    "in",
+                                    [
+                                        "get",
+                                        "subclass"
+                                    ],
+                                    [
+                                        "literal",
+                                        [
+                                            "marketplace"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "grocery",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.shop.toys": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "shop"
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                "toys"
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "shop",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.shop.butcher": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "butcher"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "butcher",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.shop.bakery": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "bakery"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "bakery",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.shop.library": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "library"
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                "books"
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "library",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.shop.electronics": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "shop"
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                "electronics"
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "shop",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.shop.furniture": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "furniture"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "furniture",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.shop.sports": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "sports"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "pitch",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.shop.clothes": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "clothes"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "clothing-store",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.food_and_drinks.bar": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "bar"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "bar",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.food_and_drinks.pub": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "pub"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "beer",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.food_and_drinks.cafe": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "cafe"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "cafe",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.food_and_drinks.fast_food": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "fast_food"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "fast-food",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.food_and_drinks.restaurant": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "restaurant"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "restaurant",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.parking": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "parking"
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#03b1fc",
+                        "text_color": "rgb(2, 123, 176)",
+                        "icon": "parking",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.fuel": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "fuel"
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                "fuel"
+                            ]
+                        ],
+                        "symbol_color": "#fff",
+                        "symbol_halo_color": "#ee9316",
+                        "text_color": "rgb(169, 103, 12)",
+                        "icon": "fuel",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    }
+                },
+                "poiBaseFilter": [
+                    "all",
+                    [
+                        "has",
+                        "name"
+                    ],
+                    [
+                        "==",
+                        [
+                            "geometry-type"
+                        ],
+                        "Point"
+                    ],
+                    [
+                        "<",
+                        [
+                            "get",
+                            "rank"
+                        ],
+                        [
+                            "interpolate",
+                            [
+                                "linear"
+                            ],
+                            [
+                                "zoom"
+                            ],
+                            14,
+                            10,
+                            15,
+                            50,
+                            16,
+                            100,
+                            17,
+                            150,
+                            18,
+                            400,
+                            19,
+                            800,
+                            20,
+                            1000
+                        ]
+                    ]
+                ]
+            },
+            "filter": [
+                "all",
+                [
+                    "has",
+                    "name"
+                ],
+                [
+                    "==",
+                    [
+                        "geometry-type"
+                    ],
+                    "Point"
+                ],
+                [
+                    "<",
+                    [
+                        "get",
+                        "rank"
+                    ],
+                    [
+                        "interpolate",
+                        [
+                            "linear"
+                        ],
+                        [
+                            "zoom"
+                        ],
+                        14,
+                        10,
+                        15,
+                        50,
+                        16,
+                        100,
+                        17,
+                        150,
+                        18,
+                        400,
+                        19,
+                        800,
+                        20,
+                        1000
+                    ]
+                ],
+                [
+                    "any",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "park"
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "place_of_worship"
+                        ],
+                        [
+                            "has",
+                            "subclass"
+                        ]
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "hospital"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "hospital"
+                        ]
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "pharmacy"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "police"
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "college"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "university"
+                        ]
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "school"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "school"
+                        ]
+                    ],
+                    [
+                        "in",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        [
+                            "literal",
+                            [
+                                "sports_centre",
+                                "stadium"
+                            ]
+                        ]
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "townhall"
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "post"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "post_office"
+                        ]
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "castle"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "castle"
+                        ]
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "museum"
+                    ],
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "monument"
+                        ]
+                    ],
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "attraction"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "attraction"
+                        ]
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "zoo"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "hotel"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "mall"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "cinema"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bank"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "atm"
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "grocery"
+                        ],
+                        [
+                            "!",
+                            [
+                                "in",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                [
+                                    "literal",
+                                    [
+                                        "marketplace"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "shop"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "toys"
+                        ]
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "butcher"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bakery"
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "library"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "books"
+                        ]
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "shop"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "electronics"
+                        ]
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "furniture"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "sports"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "clothes"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bar"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "pub"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "cafe"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "fast_food"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "restaurant"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "parking"
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "fuel"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "fuel"
+                        ]
+                    ]
+                ]
+            ],
+            "source-layer": "poi",
+            "source": "openmaptiles",
+            "type": "symbol",
+            "paint": {
+                "icon-color": [
+                    "case",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "park"
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "place_of_worship"
+                        ],
+                        [
+                            "has",
+                            "subclass"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "hospital"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "hospital"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "pharmacy"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "police"
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "college"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "university"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "school"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "school"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "in",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        [
+                            "literal",
+                            [
+                                "sports_centre",
+                                "stadium"
+                            ]
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "townhall"
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "post"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "post_office"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "castle"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "castle"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "museum"
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "monument"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "attraction"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "attraction"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "zoo"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "hotel"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "mall"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "cinema"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bank"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "atm"
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "grocery"
+                        ],
+                        [
+                            "!",
+                            [
+                                "in",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                [
+                                    "literal",
+                                    [
+                                        "marketplace"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "shop"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "toys"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "butcher"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bakery"
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "library"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "books"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "shop"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "electronics"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "furniture"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "sports"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "clothes"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bar"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "pub"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "cafe"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "fast_food"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "restaurant"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "parking"
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "fuel"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "fuel"
+                        ]
+                    ],
+                    "#fff",
+                    "transparent"
+                ],
+                "icon-halo-color": [
+                    "case",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "park"
+                    ],
+                    "green",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "place_of_worship"
+                        ],
+                        [
+                            "has",
+                            "subclass"
+                        ]
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "hospital"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "hospital"
+                        ]
+                    ],
+                    "rgb(255, 25, 25)",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "pharmacy"
+                    ],
+                    "rgb(255, 25, 25)",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "police"
+                    ],
+                    "#0056d6",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "college"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "university"
+                        ]
+                    ],
+                    "brown",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "school"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "school"
+                        ]
+                    ],
+                    "brown",
+                    [
+                        "in",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        [
+                            "literal",
+                            [
+                                "sports_centre",
+                                "stadium"
+                            ]
+                        ]
+                    ],
+                    "green",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "townhall"
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "post"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "post_office"
+                        ]
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "castle"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "castle"
+                        ]
+                    ],
+                    "grey",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "museum"
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "monument"
+                        ]
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "attraction"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "attraction"
+                        ]
+                    ],
+                    "grey",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "zoo"
+                    ],
+                    "green",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "hotel"
+                    ],
+                    "purple",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "mall"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "cinema"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bank"
+                    ],
+                    "grey",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "atm"
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "grocery"
+                        ],
+                        [
+                            "!",
+                            [
+                                "in",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                [
+                                    "literal",
+                                    [
+                                        "marketplace"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    "#ee9316",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "shop"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "toys"
+                        ]
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "butcher"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bakery"
+                    ],
+                    "#ee9316",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "library"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "books"
+                        ]
+                    ],
+                    "#ee9316",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "shop"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "electronics"
+                        ]
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "furniture"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "sports"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "clothes"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bar"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "pub"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "cafe"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "fast_food"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "restaurant"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "parking"
+                    ],
+                    "#03b1fc",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "fuel"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "fuel"
+                        ]
+                    ],
+                    "#ee9316",
+                    "transparent"
+                ],
+                "icon-halo-width": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    14,
+                    2.8,
+                    16,
+                    4
+                ],
+                "text-color": [
+                    "case",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "park"
+                    ],
+                    "green",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "place_of_worship"
+                        ],
+                        [
+                            "has",
+                            "subclass"
+                        ]
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "hospital"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "hospital"
+                        ]
+                    ],
+                    "rgb(255, 25, 25)",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "pharmacy"
+                    ],
+                    "rgb(255, 25, 25)",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "police"
+                    ],
+                    "#0056d6",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "college"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "university"
+                        ]
+                    ],
+                    "brown",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "school"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "school"
+                        ]
+                    ],
+                    "brown",
+                    [
+                        "in",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        [
+                            "literal",
+                            [
+                                "sports_centre",
+                                "stadium"
+                            ]
+                        ]
+                    ],
+                    "green",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "townhall"
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "post"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "post_office"
+                        ]
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "castle"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "castle"
+                        ]
+                    ],
+                    "grey",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "museum"
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "monument"
+                        ]
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "attraction"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "attraction"
+                        ]
+                    ],
+                    "grey",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "zoo"
+                    ],
+                    "green",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "hotel"
+                    ],
+                    "purple",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "mall"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "cinema"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bank"
+                    ],
+                    "grey",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "atm"
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "grocery"
+                        ],
+                        [
+                            "!",
+                            [
+                                "in",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                [
+                                    "literal",
+                                    [
+                                        "marketplace"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    "#ee9316",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "shop"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "toys"
+                        ]
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "butcher"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bakery"
+                    ],
+                    "#ee9316",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "library"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "books"
+                        ]
+                    ],
+                    "#ee9316",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "shop"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "electronics"
+                        ]
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "furniture"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "sports"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "clothes"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bar"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "pub"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "cafe"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "fast_food"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "restaurant"
+                    ],
+                    "#ee9316",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "parking"
+                    ],
+                    "#03b1fc",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "fuel"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "fuel"
+                        ]
+                    ],
+                    "#ee9316",
+                    "transparent"
+                ],
+                "text-halo-blur": 0.2,
+                "text-halo-color": "#fff",
+                "text-halo-width": 1.3
+            },
+            "layout": {
+                "visibility": "none",
+                "icon-allow-overlap": false,
+                "icon-image": [
+                    "case",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "park"
+                    ],
+                    "park",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "place_of_worship"
+                        ],
+                        [
+                            "has",
+                            "subclass"
+                        ]
+                    ],
+                    "place-of-worship",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "hospital"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "hospital"
+                        ]
+                    ],
+                    "hospital",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "pharmacy"
+                    ],
+                    "pharmacy",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "police"
+                    ],
+                    "police",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "college"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "university"
+                        ]
+                    ],
+                    "college",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "school"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "school"
+                        ]
+                    ],
+                    "school",
+                    [
+                        "in",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        [
+                            "literal",
+                            [
+                                "sports_centre",
+                                "stadium"
+                            ]
+                        ]
+                    ],
+                    "pitch",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "townhall"
+                    ],
+                    "town-hall",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "post"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "post_office"
+                        ]
+                    ],
+                    "post",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "castle"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "castle"
+                        ]
+                    ],
+                    "castle",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "museum"
+                    ],
+                    "museum",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "monument"
+                        ]
+                    ],
+                    "monument",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "attraction"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "attraction"
+                        ]
+                    ],
+                    "attraction",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "zoo"
+                    ],
+                    "zoo",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "hotel"
+                    ],
+                    "lodging",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "mall"
+                    ],
+                    "shop",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "cinema"
+                    ],
+                    "cinema",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bank"
+                    ],
+                    "building",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "atm"
+                    ],
+                    "bank",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "grocery"
+                        ],
+                        [
+                            "!",
+                            [
+                                "in",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                [
+                                    "literal",
+                                    [
+                                        "marketplace"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    "grocery",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "shop"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "toys"
+                        ]
+                    ],
+                    "shop",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "butcher"
+                    ],
+                    "butcher",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bakery"
+                    ],
+                    "bakery",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "library"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "books"
+                        ]
+                    ],
+                    "library",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "shop"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "electronics"
+                        ]
+                    ],
+                    "shop",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "furniture"
+                    ],
+                    "furniture",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "sports"
+                    ],
+                    "pitch",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "clothes"
+                    ],
+                    "clothing-store",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "bar"
+                    ],
+                    "bar",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "pub"
+                    ],
+                    "beer",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "cafe"
+                    ],
+                    "cafe",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "fast_food"
+                    ],
+                    "fast-food",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "restaurant"
+                    ],
+                    "restaurant",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "parking"
+                    ],
+                    "parking",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "fuel"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "fuel"
+                        ]
+                    ],
+                    "fuel",
+                    "circle"
+                ],
+                "icon-padding": 8.0,
+                "icon-size": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    14,
+                    0.7,
+                    16,
+                    1
+                ],
+                "symbol-sort-key": [
+                    "get",
+                    "rank"
+                ],
+                "text-field": [
+                    "get",
+                    "name"
+                ],
+                "text-font": [
+                    "Noto Sans Bold"
+                ],
+                "text-size": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    10,
+                    10,
+                    14,
+                    11
+                ],
+                "text-variable-anchor": [
+                    "left",
+                    "right"
+                ],
+                "text-justify": "auto",
+                "text-offset": [
+                    0,
+                    1
+                ],
+                "text-optional": true,
+                "text-padding": 15,
+                "text-max-width": 6.25
+            }
+        },
+        {
+            "id": "poi",
+            "metadata": {
+                "featureType": "poi",
+                "elementTypes": [
+                    "labels"
+                ],
+                "poiMetadata": {
+                    "park": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "park"
+                        ],
+                        "symbol_color": "green",
+                        "symbol_halo_color": "#fff",
+                        "text_color": "#444",
+                        "icon": "park",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "place_of_worship": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "place_of_worship"
+                            ],
+                            [
+                                "has",
+                                "subclass"
+                            ]
+                        ],
+                        "symbol_color": "grey",
+                        "symbol_halo_color": "#fff",
+                        "text_color": "#444",
+                        "icon": "place-of-worship",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "medical.hospital": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "hospital"
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                "hospital"
+                            ]
+                        ],
+                        "symbol_color": "rgb(255, 25, 25)",
+                        "symbol_halo_color": "#fff",
+                        "text_color": "#444",
+                        "icon": "hospital",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "school.university": {
+                        "filter": [
+                            "all",
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "college"
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                "university"
+                            ]
+                        ],
+                        "symbol_color": "brown",
+                        "symbol_halo_color": "#fff",
+                        "text_color": "#444",
+                        "icon": "college",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "sports_complex": {
+                        "filter": [
+                            "in",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            [
+                                "literal",
+                                [
+                                    "sports_centre",
+                                    "stadium"
+                                ]
+                            ]
+                        ],
+                        "symbol_color": "green",
+                        "symbol_halo_color": "#fff",
+                        "text_color": "#444",
+                        "icon": "pitch",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "government": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "townhall"
+                        ],
+                        "symbol_color": "grey",
+                        "symbol_halo_color": "#fff",
+                        "text_color": "#444",
+                        "icon": "town-hall",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "museum": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "museum"
+                        ],
+                        "symbol_color": "grey",
+                        "symbol_halo_color": "#fff",
+                        "text_color": "#444",
+                        "icon": "museum",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "monument": {
+                        "filter": [
+                            "all",
+                            [
+                                "!",
+                                [
+                                    "has",
+                                    "level"
+                                ]
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "monument"
+                            ]
+                        ],
+                        "symbol_color": "grey",
+                        "symbol_halo_color": "#fff",
+                        "text_color": "#444",
+                        "icon": "monument",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "attraction": {
+                        "filter": [
+                            "all",
+                            [
+                                "!",
+                                [
+                                    "has",
+                                    "level"
+                                ]
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "class"
+                                ],
+                                "attraction"
+                            ],
+                            [
+                                "==",
+                                [
+                                    "get",
+                                    "subclass"
+                                ],
+                                "attraction"
+                            ]
+                        ],
+                        "symbol_color": "grey",
+                        "symbol_halo_color": "#fff",
+                        "text_color": "#444",
+                        "icon": "attraction",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "police": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "police"
+                        ],
+                        "symbol_color": "#0056d6",
+                        "symbol_halo_color": "#fff",
+                        "text_color": "#444",
+                        "icon": "police",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    },
+                    "business.parking": {
+                        "filter": [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "parking"
+                        ],
+                        "symbol_color": "#03b1fc",
+                        "symbol_halo_color": "#fff",
+                        "text_color": "#444",
+                        "icon": "parking",
+                        "visible": false,
+                        "visibility": {},
+                        "colors": {}
+                    }
+                },
+                "poiBaseFilter": [
+                    "all",
+                    [
+                        "has",
+                        "name"
+                    ],
+                    [
+                        "==",
+                        [
+                            "geometry-type"
+                        ],
+                        "Point"
+                    ],
+                    [
+                        "<",
+                        [
+                            "get",
+                            "rank"
+                        ],
+                        [
+                            "interpolate",
+                            [
+                                "linear"
+                            ],
+                            [
+                                "zoom"
+                            ],
+                            14,
+                            10,
+                            15,
+                            50,
+                            16,
+                            100,
+                            17,
+                            150,
+                            18,
+                            400,
+                            19,
+                            800,
+                            20,
+                            1000
+                        ]
+                    ]
+                ]
+            },
+            "filter": [
+                "all",
+                [
+                    "has",
+                    "name"
+                ],
+                [
+                    "==",
+                    [
+                        "geometry-type"
+                    ],
+                    "Point"
+                ],
+                [
+                    "<",
+                    [
+                        "get",
+                        "rank"
+                    ],
+                    [
+                        "interpolate",
+                        [
+                            "linear"
+                        ],
+                        [
+                            "zoom"
+                        ],
+                        14,
+                        10,
+                        15,
+                        50,
+                        16,
+                        100,
+                        17,
+                        150,
+                        18,
+                        400,
+                        19,
+                        800,
+                        20,
+                        1000
+                    ]
+                ],
+                [
+                    "any",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "park"
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "place_of_worship"
+                        ],
+                        [
+                            "has",
+                            "subclass"
+                        ]
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "hospital"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "hospital"
+                        ]
+                    ],
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "college"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "university"
+                        ]
+                    ],
+                    [
+                        "in",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        [
+                            "literal",
+                            [
+                                "sports_centre",
+                                "stadium"
+                            ]
+                        ]
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "townhall"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "museum"
+                    ],
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "monument"
+                        ]
+                    ],
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "attraction"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "attraction"
+                        ]
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "police"
+                    ],
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "parking"
+                    ]
+                ]
+            ],
+            "source-layer": "poi",
+            "source": "openmaptiles",
+            "type": "symbol",
+            "paint": {
+                "icon-color": [
+                    "case",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "park"
+                    ],
+                    "green",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "place_of_worship"
+                        ],
+                        [
+                            "has",
+                            "subclass"
+                        ]
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "hospital"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "hospital"
+                        ]
+                    ],
+                    "rgb(255, 25, 25)",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "college"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "university"
+                        ]
+                    ],
+                    "brown",
+                    [
+                        "in",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        [
+                            "literal",
+                            [
+                                "sports_centre",
+                                "stadium"
+                            ]
+                        ]
+                    ],
+                    "green",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "townhall"
+                    ],
+                    "grey",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "museum"
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "monument"
+                        ]
+                    ],
+                    "grey",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "attraction"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "attraction"
+                        ]
+                    ],
+                    "grey",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "police"
+                    ],
+                    "#0056d6",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "parking"
+                    ],
+                    "#03b1fc",
+                    "transparent"
+                ],
+                "icon-halo-color": [
+                    "case",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "park"
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "place_of_worship"
+                        ],
+                        [
+                            "has",
+                            "subclass"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "hospital"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "hospital"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "college"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "university"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "in",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        [
+                            "literal",
+                            [
+                                "sports_centre",
+                                "stadium"
+                            ]
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "townhall"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "museum"
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "monument"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "attraction"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "attraction"
+                        ]
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "police"
+                    ],
+                    "#fff",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "parking"
+                    ],
+                    "#fff",
+                    "transparent"
+                ],
+                "icon-halo-width": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    14,
+                    2.8,
+                    16,
+                    4
+                ],
+                "text-color": "#444",
+                "text-halo-blur": 0.2,
+                "text-halo-color": "#fff",
+                "text-halo-width": 1.3
+            },
+            "layout": {
+                "visibility": "none",
+                "icon-allow-overlap": false,
+                "icon-image": [
+                    "case",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "park"
+                    ],
+                    "park",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "place_of_worship"
+                        ],
+                        [
+                            "has",
+                            "subclass"
+                        ]
+                    ],
+                    "place-of-worship",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "hospital"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "hospital"
+                        ]
+                    ],
+                    "hospital",
+                    [
+                        "all",
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "college"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "university"
+                        ]
+                    ],
+                    "college",
+                    [
+                        "in",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        [
+                            "literal",
+                            [
+                                "sports_centre",
+                                "stadium"
+                            ]
+                        ]
+                    ],
+                    "pitch",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "subclass"
+                        ],
+                        "townhall"
+                    ],
+                    "town-hall",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "museum"
+                    ],
+                    "museum",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "monument"
+                        ]
+                    ],
+                    "monument",
+                    [
+                        "all",
+                        [
+                            "!",
+                            [
+                                "has",
+                                "level"
+                            ]
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "class"
+                            ],
+                            "attraction"
+                        ],
+                        [
+                            "==",
+                            [
+                                "get",
+                                "subclass"
+                            ],
+                            "attraction"
+                        ]
+                    ],
+                    "attraction",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "police"
+                    ],
+                    "police",
+                    [
+                        "==",
+                        [
+                            "get",
+                            "class"
+                        ],
+                        "parking"
+                    ],
+                    "parking",
+                    "circle"
+                ],
+                "icon-padding": 8.0,
+                "icon-size": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    14,
+                    0.7,
+                    16,
+                    1
+                ],
+                "symbol-sort-key": [
+                    "get",
+                    "rank"
+                ],
+                "text-field": [
+                    "get",
+                    "name"
+                ],
+                "text-font": [
+                    "Noto Sans Regular"
+                ],
+                "text-size": [
+                    "interpolate",
+                    [
+                        "linear"
+                    ],
+                    [
+                        "zoom"
+                    ],
+                    10,
+                    10,
+                    14,
+                    11
+                ],
+                "text-variable-anchor": [
+                    "left",
+                    "right"
+                ],
+                "text-justify": "auto",
+                "text-offset": [
+                    0,
+                    1
+                ],
+                "text-optional": true,
+                "text-padding": 15,
+                "text-max-width": 6.25
+            }
+        },
+        {
             "id": "poi_transit_station_stop_z12",
             "type": "symbol",
             "metadata": {
@@ -6774,7 +10332,7 @@ export default {
                 ]
             ],
             "layout": {
-                "icon-image": "{class}_11",
+                "icon-image": "railway_11",
                 "visibility": "visible",
                 "icon-size": {
                     "stops": [
@@ -6819,7 +10377,7 @@ export default {
                 ]
             ],
             "layout": {
-                "icon-image": "{class}_11",
+                "icon-image": "railway_11",
                 "text-variable-anchor": [
                     "left",
                     "right"
@@ -6940,7 +10498,7 @@ export default {
                 ]
             ],
             "layout": {
-                "icon-image": "{class}_11",
+                "icon-image": "railway_11",
                 "text-anchor": "left",
                 "text-field": [
                     "let",

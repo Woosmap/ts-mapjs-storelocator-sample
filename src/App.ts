@@ -1,16 +1,18 @@
 import {AssetFeatureResponse} from "./types/stores";
 import Component from "./components/component";
-import MapComponent, {MapComponentEvents} from "./components/map/map";
+import MapComponent, {MapComponentEvents, MapLocation} from "./components/map/map";
 import SearchComponent, {SearchComponentEvents, SearchLocation} from "./components/search/search";
 import StoreDetailsComponent, {StoreDetailsComponentEvents} from "./components/storedetails/store_details";
 import StoresListComponent, {StoresListComponentEvents} from "./components/storeslist/stores_list";
 import "./styles/main.scss";
 import FilterComponent, {FilterComponentEvents} from "./components/filter/filter";
-import GeoJSONFeature = woosmap.map.GeoJSONFeature;
-import DirectionsComponent, {DirectionsComponentEvents} from "./components/directions/directions";
-import {SYSTEM_LANG, setUserLocale} from './helpers/locale';
+import DirectionsComponent, {DirectionsComponentEvents, IDirections} from "./components/directions/directions";
+import {setUserLocale, SYSTEM_LANG} from './helpers/locale';
 import {debounce} from "./utils/utils";
 import {Configuration, getConfig, setConfig} from "./configuration/config";
+import {AllowedParameters, URLParameterManager} from "./components/url_parameter_manager";
+import {WoosmapApiClient} from "./services/woosmap_api";
+import GeoJSONFeature = woosmap.map.GeoJSONFeature;
 
 export interface IStoreLocator {
     initialSearch?: string;
@@ -38,8 +40,10 @@ export default class StoreLocator extends Component<IStoreLocator> {
     public storeDetailsComponent!: StoreDetailsComponent;
     public filterComponent!: FilterComponent;
     private $sidebarContentContainer!: HTMLElement;
+    private urlParameterManager!: URLParameterManager<AllowedParameters>;
 
     init(): void {
+        this.urlParameterManager = new URLParameterManager();
     }
 
     render(): void {
@@ -59,7 +63,8 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 inputID: getConfig().selectors.searchInputID,
                 woosmapPublicKey: getConfig().map.woosmapPublicKey,
                 searchOptions: getConfig().search.localitiesConf,
-                featuresBtn: ["search", "clear", "geolocate"]
+                featuresBtn: ["search", "clear", "geolocate"],
+                selectedLocality: this.urlParameterManager.getLocality(),
             },
         });
         this.mapComponent = new MapComponent({
@@ -69,6 +74,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 mapOptions: getConfig().map.mapOptions,
                 storesStyle: getConfig().map.storesStyle,
                 padding: this.state.padding,
+                location: this.urlParameterManager.getLocation()
             },
         });
         this.directionsComponent = new DirectionsComponent({
@@ -94,7 +100,9 @@ export default class StoreLocator extends Component<IStoreLocator> {
             $target: document.getElementById(
                 getConfig().selectors.detailsStoreContainerID
             ) as HTMLElement,
-            initialState: {},
+            initialState: {
+                store: undefined
+            },
         });
         if (getConfig().search.availableServices.length) {
             this.filterComponent = new FilterComponent({
@@ -113,6 +121,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
             });
         }
         this.searchComponent.on(SearchComponentEvents.SELECTED_LOCALITY, (locality: SearchLocation) => {
+                this.urlParameterManager.setLocality(locality)
                 this.storeDetailsComponent.setState({store: undefined});
                 this.storesListComponent.setState({nearbyLocation: locality.location}, true, () =>
                     this.storesListComponent.emit(StoresListComponentEvents.LOCALITY_CHANGED)
@@ -124,6 +133,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
             }
         );
         this.searchComponent.on(SearchComponentEvents.SEARCH_CLEAR, () => {
+                this.urlParameterManager.setLocality(undefined)
                 this.storesListComponent.setState({nearbyLocation: undefined, stores: []});
                 this.mapComponent.setState({selectedStore: undefined, stores: []}, true, () =>
                     this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
@@ -140,6 +150,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
             this.setListView();
         });
         this.storesListComponent.on(StoresListComponentEvents.STORE_SELECTED, (selectedStore: AssetFeatureResponse) => {
+                this.urlParameterManager.setStoreId(selectedStore.properties.store_id)
                 this.storeDetailsComponent.setState({store: selectedStore});
                 this.mapComponent.setState({selectedStore: selectedStore}, true, () =>
                     this.mapComponent.selectStore()
@@ -163,12 +174,16 @@ export default class StoreLocator extends Component<IStoreLocator> {
         });
         this.mapComponent.on(MapComponentEvents.MAP_READY, () => {
             this.directionsComponent.emit(DirectionsComponentEvents.MAP_READY, this.mapComponent.map);
-
+            this.setChildrenInitialState()
         });
         this.mapComponent.on(MapComponentEvents.MAP_IDLE, () => {
             this.emit(MapComponentEvents.MAP_IDLE)
         });
+        this.mapComponent.on(MapComponentEvents.LOCATION_CHANGED, (location: MapLocation) => {
+            this.urlParameterManager.setLocation(location)
+        });
         this.mapComponent.on(MapComponentEvents.STORE_UNSELECTED, () => {
+            this.urlParameterManager.setStoreId(undefined)
             if (this.$target.className === StoreLocatorViews.DETAILS_VIEW) {
                 this.setListView();
             }
@@ -191,8 +206,15 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 this.setDirectionsView();
             }
         );
+        this.directionsComponent.on(DirectionsComponentEvents.DIRECTIONS_UPDATED, (directionState: IDirections) => {
+            this.urlParameterManager.setDirection({
+                from: directionState.origin,
+                to: directionState.destination
+            })
+        })
         this.mapComponent.on(MapComponentEvents.STORE_SELECTED, (selectedStore: AssetFeatureResponse) => {
             if (selectedStore) {
+                this.urlParameterManager.setStoreId(selectedStore.properties.store_id)
                 this.storeDetailsComponent.setState({store: selectedStore});
                 if (this.$target.className === StoreLocatorViews.DIRECTIONS_VIEW || this.$target.className === StoreLocatorViews.ROADBOOK_VIEW) {
                     const destination = {
@@ -210,6 +232,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
                     this.setDetailsView();
                 }
             } else {
+                this.urlParameterManager.setStoreId(undefined)
                 this.setDetailsView();
             }
         });
@@ -225,13 +248,55 @@ export default class StoreLocator extends Component<IStoreLocator> {
             this.setDirectionsView();
         });
         this.directionsComponent.on(DirectionsComponentEvents.CLOSE_DIRECTIONS, () => {
-            this.setDetailsView();
+            if (this.urlParameterManager.getDirection()) {
+                this.urlParameterManager.setDirection(undefined)
+            }
+            if (this.urlParameterManager.getStoreId()) {
+                this.setDetailsView();
+            } else {
+                this.setListView();
+            }
         });
         window.addEventListener('resize', debounce(() => {
             this.managePadding();
         }, 100))
-        this.setListView();
         this.managePadding();
+    }
+
+    setChildrenInitialState(): void {
+        if (this.urlParameterManager.getStoreId()) {
+            const api = new WoosmapApiClient({apiKey: getConfig().map.woosmapPublicKey});
+            api.stores
+                .searchStores({query: `idstore:="${this.urlParameterManager.getStoreId()}"`})
+                .then((response) => {
+                    const selectedStore = response?.features[0]
+                    this.storeDetailsComponent.setState({store: selectedStore});
+                    this.setDetailsView()
+                    this.mapComponent.setState({selectedStore: selectedStore}, true, () =>
+                        this.mapComponent.selectStore()
+                    );
+                })
+                .catch((exception) => {
+                    console.error(exception);
+                });
+        } else if (this.urlParameterManager.getLocality()) {
+            this.searchComponent.setState({selectedLocality: this.urlParameterManager.getLocality()}, true);
+        } else if (this.urlParameterManager.getDirection()) {
+            const direction = this.urlParameterManager.getDirection();
+            let directionState = {};
+            if (direction?.from) {
+                directionState = {...directionState, origin: direction.from};
+            }
+            if (direction?.to) {
+                directionState = {...directionState, destination: direction.to};
+            }
+            this.directionsComponent.setState(directionState, true, () => {
+                this.directionsComponent.emit(DirectionsComponentEvents.DESTINATION_CHANGED)
+                this.setDirectionsView();
+            });
+        } else {
+            this.setListView();
+        }
     }
 
     setDetailsView(): void {

@@ -27,7 +27,8 @@ export enum DirectionsComponentEvents {
     ROUTES_CHANGED = "routes_changed",
     SELECTED_ROUTE_CHANGED = "selected_route_changed",
     CLOSE_DIRECTIONS = 'close_directions',
-    ROADBOOK_SHOW = "roadbook_show"
+    ROADBOOK_SHOW = "roadbook_show",
+    DIRECTIONS_UPDATED = "directions_updated"
 }
 
 export default class DirectionsComponent extends Component<IDirections> {
@@ -103,10 +104,10 @@ export default class DirectionsComponent extends Component<IDirections> {
                     isLoading: false
                 },
             });
-            if (this.state.origin) {
+            if (this.state.origin?.name) {
                 searchOriginComponent.setLocality(this.state.origin.name);
             }
-            if (this.state.destination) {
+            if (this.state.destination?.name) {
                 searchDestinationComponent.setLocality(this.state.destination.name);
             }
 
@@ -125,6 +126,7 @@ export default class DirectionsComponent extends Component<IDirections> {
                     this.setState({
                         origin: {
                             location: locality.location,
+                            publicId: locality.publicId,
                             name: locality.name
                         }
                     }, true, () => {
@@ -139,6 +141,7 @@ export default class DirectionsComponent extends Component<IDirections> {
                     this.setState({
                         destination: {
                             location: locality.location,
+                            publicId: locality.publicId,
                             name: locality.name
                         }
                     }, true, () => {
@@ -175,21 +178,23 @@ export default class DirectionsComponent extends Component<IDirections> {
                 if (this.state.origin && this.state.destination) {
                     this.computeRoute();
                 }
-                if (this.state.origin) {
+                if (this.state.origin?.name) {
                     searchOriginComponent.setLocality(this.state.origin.name);
                 }
-                if (this.state.destination) {
+                if (this.state.destination?.name) {
                     searchDestinationComponent.setLocality(this.state.destination.name);
                 }
+                this.emit(DirectionsComponentEvents.DIRECTIONS_UPDATED, this.state);
             });
             this.on(DirectionsComponentEvents.DIRECTIONS_SHOW, () => {
-                if (this.state.directionsResult && this.state.directionsResult.routes && this.state.directionsResult.routes.length) {
+                if (this.state.directionsResult?.routes?.length) {
                     this.directionsRenderer.setMap(this.map);
                     this.directionMarkers.forEach((marker) => {
                         marker.setMap(this.map);
                     });
                     this.fitToRouteBounds(this.bounds);
                 }
+                this.emit(DirectionsComponentEvents.DIRECTIONS_UPDATED, this.state);
             });
             let routeRoadbookComponent: RouteRoadbookComponent;
             this.routesSummaryComponent.on(RoutesSummaryComponentEvents.ROADBOOK_SHOW, () => {
@@ -210,17 +215,18 @@ export default class DirectionsComponent extends Component<IDirections> {
             });
             this.on(DirectionsComponentEvents.ROUTES_CHANGED, () => {
                 this.routesSummaryComponent.setState({
-                    routes: this.state.directionsResult?.routes || [],
+                    routes: this.state.directionsResult?.routes ?? [],
                     travelMode: this.state.travelMode,
                     selectedRouteIndex: this.state.selectedRouteIndex,
-                    origin: this.state.origin?.name || "",
-                    destination: this.state.destination?.name || "",
+                    origin: this.state.origin?.name ?? "",
+                    destination: this.state.destination?.name ?? "",
                     avoid: this.state.avoid,
                     unitSystem: this.state.unitSystem,
-                    error: this.state.directionsResult?.error_message || "",
+                    error: this.state.directionsResult?.error_message ?? "",
                     isLoading: false
                 })
                 this.emit(DirectionsComponentEvents.DIRECTIONS_SHOW);
+                this.emit(DirectionsComponentEvents.DIRECTIONS_UPDATED, this.state);
             });
             this.on(DirectionsComponentEvents.SELECTED_ROUTE_CHANGED, () => {
                 this.routesSummaryComponent.selectRoute(this.state.selectedRouteIndex)
@@ -256,8 +262,8 @@ export default class DirectionsComponent extends Component<IDirections> {
             this.routesSummaryComponent.setState({isLoading: true});
             this.api.distance.route(
                 {
-                    origin: `${this.state.origin.location.lat},${this.state.origin.location.lng}`,
-                    destination: `${this.state.destination.location.lat},${this.state.destination.location.lng}`,
+                    origin: this.state.origin?.location ? `${this.state.origin.location.lat},${this.state.origin.location.lng}` : "",
+                    destination: this.state.destination?.location ? `${this.state.destination.location.lat},${this.state.destination.location.lng}` : "",
                     mode: this.state.travelMode,
                     units: this.state.unitSystem,
                     alternatives: this.state.provideRouteAlternatives,
@@ -295,11 +301,11 @@ export default class DirectionsComponent extends Component<IDirections> {
     }
 
     updateRoutes(): void {
-        if (this.state.directionsResult && this.state.directionsResult.routes && this.state.directionsResult.routes.length) {
+        if (this.state.directionsResult?.routes?.length) {
             this.cleanRoutes();
             this.bounds = new woosmap.map.LatLngBounds();
-            for (let routeIndex = 0; routeIndex < this.state.directionsResult.routes.length; routeIndex++) {
-                const route = this.state.directionsResult.routes[routeIndex];
+            for (const element of this.state.directionsResult.routes) {
+                const route = element;
                 this.bounds.union(new woosmap.map.LatLngBounds(route.bounds.northeast, route.bounds.southwest));
                 if (route.overview_polyline) {
                     const encodedPolyline = route.overview_polyline;
@@ -310,9 +316,9 @@ export default class DirectionsComponent extends Component<IDirections> {
             this.directionsRenderer.setDirections(this.state.directionsResult);
             this.directionsRenderer.setMap(this.map);
             this.fitToRouteBounds(this.bounds);
-            if (this.state.origin && this.state.destination) {
-                this.addMarkerLabel(this.state.origin.location, getConfig().directions.iconsDirections.start, this.state.origin.name);
-                this.addMarkerLabel(this.state.destination.location, getConfig().directions.iconsDirections.end, this.state.destination.name);
+            if (this.state.origin?.location && this.state.destination?.location) {
+                this.addMarkerLabel(this.state.origin.location, getConfig().directions.iconsDirections.start, this.state.origin.name ?? "");
+                this.addMarkerLabel(this.state.destination.location, getConfig().directions.iconsDirections.end, this.state.destination.name ?? "");
             }
         } else {
             this.cleanRoutes();
@@ -335,8 +341,8 @@ export default class DirectionsComponent extends Component<IDirections> {
             },
             position: positon,
             icon: icon,
-                map: this.map
-            }));
+            map: this.map
+        }));
     }
 
     fitToRouteBounds(bounds: woosmap.map.LatLngBounds): void {
