@@ -1,8 +1,10 @@
 {
   "name": "ts-mapjs-storelocator-sample",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Store Locator sample based on Woosmap Map JS using typescript and vanillajs",
-  "browserslist": "> 0.25%, not dead",
+  "browserslist": [
+    "> 0.25%, not dead"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Woosmap/ts-mapjs-storelocator-sample.git"
