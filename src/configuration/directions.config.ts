@@ -5,6 +5,11 @@ const directionsOptions: Record<string, string | boolean | string[]> = {
     avoid: []
 }
 
+const distanceMatrixOptions: Record<string, any> = {
+    travelMode: 'DRIVING',
+    unitSystem: 'METRIC',
+}
+
 const avoidOptions: Record<string, string>[] = [
     {paramKey: 'highways'},
     {paramKey: 'tolls'},
@@ -87,5 +92,6 @@ export default {
     travelModes: travelModes,
     unitOptions: unitOptions,
     avoidOptions: avoidOptions,
-    directionsOptions: directionsOptions
+    directionsOptions: directionsOptions,
+    distanceMatrixOptions: distanceMatrixOptions
 }

@@ -53,8 +53,8 @@ export default class StoresListComponent extends Component<IStoresListComponent>
                             <div class="summaryStore__name">${store.properties.name}</div>
                             ${properties.address ? `<div class="summaryStore__address">${getReadableAddress(properties.address)}</div>` : ""}
                             ${properties.contact?.phone ? `<div class="summaryStore__phone">${getPhoneLink(properties.contact)}</div>` : ""}
-                            ${properties.distance ? `<div class="summaryStore__distance">${getReadableDistance(properties.distance)}</div>` : ""}`;
-                        $storeElement.addEventListener("click", (e) => {
+                            ${properties.user_properties?.distance ? `<div class="summaryStore__distance">${(properties.user_properties?.distance as woosmap.map.Distance).text}</div>` : properties.distance ? `<div class="summaryStore__distance">${getReadableDistance(properties.distance)}</div>` : ""}`;
+                        $storeElement.addEventListener("click", () => {
                             this.emit(StoresListComponentEvents.STORE_SELECTED, store);
                         });
                         $storeElement.addEventListener('mouseenter', () => {
@@ -103,13 +103,47 @@ export default class StoresListComponent extends Component<IStoresListComponent>
                 .searchStores(params)
                 .then((response) => {
                     const storesList = response?.features.map((store) => store);
-                    this.setState({stores: storesList});
-                    this.emit(StoresListComponentEvents.STORES_CHANGED, this.state);
+                    this.updateStoresWithDistanceMatrix(storesList)
+                        .then((updatedStores) => {
+                            this.setState({stores: updatedStores});
+                            this.emit(StoresListComponentEvents.STORES_CHANGED, this.state);
+                        });
                 })
                 .catch((exception) => {
                     console.error(exception);
                     this.setState({stores: []});
                 });
         }
+    }
+
+    updateStoresWithDistanceMatrix(stores: AssetFeatureResponse[]): Promise<AssetFeatureResponse[]> {
+        return new Promise((resolve, reject) => {
+            const distanceService = new woosmap.map.DistanceService();
+            const distanceMatrixRequest: woosmap.map.distance.DistanceMatrixRequest = {
+                ...getConfig().directions.distanceMatrixOptions,
+                origins: [this.state.nearbyLocation as woosmap.map.LatLngLiteral],
+                destinations: stores.map((store) => {
+                    return {lat: store.geometry.coordinates[1], lng: store.geometry.coordinates[0]};
+                }),
+            }
+            distanceService.getDistanceMatrix(distanceMatrixRequest)
+                .then((response) => {
+                    if (response.status === "OK") {
+                        stores.forEach((store, i) => {
+                            const result = response.rows[0].elements[i];
+                            if (result.status === "OK") {
+                                store.properties.user_properties = store.properties.user_properties || {};
+                                store.properties.user_properties["distance"] = result.distance ?? store.properties.user_properties["distance"];
+                            }
+                        });
+                        stores.sort((a, b) => ((a.properties.user_properties?.distance as woosmap.map.Distance).value || 0) - ((b.properties.user_properties?.distance as woosmap.map.Distance).value || 0));
+                    }
+                    resolve(stores); // Resolve with stores even if Distance Matrix request failed
+                })
+                .catch((error) => {
+                    console.error(error);
+                    reject(error);
+                });
+        });
     }
 }

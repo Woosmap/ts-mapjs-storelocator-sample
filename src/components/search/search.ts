@@ -90,8 +90,8 @@ export default class SearchComponent extends Component<ISearchComponent> {
 
     selectLocality(): void {
         if (this.state.selectedLocality) {
-            this.setLocality(this.state.selectedLocality.name || '');
             this.emit(SearchComponentEvents.SELECTED_LOCALITY, this.state.selectedLocality);
+            this.setLocality(this.state.selectedLocality.name || '');
         }
     }
 
@@ -109,33 +109,44 @@ export default class SearchComponent extends Component<ISearchComponent> {
         $inputContainer.appendChild($searchBtn);
     }
 
+    handleClearBtnClick = ($clearBtn: HTMLElement, $inputContainer: HTMLElement) => {
+        const $emptyButton = $inputContainer.querySelector(".localities-empty-button") as HTMLDivElement
+        if ($emptyButton) {
+            $emptyButton.click();
+            $clearBtn.style.display = 'none';
+        } else {
+            (this.$element as HTMLInputElement).value = "";
+            $clearBtn.style.display = 'none';
+            this.$element.focus();
+        }
+        this.emit(SearchComponentEvents.SEARCH_CLEAR);
+    }
+
+    handleInputChange = ($clearBtn: HTMLElement) => {
+        if ((this.$element as HTMLInputElement).value.length === 0) {
+            $clearBtn.style.display = 'none';
+        } else {
+            $clearBtn.style.display = 'block';
+        }
+    }
+
     manageClearButton($inputContainer: HTMLElement): void {
         const $clearBtn = document.createElement("div");
         $clearBtn.className = "search__clearBtn";
         $clearBtn.innerHTML = `<button type="button" aria-label="${getLocale().search.clearLabel}"></button>`
-        $clearBtn.addEventListener("click", () => {
-            const $emptyButton = $inputContainer.querySelector(".localities-empty-button") as HTMLDivElement
-            if ($emptyButton) {
-                $emptyButton.click();
-                $clearBtn.style.display = 'none';
-            } else {
-                (this.$element as HTMLInputElement).value = "";
-                $clearBtn.style.display = 'none';
-                this.$element.focus();
-            }
-            this.emit(SearchComponentEvents.SEARCH_CLEAR);
-        });
-        ['input', 'locality_changed'].forEach(evt =>
-            this.$element.addEventListener(evt, () => {
-                if ((this.$element as HTMLInputElement).value.length === 0) {
-                    $clearBtn.style.display = 'none';
-                } else {
-                    $clearBtn.style.display = 'block';
-                }
-            })
-        );
+        $clearBtn.addEventListener("click", () => this.handleClearBtnClick($clearBtn, $inputContainer));
+        ['input', 'locality_changed'].forEach(evt => this.$element.addEventListener(evt, () => this.handleInputChange($clearBtn)));
         $clearBtn.style.display = 'none';
         $inputContainer.appendChild($clearBtn);
+    }
+
+    setLocality(name: string): void {
+        (this.$element as HTMLInputElement).value = name;
+        const $clearBtn = document.querySelector(".search__clearBtn") as HTMLElement;
+        if ($clearBtn) {
+            this.handleInputChange($clearBtn);
+        }
+
     }
 
     manageGeolocateButton($inputContainer: HTMLElement): void {
@@ -157,10 +168,5 @@ export default class SearchComponent extends Component<ISearchComponent> {
                 this.emit(SearchComponentEvents.SELECTED_LOCALITY, searchLocation);
             }
         })
-    }
-
-    setLocality(name: string): void {
-        (this.$element as HTMLInputElement).value = name;
-        (this.$element as HTMLInputElement).dispatchEvent(new Event('locality_changed'))
     }
 }

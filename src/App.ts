@@ -316,10 +316,10 @@ export default class StoreLocator extends Component<IStoreLocator> {
                     position,
                     icon: getConfig().map.userLocationIconOptions
                 });
-                this.userLocationMarker.setMap(this.mapComponent.map);
             } else {
                 this.userLocationMarker.setPosition(position);
             }
+            this.userLocationMarker.setMap(this.mapComponent.map);
         }
     }
 
