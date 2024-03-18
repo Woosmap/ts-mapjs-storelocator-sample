@@ -141,12 +141,16 @@ export default class SearchComponent extends Component<ISearchComponent> {
     }
 
     setLocality(name: string): void {
-        (this.$element as HTMLInputElement).value = name;
-        const $clearBtn = document.querySelector(".search__clearBtn") as HTMLElement;
-        if ($clearBtn) {
-            this.handleInputChange($clearBtn);
-        }
-
+        const observer = new MutationObserver((mutationsList, observer) => {
+            if (this.$element) {
+                (this.$element as HTMLInputElement).value = name;
+                if (this.$element instanceof HTMLInputElement) {
+                    (this.$element as HTMLInputElement).dispatchEvent(new Event('locality_changed'));
+                }
+                observer.disconnect();
+            }
+        });
+        observer.observe(document, {childList: true, subtree: true});
     }
 
     manageGeolocateButton($inputContainer: HTMLElement): void {
