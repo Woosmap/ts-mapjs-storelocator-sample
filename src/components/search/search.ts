@@ -86,6 +86,9 @@ export default class SearchComponent extends Component<ISearchComponent> {
                 this.manageGeolocateButton($inputContainer);
             }
         });
+    }
+
+    selectLocality(): void {
         if (this.state.selectedLocality) {
             this.setLocality(this.state.selectedLocality.name || '');
             this.emit(SearchComponentEvents.SELECTED_LOCALITY, this.state.selectedLocality);

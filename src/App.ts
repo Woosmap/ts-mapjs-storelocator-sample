@@ -12,7 +12,7 @@ import {debounce} from "./utils/utils";
 import {Configuration, getConfig, setConfig} from "./configuration/config";
 import {AllowedParameters, URLParameterManager} from "./components/url_parameter_manager";
 import {WoosmapApiClient} from "./services/woosmap_api";
-import GeoJSONFeature = woosmap.map.GeoJSONFeature;
+import LatLngLiteral = woosmap.map.LatLngLiteral;
 
 export interface IStoreLocator {
     initialSearch?: string;
@@ -41,6 +41,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
     public filterComponent!: FilterComponent;
     private $sidebarContentContainer!: HTMLElement;
     private urlParameterManager!: URLParameterManager<AllowedParameters>;
+    private userLocationMarker!: woosmap.map.Marker | null;
 
     init(): void {
         this.urlParameterManager = new URLParameterManager();
@@ -64,7 +65,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 woosmapPublicKey: getConfig().map.woosmapPublicKey,
                 searchOptions: getConfig().search.localitiesConf,
                 featuresBtn: ["search", "clear", "geolocate"],
-                selectedLocality: this.urlParameterManager.getLocality(),
+                selectedLocality: undefined,
             },
         });
         this.mapComponent = new MapComponent({
@@ -130,21 +131,23 @@ export default class StoreLocator extends Component<IStoreLocator> {
                     origin: {location: locality.location, name: locality.name}
                 }, true);
                 this.setListView();
+                this.setUserPosition(locality.location as LatLngLiteral);
             }
         );
         this.searchComponent.on(SearchComponentEvents.SEARCH_CLEAR, () => {
                 this.urlParameterManager.setLocality(undefined)
                 this.storesListComponent.setState({nearbyLocation: undefined, stores: []});
-                this.mapComponent.setState({selectedStore: undefined, stores: []}, true, () =>
+                this.mapComponent.setState({selectedStore: undefined, nearbyLocation: undefined, stores: []}, true, () =>
                     this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
                 );
                 this.directionsComponent.setState({origin: undefined}, true);
                 this.setListView();
+                this.setUserPosition(undefined);
             }
         );
-        this.storesListComponent.on(StoresListComponentEvents.STORES_CHANGED, (stores: GeoJSONFeature[]) => {
+        this.storesListComponent.on(StoresListComponentEvents.STORES_CHANGED, ({stores, nearbyLocation}) => {
             this.mapComponent.setState({selectedStore: undefined}, true);
-            this.mapComponent.setState({stores: stores}, true, () =>
+            this.mapComponent.setState({stores: stores, nearbyLocation}, true, () =>
                 this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
             );
             this.setListView();
@@ -280,7 +283,9 @@ export default class StoreLocator extends Component<IStoreLocator> {
                     console.error(exception);
                 });
         } else if (this.urlParameterManager.getLocality()) {
-            this.searchComponent.setState({selectedLocality: this.urlParameterManager.getLocality()}, true);
+            this.searchComponent.setState({selectedLocality: this.urlParameterManager.getLocality()}, true, () => {
+                this.searchComponent.selectLocality();
+            })
         } else if (this.urlParameterManager.getDirection()) {
             const direction = this.urlParameterManager.getDirection();
             let directionState = {};
@@ -296,6 +301,25 @@ export default class StoreLocator extends Component<IStoreLocator> {
             });
         } else {
             this.setListView();
+        }
+    }
+
+    setUserPosition(position: woosmap.map.LatLngLiteral | undefined): void {
+        if (!position && this.userLocationMarker) {
+            this.userLocationMarker.setMap(null);
+            return;
+        }
+
+        if (position) {
+            if (!this.userLocationMarker) {
+                this.userLocationMarker = new woosmap.map.Marker({
+                    position,
+                    icon: getConfig().map.userLocationIconOptions
+                });
+                this.userLocationMarker.setMap(this.mapComponent.map);
+            } else {
+                this.userLocationMarker.setPosition(position);
+            }
         }
     }
 

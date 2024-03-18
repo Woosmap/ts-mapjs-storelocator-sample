@@ -2,6 +2,13 @@ const woosmapPublicKey = "woos-48c80350-88aa-333e-835a-07f4b658a9a4";
 
 const mobileBreakPoint = 768;
 
+const userLocationIconOptions: woosmap.map.Icon = {
+    url: "https://images.woosmap.com/user-position.png",
+    scaledSize: {
+        height: 32,
+        width: 32,
+    },
+}
 const mapPaddings: { [key: string]: woosmap.map.Padding } = {
     mobile: {left: 50, right: 50, top: 50, bottom: 550},
     full: {left: 450, right: 50, top: 50, bottom: 50},
@@ -53,5 +60,6 @@ export default {
     storesStyle: storesStyle,
     mapPaddings: mapPaddings,
     mobileBreakPoint: mobileBreakPoint,
-    woosmapPublicKey: woosmapPublicKey
+    woosmapPublicKey: woosmapPublicKey,
+    userLocationIconOptions: userLocationIconOptions,
 }

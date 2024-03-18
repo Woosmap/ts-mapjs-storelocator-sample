@@ -104,7 +104,7 @@ export default class StoresListComponent extends Component<IStoresListComponent>
                 .then((response) => {
                     const storesList = response?.features.map((store) => store);
                     this.setState({stores: storesList});
-                    this.emit(StoresListComponentEvents.STORES_CHANGED, storesList);
+                    this.emit(StoresListComponentEvents.STORES_CHANGED, this.state);
                 })
                 .catch((exception) => {
                     console.error(exception);

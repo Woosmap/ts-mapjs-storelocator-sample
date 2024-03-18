@@ -36,14 +36,11 @@ export default {
         servicesTitle: "Services",
         services: {
             WF: 'Wireless Hotspot',
-            CD: 'Mobile Payment',
             DT: 'Drive-Thru',
             DR: 'Digital Rewards',
             hrs24: 'Open 24 hours per day',
             WA: 'Oven-warmed Food',
-            LB: 'LaBoulange',
             XO: 'Mobile Order and Pay',
-            VS: 'Verismo',
             NB: 'Nitro Cold Brew',
             CL: 'Starbucks Reserve-Clover Brewed',
         }

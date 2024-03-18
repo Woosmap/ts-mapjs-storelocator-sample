@@ -6,19 +6,16 @@ const localitiesConf: woosmap.localities.AutocompleteParameters = {
     types: ['locality', 'postal_code', 'address', 'admin_level', 'airport', 'train_station', 'metro_station', 'shopping', 'country']
 };
 const searchAPIParameters: ParamsSearchRequest = {
-    stores_by_page: 15,
+    stores_by_page: 7,
     radius: 500000
 };
 const availableServices: Record<string, string>[] = [
     {serviceKey: 'WF'},
-    {serviceKey: 'CD'},
     {serviceKey: 'DT'},
     {serviceKey: 'DR'},
     {serviceKey: 'hrs24'},
     {serviceKey: 'WA'},
-    {serviceKey: 'LB'},
     {serviceKey: 'XO'},
-    {serviceKey: 'VS'},
     {serviceKey: 'NB'},
     {serviceKey: 'CL'},
 ];

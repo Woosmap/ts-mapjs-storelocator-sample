@@ -173,6 +173,9 @@ export default class MapComponent extends Component<IMapComponent> {
                     const LatLngPoint = feature.getGeometry() as woosmap.map.Data.Point;
                     bounds.extend(LatLngPoint.get());
                 });
+                if (this.state.nearbyLocation) {
+                    bounds.extend(this.state.nearbyLocation);
+                }
                 this.map.fitBounds(bounds, this.state.padding);
                 this.storesOverlay.setMap(null);
             } else {
