@@ -27,7 +27,7 @@ export default {
         ]
     },
     search: {
-        placeholder: "Search an address...",
+        placeholder: "Search an address, a postal code...",
         submitLabel: "Search",
         clearLabel: "Clear Search",
         yourLocation: "Your location",

@@ -49,6 +49,14 @@ const mapOptions: woosmap.map.MapOptions = {
                     visibility: "off",
                 },
             ],
+        }, {
+            featureType: "point_of_interest",
+            elementType: "all",
+            stylers: [
+                {
+                    visibility: "on"
+                }
+            ]
         }
     ],
     gestureHandling: "greedy",
