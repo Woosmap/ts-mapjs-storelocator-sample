@@ -90,8 +90,8 @@ export default class SearchComponent extends Component<ISearchComponent> {
 
     selectLocality(): void {
         if (this.state.selectedLocality) {
-            this.emit(SearchComponentEvents.SELECTED_LOCALITY, this.state.selectedLocality);
             this.setLocality(this.state.selectedLocality.name || '');
+            this.emit(SearchComponentEvents.SELECTED_LOCALITY, this.state.selectedLocality);
         }
     }
 
@@ -142,14 +142,13 @@ export default class SearchComponent extends Component<ISearchComponent> {
 
     setLocality(name: string): void {
         const observer = new MutationObserver((mutationsList, observer) => {
-            if (this.$element) {
-                (this.$element as HTMLInputElement).value = name;
-                if (this.$element instanceof HTMLInputElement) {
+                if (this.$element && this.$element instanceof HTMLInputElement && this.$target.querySelector(".search__clearBtn")) {
+                    (this.$element as HTMLInputElement).value = name;
                     (this.$element as HTMLInputElement).dispatchEvent(new Event('locality_changed'));
+                    observer.disconnect();
                 }
-                observer.disconnect();
             }
-        });
+        );
         observer.observe(document, {childList: true, subtree: true});
     }
 

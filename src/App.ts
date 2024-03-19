@@ -12,7 +12,6 @@ import {debounce} from "./utils/utils";
 import {Configuration, getConfig, setConfig} from "./configuration/config";
 import {AllowedParameters, URLParameterManager} from "./components/url_parameter_manager";
 import {WoosmapApiClient} from "./services/woosmap_api";
-import LatLngLiteral = woosmap.map.LatLngLiteral;
 
 export interface IStoreLocator {
     initialSearch?: string;
@@ -131,7 +130,6 @@ export default class StoreLocator extends Component<IStoreLocator> {
                     origin: {location: locality.location, name: locality.name}
                 }, true);
                 this.setListView();
-                this.setUserPosition(locality.location as LatLngLiteral);
             }
         );
         this.searchComponent.on(SearchComponentEvents.SEARCH_CLEAR, () => {
@@ -147,8 +145,10 @@ export default class StoreLocator extends Component<IStoreLocator> {
         );
         this.storesListComponent.on(StoresListComponentEvents.STORES_CHANGED, ({stores, nearbyLocation}) => {
             this.mapComponent.setState({selectedStore: undefined}, true);
-            this.mapComponent.setState({stores: stores, nearbyLocation}, true, () =>
-                this.mapComponent.emit(MapComponentEvents.STORES_CHANGED)
+            this.mapComponent.setState({stores: stores, nearbyLocation}, true, () => {
+                    this.mapComponent.emit(MapComponentEvents.STORES_CHANGED);
+                    this.setUserPosition(nearbyLocation);
+                }
             );
             this.setListView();
         });
