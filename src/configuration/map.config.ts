@@ -57,6 +57,14 @@ const mapOptions: woosmap.map.MapOptions = {
                     visibility: "off"
                 }
             ]
+        }, {
+            featureType: "point_of_interest.business.food_and_drinks",
+            elementType: "all",
+            stylers: [
+                {
+                    visibility: "off"
+                }
+            ]
         },
     ],
     gestureHandling: "greedy",
