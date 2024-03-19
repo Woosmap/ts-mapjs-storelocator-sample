@@ -42,14 +42,6 @@ const mapOptions: woosmap.map.MapOptions = {
     zoom: 6,
     styles: [
         {
-            featureType: "poi.business",
-            elementType: "labels",
-            stylers: [
-                {
-                    visibility: "off",
-                },
-            ],
-        }, {
             featureType: "point_of_interest",
             elementType: "all",
             stylers: [
@@ -57,7 +49,15 @@ const mapOptions: woosmap.map.MapOptions = {
                     visibility: "on"
                 }
             ]
-        }
+        }, {
+            featureType: "point_of_interest.business.shop",
+            elementType: "all",
+            stylers: [
+                {
+                    visibility: "off"
+                }
+            ]
+        },
     ],
     gestureHandling: "greedy",
 };
