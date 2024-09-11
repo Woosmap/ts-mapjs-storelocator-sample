@@ -40,6 +40,7 @@
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
     "cypress": "^13.6.4",
+    "deep-chat": "^2.0.1",
     "jest": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
     "lint-staged": "^15.2.1",

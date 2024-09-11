@@ -7,6 +7,7 @@ import StoresListComponent, {StoresListComponentEvents} from "./components/store
 import "./styles/main.scss";
 import FilterComponent, {FilterComponentEvents} from "./components/filter/filter";
 import DirectionsComponent, {DirectionsComponentEvents, IDirections} from "./components/directions/directions";
+import ChatbotComponent from "./components/chatbot/chatbot";
 import {setUserLocale, SYSTEM_LANG} from './helpers/locale';
 import {debounce} from "./utils/utils";
 import {Configuration, getConfig, setConfig} from "./configuration/config";
@@ -38,6 +39,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
     public storesListComponent!: StoresListComponent;
     public storeDetailsComponent!: StoreDetailsComponent;
     public filterComponent!: FilterComponent;
+    public chatbotComponent!: ChatbotComponent;
     private $sidebarContentContainer!: HTMLElement;
     private urlParameterManager!: URLParameterManager<AllowedParameters>;
     private userLocationMarker!: woosmap.map.Marker | null;
@@ -103,6 +105,12 @@ export default class StoreLocator extends Component<IStoreLocator> {
             initialState: {
                 store: undefined
             },
+        });
+        this.chatbotComponent = new ChatbotComponent({
+            $target: document.getElementById(
+                getConfig().selectors.chatContainerID
+            ) as HTMLElement,
+            initialState: {},
         });
         if (getConfig().search.availableServices.length) {
             this.filterComponent = new FilterComponent({
@@ -381,6 +389,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
            </div>
         <div id="${getConfig().selectors.directionsContainerID}"></div>   
         <div id="${getConfig().selectors.roadbookContainerID}"></div>
-        </div>`;
+        </div>
+        <div id="${getConfig().selectors.chatContainerID}"></div>`;
     }
 }

@@ -12,6 +12,7 @@ enum selectors {
     directionsContainerID = "directionsContainer",
     travelModeContainerID = "travelModeContainer",
     roadbookContainerID = "directionsInstructionsContainer",
+    chatContainerID = "chatContainer",
 }
 
 export default selectors;
