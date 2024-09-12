@@ -1,6 +1,7 @@
 import mapConfig from "./map.config";
 import directionsConfig from "./directions.config";
 import searchConfig from "./search.config";
+import chatConfig from "./chat.config";
 import selectors from "./selectors.config";
 import urls from "./urls.config";
 import {merge} from "../utils/utils";
@@ -9,8 +10,9 @@ export const defaultConfig = {
     map: mapConfig,
     directions: directionsConfig,
     search: searchConfig,
+    chat: chatConfig,
     selectors: selectors,
-    urls: urls
+    urls: urls,
 }
 export type Configuration = typeof defaultConfig;
 

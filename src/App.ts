@@ -7,7 +7,7 @@ import StoresListComponent, {StoresListComponentEvents} from "./components/store
 import "./styles/main.scss";
 import FilterComponent, {FilterComponentEvents} from "./components/filter/filter";
 import DirectionsComponent, {DirectionsComponentEvents, IDirections} from "./components/directions/directions";
-import ChatbotComponent from "./components/chatbot/chatbot";
+import ChatbotComponent, {ChatbotComponentEvents} from "./components/chatbot/chatbot";
 import {setUserLocale, SYSTEM_LANG} from './helpers/locale';
 import {debounce} from "./utils/utils";
 import {Configuration, getConfig, setConfig} from "./configuration/config";
@@ -138,6 +138,12 @@ export default class StoreLocator extends Component<IStoreLocator> {
                     origin: {location: locality.location, name: locality.name}
                 }, true);
                 this.setListView();
+            }
+        );
+        this.chatbotComponent.on(ChatbotComponentEvents.FIND_NEARBY_STORES, (locality: SearchLocation) => {
+                this.searchComponent.setState({selectedLocality: locality}, true, () => {
+                    this.searchComponent.selectLocality();
+                })
             }
         );
         this.searchComponent.on(SearchComponentEvents.SEARCH_CLEAR, () => {
