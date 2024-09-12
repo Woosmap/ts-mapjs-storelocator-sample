@@ -1,5 +1,3 @@
-import aiBot from "../assets/ai.svg";
-
 const chatConfig = {
     elementId: "chat-element",
     elementStyle: "border: none",
@@ -10,7 +8,7 @@ const chatConfig = {
                 "container": {"marginTop": "8px"}
             }
         },
-        "ai": {"src": aiBot, "styles": {"avatar": {"marginLeft": "-3px"}}}
+        "ai": {"src": "", "styles": {"avatar": {"marginLeft": "-3px"}}}
     },
     textInput: {"placeholder": {"text": "Welcome!"}},
     introMessage: {

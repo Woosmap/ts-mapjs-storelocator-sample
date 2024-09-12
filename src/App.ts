@@ -140,10 +140,12 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 this.setListView();
             }
         );
-        this.chatbotComponent.on(ChatbotComponentEvents.FIND_NEARBY_STORES, (locality: SearchLocation) => {
-                this.searchComponent.setState({selectedLocality: locality}, true, () => {
-                    this.searchComponent.selectLocality();
-                })
+        this.chatbotComponent.on(ChatbotComponentEvents.FIND_NEARBY_STORES, (locality?: SearchLocation) => {
+                if (locality) {
+                    this.searchComponent.setState({selectedLocality: locality}, true, () => {
+                        this.searchComponent.selectLocality();
+                    })
+                }
             }
         );
         this.searchComponent.on(SearchComponentEvents.SEARCH_CLEAR, () => {

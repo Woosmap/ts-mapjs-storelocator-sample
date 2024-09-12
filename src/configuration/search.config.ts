@@ -3,7 +3,7 @@ import {ParamsSearchRequest} from "../services/api/stores";
 const localitiesConf: woosmap.localities.AutocompleteParameters = {
     minLength: 0,
     data: 'advanced',
-    types: ['locality', 'postal_code', 'address', 'admin_level', 'airport', 'train_station', 'metro_station', 'shopping', 'country']
+    types: ['locality', 'postal_code', 'address', 'admin_level', 'airport', 'train_station', 'metro_station', 'shopping', 'country', 'tourist_attraction', 'museum', 'art_gallery']
 };
 const searchAPIParameters: ParamsSearchRequest = {
     stores_by_page: 7,

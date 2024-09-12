@@ -2,17 +2,18 @@ import 'deep-chat';
 import {Signals} from 'deep-chat/dist/types/handler';
 import Component from "../component";
 import {DeepChat} from "deep-chat";
-import {SearchLocation} from "../search/search";
-import { GeolocationService} from "../../services/geolocation";
-import {getLocale} from "../../helpers/locale";
 import {getConfig} from "../../configuration/config";
+import {handleFindNearestStores} from "./chatbotActions";
+import aiBotImg from "../../assets/ai.svg"
 
 export interface IChatbotComponent {
     messages?: { text: string, sender: string }[];
 }
 
 export enum ChatbotComponentEvents {
-    FIND_NEARBY_STORES = "find_nearby_stores"
+    FIND_NEARBY_STORES = "find_nearby_stores",
+    GET_DIRECTIONS = "get_directions",
+    MOVE_MAP = "move_map",
 }
 
 interface Action {
@@ -25,7 +26,6 @@ interface Action {
 
 export default class ChatbotComponent extends Component<IChatbotComponent> {
     private botButton!: HTMLElement;
-    private localitiesRequest: woosmap.map.localities.LocalitiesGeocodeRequest = {};
     private localitiesService!: woosmap.map.LocalitiesService;
 
 
@@ -71,114 +71,38 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
         return botBtnElement;
     }
 
-    async handleGeocode(latlng: woosmap.map.LatLngLiteral | null, search: string | null): Promise<woosmap.map.localities.LocalitiesGeocodeResult | null> {
+    private async handleActions(actions: Action[]): Promise<void> {
         this.localitiesService = this.localitiesService ?? new woosmap.map.LocalitiesService();
-        if (latlng) {
-            this.localitiesRequest.latLng = latlng;
-            delete this.localitiesRequest.address;
-        } else if (search && search !== "") {
-            this.localitiesRequest.address = search;
-            delete this.localitiesRequest.latLng;
-        }
-
-        if (this.localitiesRequest.latLng || this.localitiesRequest.address) {
-            try {
-                const localities = await this.localitiesService.geocode(this.localitiesRequest);
-                return localities.results[0] || null;
-            } catch (error) {
-                console.error("Error geocoding localities:", error);
-                return null;
-            }
-        }
-
-        return null;
-    }
-
-    private async handleFindNearestStores(action: Action): Promise<void> {
-        if (!action.parameters.search) {
-            console.log("Search parameter is undefined");
-            return;
-        }
-
-        let result: woosmap.map.localities.LocalitiesGeocodeResult | null = null;
-        let searchLocation: SearchLocation | null = null;
-        let position: GeolocationPosition | null = null;
-
-        switch (action.parameters.search) {
-            case "user_location":
-                position = await GeolocationService.getCurrentPosition();
-                if (position) {
-                    searchLocation = {
-                        name: getLocale().search.yourLocation,
-                        location: {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude,
-                        }
-                    };
-                    this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
-                } else {
-                    console.log("Unable to get user's location");
-                }
-                break;
-            case "map_center":
-                break;
-            default:
-                result = await this.handleGeocode(null, action.parameters.search);
-                if (result) {
-                    const searchLocation: SearchLocation = {
-                        name: result.formatted_address,
-                        publicId: result.public_id,
-                        location: result.geometry?.location
-                    };
-                    this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
-                } else {
-                    console.log(`No localities found for search: ${action.parameters.search}`);
-                }
-        }
-    }
-
-    private handleGetDirections(action: Action): void {
-        console.log(`Getting directions to: ${action.parameters.search}`);
-    }
-
-    private handleFilterStores(action: Action): void {
-        console.log(`filtering stores: ${action.parameters.search}`);
-    }
-
-    private handleMoveMap(action: Action): void {
-        console.log(`Moving map: ${action.parameters.search}`);
-    }
-
-    private handleUnknownAction(action: Action): void {
-        console.log(`Unknown action: ${action.action}`);
-    }
-
-    private processActions(actions: Action[]): void {
-        actions.forEach((action: Action) => {
+        for (const action of actions) {
+            let searchLocation = null;
             switch (action.action) {
-                case "find_nearest_stores":
-                    this.handleFindNearestStores(action);
+                case ChatbotComponentEvents.FIND_NEARBY_STORES:
+                    searchLocation = await handleFindNearestStores(this.localitiesService, action);
+                    this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
                     break;
-                case "get_directions":
-                    this.handleGetDirections(action);
+                case ChatbotComponentEvents.GET_DIRECTIONS:
+                    this.emit(ChatbotComponentEvents.GET_DIRECTIONS);
                     break;
                 case "filter_stores":
-                    this.handleFilterStores(action);
+                    searchLocation = await handleFindNearestStores(this.localitiesService, action);
+                    this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
                     break;
-                case "move_map":
-                    this.handleMoveMap(action);
+                case ChatbotComponentEvents.MOVE_MAP:
+                    this.emit(ChatbotComponentEvents.MOVE_MAP);
                     break;
                 default:
-                    this.handleUnknownAction(action);
+                    //await this.handleUnknownAction(action);
             }
-        });
+        }
     }
 
     createChatElement(): DeepChat {
         const chatElement: DeepChat = document.createElement("deep-chat");
         chatElement.setAttribute("id", getConfig().chat.elementId);
         chatElement.setAttribute("style", getConfig().chat.elementStyle);
-        chatElement.avatars = getConfig().chat.avatars;
+        const avatarsConf = getConfig().chat.avatars;
+        avatarsConf.ai.src = aiBotImg;
+        chatElement.avatars = avatarsConf;
         chatElement.textInput = getConfig().chat.textInput;
         chatElement.introMessage = getConfig().chat.introMessage;
 
@@ -201,7 +125,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
                     }
                     signals.onResponse({text: answer["assistant"] || answer["text"]});
                     if (answer["actions"] && answer["actions"].length > 0) {
-                        this.processActions(answer["actions"]);
+                        await this.handleActions(answer["actions"]);
                     }
                 } catch (e) {
                     signals.onResponse({error: 'Error retrieving response'});
