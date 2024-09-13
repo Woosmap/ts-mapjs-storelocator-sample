@@ -3,7 +3,7 @@ import {Signals} from 'deep-chat/dist/types/handler';
 import Component from "../component";
 import {DeepChat} from "deep-chat";
 import {getConfig} from "../../configuration/config";
-import {handleFindNearestStores} from "./chatbotActions";
+import {handleFindNearestStores, handleGetDirections} from "./chatbotActions";
 import aiBotImg from "../../assets/ai.svg"
 
 export interface IChatbotComponent {
@@ -27,7 +27,7 @@ interface Action {
 export default class ChatbotComponent extends Component<IChatbotComponent> {
     private botButton!: HTMLElement;
     private localitiesService!: woosmap.map.LocalitiesService;
-
+    private chatElement!: DeepChat;
 
     init(): void {
         this.$element = document.createElement("div") as HTMLDivElement;
@@ -40,8 +40,8 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
     render(): void {
         if (this.state && this.$element) {
             const chatHeader = this.createChatHeader();
-            const chatElement = this.createChatElement();
-            this.$element.replaceChildren(chatHeader, chatElement);
+            this.chatElement = this.createChatElement();
+            this.$element.replaceChildren(chatHeader, this.chatElement);
         }
     }
 
@@ -74,24 +74,28 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
     private async handleActions(actions: Action[]): Promise<void> {
         this.localitiesService = this.localitiesService ?? new woosmap.map.LocalitiesService();
         for (const action of actions) {
-            let searchLocation = null;
+            let searchLocation, directions = null;
             switch (action.action) {
                 case ChatbotComponentEvents.FIND_NEARBY_STORES:
                     searchLocation = await handleFindNearestStores(this.localitiesService, action);
                     this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
                     break;
                 case ChatbotComponentEvents.GET_DIRECTIONS:
-                    this.emit(ChatbotComponentEvents.GET_DIRECTIONS);
+                    directions = await handleGetDirections(this.localitiesService, action);
+                    this.emit(ChatbotComponentEvents.GET_DIRECTIONS, directions);
                     break;
                 case "filter_stores":
                     searchLocation = await handleFindNearestStores(this.localitiesService, action);
                     this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
                     break;
                 case ChatbotComponentEvents.MOVE_MAP:
-                    this.emit(ChatbotComponentEvents.MOVE_MAP);
+                    searchLocation = await handleFindNearestStores(this.localitiesService, action);
+                    this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
                     break;
                 default:
-                    //await this.handleUnknownAction(action);
+                    console.warn(`Unknown action: ${action.action}`);
+                // Optionally handle unknown actions
+                // await this.handleUnknownAction(action);
             }
         }
     }
@@ -105,9 +109,9 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
         chatElement.avatars = avatarsConf;
         chatElement.textInput = getConfig().chat.textInput;
         chatElement.introMessage = getConfig().chat.introMessage;
-
+        chatElement.history = [];
         chatElement.connect = {
-            handler: async (body: Request, signals: Signals) => {
+            handler: async (body: any, signals: Signals) => {
                 try {
                     const response = await fetch(getConfig().chat.apiUrl, {
                         method: 'POST',
@@ -116,6 +120,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
                         },
                         body: JSON.stringify(body)
                     });
+                    chatElement.history?.push(body.messages[0])
                     const data = await response.json();
                     let answer;
                     try {
@@ -124,6 +129,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
                         answer = {text: data["text"]};
                     }
                     signals.onResponse({text: answer["assistant"] || answer["text"]});
+                    chatElement.history?.push({text: answer["assistant"] || answer["text"], role: "ai"})
                     if (answer["actions"] && answer["actions"].length > 0) {
                         await this.handleActions(answer["actions"]);
                     }
@@ -142,7 +148,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
                 chatWrapper.classList.remove("chatWrapper__hidden");
                 botButton.classList.add("hidden");
                 chatWrapper.classList.add("animation-scale-in");
-                chatWrapper.addEventListener("animationend", () => this.dialogueDisplayed(chatWrapper), {once: true});
+                chatWrapper.addEventListener("animationend", () => this.dialogueDisplayed(), {once: true});
             } else {
                 chatWrapper.classList.add("animation-scale-out");
                 chatWrapper.addEventListener("animationend", () => {
@@ -155,9 +161,9 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
         }
     }
 
-    dialogueDisplayed(element: HTMLElement): void {
-        if (element !== null) {
-            element.focus();
+    dialogueDisplayed(): void {
+        if (this.chatElement) {
+            this.chatElement.focusInput();
         }
     }
 

@@ -140,14 +140,38 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 this.setListView();
             }
         );
-        this.chatbotComponent.on(ChatbotComponentEvents.FIND_NEARBY_STORES, (locality?: SearchLocation) => {
+        [ChatbotComponentEvents.FIND_NEARBY_STORES, ChatbotComponentEvents.MOVE_MAP].forEach(event => {
+            this.chatbotComponent.on(event, (locality?: SearchLocation) => {
+                this.directionsComponent.emit(DirectionsComponentEvents.CLOSE_DIRECTIONS)
                 if (locality) {
                     this.searchComponent.setState({selectedLocality: locality}, true, () => {
                         this.searchComponent.selectLocality();
                     })
+                } else {
+                    const centerLatLng = this.mapComponent.map.getCenter().toJSON()
+                    const location = {
+                        name: `${centerLatLng.lat}, ${centerLatLng.lng}`,
+                        location: {
+                            lat: centerLatLng.lat,
+                            lng: centerLatLng.lng
+                        }
+                    };
+                    this.searchComponent.setState({selectedLocality: location}, true, () => {
+                        this.searchComponent.selectLocality();
+                    })
                 }
-            }
-        );
+            });
+        });
+        this.chatbotComponent.on(ChatbotComponentEvents.GET_DIRECTIONS, ({origin, destination}) => {
+            let directionState = {};
+            directionState = {...directionState, origin};
+            directionState = {...directionState, destination};
+            this.directionsComponent.setState(directionState, true, () => {
+                this.directionsComponent.emit(DirectionsComponentEvents.DESTINATION_CHANGED)
+                this.setDirectionsView();
+            });
+        })
+
         this.searchComponent.on(SearchComponentEvents.SEARCH_CLEAR, () => {
                 this.urlParameterManager.setLocality(undefined)
                 this.storesListComponent.setState({nearbyLocation: undefined, stores: []});
@@ -320,7 +344,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
         }
     }
 
-    setUserPosition(position: woosmap.map.LatLngLiteral | undefined): void {
+    setUserPosition(position: woosmap.map.LatLng | woosmap.map.LatLngLiteral | undefined): void {
         if (!position && this.userLocationMarker) {
             this.userLocationMarker.setMap(null);
             return;
