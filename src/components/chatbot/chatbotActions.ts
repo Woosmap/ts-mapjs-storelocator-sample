@@ -84,6 +84,7 @@ export const getLocation = async (localitiesService: woosmap.map.LocalitiesServi
 
         case "closest_store":
         case "nearest_store":
+        case "nearby_stores":
         case "nearby_store": {
             return null;
         }

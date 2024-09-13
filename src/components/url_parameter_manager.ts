@@ -26,19 +26,29 @@ const LOCALITY_DATA_REGEX = /loc=!pid(.+?)!lat([-\d.]+)!lng([-\d.]+)/;
  */
 export class URLParameterManager<T extends AllowedParameters> {
     private parameters: T;
-    private baseURL: string = '/storelocator/mapjs/#!/'
+    private baseURL: string;
 
     /**
      * Constructs a new URLParameterManager and loads parameters from the URL.
      */
     constructor() {
         this.parameters = {} as T;
+        this.baseURL = this.constructBaseURL();
         this.loadFromURL();
 
         // Listen for URL changes
         window.addEventListener("popstate", () => {
             this.loadFromURL();
         });
+    }
+
+    /**
+     * Constructs the base URL dynamically based on the current location.
+     */
+    private constructBaseURL(): string {
+        const {protocol, host, pathname} = window.location;
+        const basePath = pathname.split('/').slice(0, -1).join('/');
+        return `${protocol}//${host}${basePath}/#!/`;
     }
 
     /**
