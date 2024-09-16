@@ -27,11 +27,11 @@ export default class FilterComponent extends Component<IFilterComponent> {
             const servicesHTML: HTMLLIElement[] = getConfig().search.availableServices.map((service) => {
                 const $service: HTMLLIElement = document.createElement("li");
                 $service.dataset.servicekey = service.serviceKey;
-                $service.dataset.servicename = getLabel(getLocale().filtering.services,service.serviceKey);
+                $service.dataset.servicename = getLabel(getLocale().filtering.services, service.serviceKey);
                 $service.innerHTML = `
                     <button class="button">
                     <div class='iconService iconService__${service.serviceKey}'></div>
-                    <div class='filterList__serviceName'>${getLabel(getLocale().filtering.services,service.serviceKey)}</div>
+                    <div class='filterList__serviceName'>${getLabel(getLocale().filtering.services, service.serviceKey)}</div>
                     <div class="filterList__iconWrapper"></div>
                     </button>`;
                 $service.addEventListener("click", () => {
@@ -71,5 +71,13 @@ export default class FilterComponent extends Component<IFilterComponent> {
         this.setState({activeFilters: filters}, true, () =>
             this.emit(FilterComponentEvents.FILTERS_UPDATED, queryString)
         );
+    }
+
+    setActiveFilters(filters: string[]): void {
+        const filterElements = document.querySelectorAll<HTMLLIElement>(".filterList li");
+        filterElements.forEach(($filterLI) => {
+            $filterLI.classList.toggle("active", filters.includes($filterLI.dataset?.servicekey ?? ""));
+        });
+        this.updateActiveFilters();
     }
 }

@@ -13,6 +13,7 @@ export interface IChatbotComponent {
 export enum ChatbotComponentEvents {
     FIND_NEARBY_STORES = "find_nearby_stores",
     GET_DIRECTIONS = "get_directions",
+    FILTER_STORES = "filter_stores",
     MOVE_MAP = "move_map",
 }
 
@@ -85,9 +86,12 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
                     directions = await handleGetDirections(this.localitiesService, action);
                     this.emit(ChatbotComponentEvents.GET_DIRECTIONS, directions);
                     break;
-                case "filter_stores":
+                case ChatbotComponentEvents.FILTER_STORES:
                     searchLocation = await handleFindNearestStores(this.localitiesService, action);
                     this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
+                    if ("services" in action.parameters) {
+                        this.emit(ChatbotComponentEvents.FILTER_STORES, action.parameters.services);
+                    }
                     break;
                 case ChatbotComponentEvents.MOVE_MAP:
                     searchLocation = await handleFindNearestStores(this.localitiesService, action);

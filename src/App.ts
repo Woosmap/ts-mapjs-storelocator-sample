@@ -162,6 +162,9 @@ export default class StoreLocator extends Component<IStoreLocator> {
                 }
             });
         });
+        this.chatbotComponent.on(ChatbotComponentEvents.FILTER_STORES, (filters) => {
+            this.filterComponent.setActiveFilters(filters)
+        })
         this.chatbotComponent.on(ChatbotComponentEvents.GET_DIRECTIONS, ({origin, destination}) => {
             let directionState = {};
             directionState = {...directionState, origin};
