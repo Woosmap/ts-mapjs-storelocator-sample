@@ -41,6 +41,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
         if (this.state && this.$element) {
             const chatHeader = this.createChatHeader();
             this.chatElement = this.createChatElement();
+            this.handleChatInterceptors();
             this.$element.replaceChildren(chatHeader, this.chatElement);
         }
     }
@@ -119,8 +120,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(body)
-                    });
-                    chatElement.history?.push(body.messages[0])
+                    })
                     const data = await response.json();
                     let answer;
                     try {
@@ -140,6 +140,38 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
         };
 
         return chatElement;
+    }
+
+    handleChatInterceptors(): void {
+        if (!this.chatElement) {
+            console.error('Chat element is not initialized.');
+            return;
+        }
+
+        this.chatElement.requestInterceptor = (originalRequest: any) => {
+            try {
+                const messages = originalRequest.body?.messages;
+                if (!messages || messages.length === 0) {
+                    console.error('No messages found in the request body.');
+                    return originalRequest;
+                }
+                this.chatElement.history?.push(messages[0])
+                const transformedPayload = this.chatElement.history?.map(item => ({
+                    role: item.role === 'ai' ? 'assistant' : item.role,
+                    content: [
+                        {
+                            text: item.text
+                        }
+                    ]
+                }));
+
+                originalRequest.body = {messages: transformedPayload};
+                return originalRequest;
+            } catch (error) {
+                console.error('Error intercepting request:', error);
+                return originalRequest;
+            }
+        };
     }
 
     toggle(chatWrapper: HTMLElement, botButton: HTMLElement): void {
