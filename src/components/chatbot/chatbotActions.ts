@@ -21,7 +21,9 @@ export const handleSearch = async (
     if (search && search !== "") {
         const autocompleteRequest: woosmap.map.localities.LocalitiesAutocompleteRequest = {
             input: search,
-            types: getConfig().search.localitiesConf.types
+            types: getConfig().search.localitiesConf.types,
+            data:"advanced",
+            language: getLocaleLang()
         };
 
         try {
