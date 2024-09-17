@@ -141,15 +141,29 @@ export default class SearchComponent extends Component<ISearchComponent> {
     }
 
     setLocality(name: string): void {
+        if (!this.$element || !(this.$element instanceof HTMLInputElement) || !this.$target) {
+            console.error("Element or target is not defined or not an input element.");
+            return;
+        }
+
         const observer = new MutationObserver((mutationsList, observer) => {
-                if (this.$element && this.$element instanceof HTMLInputElement && this.$target.querySelector(".search__clearBtn")) {
-                    (this.$element as HTMLInputElement).value = name;
-                    (this.$element as HTMLInputElement).dispatchEvent(new Event('locality_changed'));
-                    observer.disconnect();
-                }
+            if (this.$element instanceof HTMLInputElement && this.$target.querySelector(".search__clearBtn")) {
+                this.$element.value = name;
+                this.$element.dispatchEvent(new Event('locality_changed'));
+                observer.disconnect();
             }
-        );
+        });
+
         observer.observe(document, {childList: true, subtree: true});
+
+        // Fallback in case the observer does not detect the mutation
+        setTimeout(() => {
+            if (this.$element instanceof HTMLInputElement && this.$target.querySelector(".search__clearBtn")) {
+                this.$element.value = name;
+                this.$element.dispatchEvent(new Event('locality_changed'));
+                observer.disconnect();
+            }
+        }, 500);
     }
 
     manageGeolocateButton($inputContainer: HTMLElement): void {

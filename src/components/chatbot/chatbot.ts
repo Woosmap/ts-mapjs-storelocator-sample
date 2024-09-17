@@ -5,6 +5,8 @@ import {DeepChat} from "deep-chat";
 import {getConfig} from "../../configuration/config";
 import {handleFindNearestStores, handleGetDirections} from "./chatbotActions";
 import aiBotImg from "../../assets/ai.svg"
+import {SearchLocation} from "../search/search";
+import StoreOpeningHours = woosmap.map.stores.StoreOpeningHours;
 
 export interface IChatbotComponent {
     messages?: { text: string, sender: string }[];
@@ -15,6 +17,7 @@ export enum ChatbotComponentEvents {
     GET_DIRECTIONS = "get_directions",
     FILTER_STORES = "filter_stores",
     MOVE_MAP = "move_map",
+    NEARBY_STORES_RETRIEVED = "nearby_stores_retrieved",
 }
 
 interface Action {
@@ -29,13 +32,13 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
     private botButton!: HTMLElement;
     private localitiesService!: woosmap.map.LocalitiesService;
     private chatElement!: DeepChat;
+    private context: any
 
     init(): void {
         this.$element = document.createElement("div") as HTMLDivElement;
         this.$element.classList.add("chatWrapper", "chatWrapper__hidden");
         this.botButton = this.createBotButton();
         this.$target.append(this.$element, this.botButton);
-        this.render();
     }
 
     render(): void {
@@ -45,6 +48,27 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
             this.handleChatInterceptors();
             this.$element.replaceChildren(chatHeader, this.chatElement);
         }
+    }
+
+    private async handleSummarizeResults() {
+        const body = {
+            "role": "user",
+            "content": [
+                {
+                    "text": JSON.stringify(this.context)
+                }
+            ]
+        }
+        const summaryResponse = await fetch(getConfig().chat.summarizeResultsAPIUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({messages: [body]})
+        })
+        const dataSummary = await summaryResponse.json();
+        this.chatElement.addMessage(dataSummary, true)
+
     }
 
     createChatHeader(): HTMLDivElement {
@@ -89,7 +113,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
                 case ChatbotComponentEvents.FILTER_STORES:
                     searchLocation = await handleFindNearestStores(this.localitiesService, action);
                     this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
-                    if ("services" in action.parameters) {
+                    if (action.parameters.services) {
                         this.emit(ChatbotComponentEvents.FILTER_STORES, action.parameters.services);
                     }
                     break;
@@ -107,6 +131,16 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
 
     createChatElement(): DeepChat {
         const chatElement: DeepChat = document.createElement("deep-chat");
+        this.configureChatElement(chatElement);
+        chatElement.connect = {
+            handler: async (body: any, signals: Signals) => {
+                await this.handleChatConnect(body, signals, chatElement);
+            }
+        };
+        return chatElement;
+    }
+
+    private configureChatElement(chatElement: DeepChat): void {
         chatElement.setAttribute("id", getConfig().chat.elementId);
         chatElement.setAttribute("style", getConfig().chat.elementStyle);
         const avatarsConf = getConfig().chat.avatars;
@@ -115,35 +149,66 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
         chatElement.textInput = getConfig().chat.textInput;
         chatElement.introMessage = getConfig().chat.introMessage;
         chatElement.history = [];
-        chatElement.connect = {
-            handler: async (body: any, signals: Signals) => {
-                try {
-                    const response = await fetch(getConfig().chat.apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(body)
-                    })
-                    const data = await response.json();
-                    let answer;
-                    try {
-                        answer = JSON.parse(data["text"]);
-                    } catch (e) {
-                        answer = {text: data["text"]};
-                    }
-                    signals.onResponse({text: answer["assistant"] || answer["text"]});
-                    chatElement.history?.push({text: answer["assistant"] || answer["text"], role: "ai"})
-                    if (answer["actions"] && answer["actions"].length > 0) {
-                        await this.handleActions(answer["actions"]);
-                    }
-                } catch (e) {
-                    signals.onResponse({error: 'Error retrieving response'});
-                }
-            }
-        };
+    }
 
-        return chatElement;
+    private async handleChatConnect(body: any, signals: Signals, chatElement: DeepChat): Promise<void> {
+        try {
+            const response = await fetch(getConfig().chat.generateActionAPIUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            });
+            const data = await response.json();
+            const answer = this.parseResponse(data);
+            signals.onResponse({text: answer["assistant"] || answer["text"]});
+            chatElement.history?.push({text: answer["assistant"] || answer["text"], role: "ai"});
+
+            if (answer["actions"] && answer["actions"].length > 0) {
+                await this.handleActions(answer["actions"]);
+                const eventHandler = async ({stores, locality}: {
+                    stores: woosmap.map.stores.StoreResponse[],
+                    locality: SearchLocation
+                }) => {
+                    const storesProperties = this.extractStoreProperties(stores);
+                    this.context = {
+                        answer: answer["assistant"] || answer["text"],
+                        search: locality,
+                        stores: storesProperties
+                    };
+                    await this.handleSummarizeResults();
+                    this.off(ChatbotComponentEvents.NEARBY_STORES_RETRIEVED, eventHandler);
+                };
+                this.once(ChatbotComponentEvents.NEARBY_STORES_RETRIEVED, eventHandler);
+            }
+        } catch (e) {
+            signals.onResponse({error: 'Error retrieving response'});
+        }
+    }
+
+    private parseResponse(data: any): { [key: string]: any } {
+        try {
+            return JSON.parse(data["text"]);
+        } catch (e) {
+            return {text: data["text"]};
+        }
+    }
+
+    private extractStoreProperties(stores: woosmap.map.stores.StoreResponse[]): {
+        name: string,
+        opening_hours: StoreOpeningHours | null,
+        distance: number | undefined,
+        tags: string[]
+    }[] {
+        return stores.map((store: woosmap.map.stores.StoreResponse) => {
+            return {
+                name: store.properties.name,
+                opening_hours: store.properties.opening_hours,
+                distance: store.properties.distance,
+                tags: store.properties.tags,
+            };
+        });
     }
 
     handleChatInterceptors(): void {
@@ -160,15 +225,16 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
                     return originalRequest;
                 }
                 this.chatElement.history?.push(messages[0])
-                const transformedPayload = this.chatElement.history?.map(item => ({
-                    role: item.role === 'ai' ? 'assistant' : item.role,
-                    content: [
-                        {
-                            text: item.text
-                        }
-                    ]
-                }));
-
+                const transformedPayload = this.chatElement.history?.map(item => {
+                    return {
+                        role: item.role === 'ai' ? 'assistant' : item.role,
+                        content: [
+                            {
+                                text: item.text
+                            }
+                        ]
+                    };
+                });
                 originalRequest.body = {messages: transformedPayload};
                 return originalRequest;
             } catch (error) {

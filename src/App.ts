@@ -149,23 +149,38 @@ export default class StoreLocator extends Component<IStoreLocator> {
                     })
                 } else {
                     const centerLatLng = this.mapComponent.map.getCenter().toJSON()
-                    const location = {
+                    locality = {
                         name: `${centerLatLng.lat}, ${centerLatLng.lng}`,
                         location: {
                             lat: centerLatLng.lat,
                             lng: centerLatLng.lng
                         }
                     };
-                    this.searchComponent.setState({selectedLocality: location}, true, () => {
+                    this.searchComponent.setState({selectedLocality: locality}, true, () => {
                         this.searchComponent.selectLocality();
                     })
                 }
+                this.storesListComponent.once(StoresListComponentEvents.STORES_CHANGED, ({stores}) => {
+                    this.chatbotComponent.emit(ChatbotComponentEvents.NEARBY_STORES_RETRIEVED, ({stores, locality}))
+                });
             });
         });
         this.chatbotComponent.on(ChatbotComponentEvents.FILTER_STORES, (filters) => {
             this.filterComponent.setActiveFilters(filters)
         })
         this.chatbotComponent.on(ChatbotComponentEvents.GET_DIRECTIONS, ({origin, destination}) => {
+            if (!destination) {
+                this.storesListComponent.once(StoresListComponentEvents.STORES_CHANGED, ({stores}) => {
+                    destination = {
+                        name: stores[0].properties.name,
+                        location: {
+                            lat: stores[0].geometry.coordinates[1],
+                            lng: stores[0].geometry.coordinates[0],
+                        },
+                    }
+                    this.chatbotComponent.emit(ChatbotComponentEvents.GET_DIRECTIONS, ({origin, destination}))
+                });
+            }
             let directionState = {};
             directionState = {...directionState, origin};
             directionState = {...directionState, destination};
