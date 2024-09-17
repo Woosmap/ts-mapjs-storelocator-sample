@@ -111,8 +111,10 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
                     this.emit(ChatbotComponentEvents.GET_DIRECTIONS, directions);
                     break;
                 case ChatbotComponentEvents.FILTER_STORES:
-                    searchLocation = await handleFindNearestStores(this.localitiesService, action);
-                    this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
+                    if (action.parameters.search) {
+                        searchLocation = await handleFindNearestStores(this.localitiesService, action);
+                        this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
+                    }
                     if (action.parameters.services) {
                         this.emit(ChatbotComponentEvents.FILTER_STORES, action.parameters.services);
                     }
