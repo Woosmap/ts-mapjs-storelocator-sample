@@ -51,6 +51,9 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
     }
 
     private async handleSummarizeResults() {
+        let message;
+        message = {text: "Summarizing store details..."}
+        this.chatElement.addMessage(message, false)
         const body = {
             "role": "user",
             "content": [
@@ -66,9 +69,8 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
             },
             body: JSON.stringify({messages: [body]})
         })
-        const dataSummary = await summaryResponse.json();
-        this.chatElement.addMessage(dataSummary, true)
-
+        message = await summaryResponse.json();
+        this.chatElement.addMessage(message, false)
     }
 
     createChatHeader(): HTMLDivElement {
