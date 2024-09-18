@@ -53,7 +53,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
     private async handleSummarizeResults() {
         let message;
         message = {text: "Summarizing store details..."}
-        this.chatElement.addMessage(message, false)
+        this.chatElement.addMessage(message, true)
         const body = {
             "role": "user",
             "content": [
@@ -70,7 +70,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
             body: JSON.stringify({messages: [body]})
         })
         message = await summaryResponse.json();
-        this.chatElement.addMessage(message, false)
+        this.chatElement.addMessage(message, true)
     }
 
     createChatHeader(): HTMLDivElement {
@@ -101,25 +101,21 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
 
     private async handleActions(actions: Action[]): Promise<void> {
         this.localitiesService = this.localitiesService ?? new woosmap.map.LocalitiesService();
+        let triggeredNearby = false
         for (const action of actions) {
             let searchLocation, directions = null;
             switch (action.action) {
                 case ChatbotComponentEvents.FIND_NEARBY_STORES:
-                    searchLocation = await handleFindNearestStores(this.localitiesService, action);
-                    this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
+                    this.emit(ChatbotComponentEvents.FILTER_STORES, action.parameters.services || []);
+                    if (action.parameters.search && !triggeredNearby) {
+                        searchLocation = await handleFindNearestStores(this.localitiesService, action);
+                        this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
+                        triggeredNearby = true;
+                    }
                     break;
                 case ChatbotComponentEvents.GET_DIRECTIONS:
                     directions = await handleGetDirections(this.localitiesService, action);
                     this.emit(ChatbotComponentEvents.GET_DIRECTIONS, directions);
-                    break;
-                case ChatbotComponentEvents.FILTER_STORES:
-                    if (action.parameters.search) {
-                        searchLocation = await handleFindNearestStores(this.localitiesService, action);
-                        this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
-                    }
-                    if (action.parameters.services) {
-                        this.emit(ChatbotComponentEvents.FILTER_STORES, action.parameters.services);
-                    }
                     break;
                 case ChatbotComponentEvents.MOVE_MAP:
                     searchLocation = await handleFindNearestStores(this.localitiesService, action);
@@ -182,7 +178,6 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
                         stores: storesProperties
                     };
                     await this.handleSummarizeResults();
-                    this.off(ChatbotComponentEvents.NEARBY_STORES_RETRIEVED, eventHandler);
                 };
                 this.once(ChatbotComponentEvents.NEARBY_STORES_RETRIEVED, eventHandler);
             }
