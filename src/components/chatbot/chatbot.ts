@@ -148,6 +148,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
         chatElement.avatars = avatarsConf;
         chatElement.textInput = getConfig().chat.textInput;
         chatElement.introMessage = getConfig().chat.introMessage;
+        chatElement.speechToText =  getConfig().chat.speechToText;
         chatElement.history = [];
     }
 

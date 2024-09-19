@@ -16,6 +16,9 @@ const chatConfig = {
     },
     generateActionAPIUrl: "https://8iaxcc0rti.execute-api.us-east-1.amazonaws.com/dev/generate-action/",
     summarizeResultsAPIUrl: "https://dpvqg0cg58.execute-api.us-east-1.amazonaws.com/dev/summarize-woosmap/",
+    speechToText: {
+        webSpeech: {"language": "en-US"},
+    }
 };
 
 export default chatConfig;
