@@ -39,14 +39,18 @@ export class EventEmitter implements EventEmitterNS.Emitter {
         return () => this.off(event, listener)
     }
 
-    public off(event: string, listener: EventEmitterNS.Listener): void {
+    public off(event: string, listener?: EventEmitterNS.Listener): void {
         if (typeof this.events[event] !== 'object') {
-            return
+            return;
         }
 
-        this.events[event] = this.events[event].filter(
-            (eventListener) => eventListener !== listener
-        )
+        if (listener) {
+            this.events[event] = this.events[event].filter(
+                (eventListener) => eventListener !== listener
+            );
+        } else {
+            this.events[event] = [];
+        }
     }
 
     public offAll(): void {

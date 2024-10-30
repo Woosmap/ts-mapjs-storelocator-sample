@@ -22,7 +22,7 @@ export const handleSearch = async (
         const autocompleteRequest: woosmap.map.localities.LocalitiesAutocompleteRequest = {
             input: search,
             types: getConfig().search.localitiesConf.types,
-            data:"advanced",
+            data: "advanced",
             language: getLocaleLang()
         };
 

@@ -50,29 +50,6 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
         }
     }
 
-    private async handleSummarizeResults() {
-        let message;
-        message = {text: "Summarizing store details..."}
-        this.chatElement.addMessage(message, true)
-        const body = {
-            "role": "user",
-            "content": [
-                {
-                    "text": JSON.stringify(this.context)
-                }
-            ]
-        }
-        const summaryResponse = await fetch(getConfig().chat.summarizeResultsAPIUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({messages: [body]})
-        })
-        message = await summaryResponse.json();
-        this.chatElement.addMessage(message, true)
-    }
-
     createChatHeader(): HTMLDivElement {
         const createElement = (tag: string, className: string, textContent?: string): HTMLElement => {
             const element = document.createElement(tag);
@@ -122,9 +99,9 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
                     this.emit(ChatbotComponentEvents.FIND_NEARBY_STORES, searchLocation);
                     break;
                 default:
+                    // Optionally handle unknown actions
+                    // await this.handleUnknownAction(action);
                     console.warn(`Unknown action: ${action.action}`);
-                // Optionally handle unknown actions
-                // await this.handleUnknownAction(action);
             }
         }
     }
@@ -148,7 +125,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
         chatElement.avatars = avatarsConf;
         chatElement.textInput = getConfig().chat.textInput;
         chatElement.introMessage = getConfig().chat.introMessage;
-        chatElement.speechToText =  getConfig().chat.speechToText;
+        chatElement.speechToText = getConfig().chat.speechToText;
         chatElement.history = [];
     }
 
@@ -168,22 +145,55 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
 
             if (answer["actions"] && answer["actions"].length > 0) {
                 await this.handleActions(answer["actions"]);
-                const eventHandler = async ({stores, locality}: {
-                    stores: woosmap.map.stores.StoreResponse[],
-                    locality: SearchLocation
-                }) => {
-                    const storesProperties = this.extractStoreProperties(stores);
-                    this.context = {
-                        answer: answer["assistant"] || answer["text"],
-                        search: locality,
-                        stores: storesProperties
-                    };
-                    await this.handleSummarizeResults();
-                };
-                this.once(ChatbotComponentEvents.NEARBY_STORES_RETRIEVED, eventHandler);
+                this.registerEventHandlerIfNeeded(answer);
             }
         } catch (e) {
             signals.onResponse({error: 'Error retrieving response'});
+        }
+    }
+
+    private async handleSummarizeResults() {
+        let message;
+        message = {text: "Summarizing store details..."}
+        this.chatElement.addMessage(message, true)
+        const body = {
+            "role": "user",
+            "content": [
+                {
+                    "text": JSON.stringify(this.context)
+                }
+            ]
+        }
+        const summaryResponse = await fetch(getConfig().chat.summarizeResultsAPIUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({messages: [body]})
+        })
+        message = await summaryResponse.json();
+        this.chatElement.addMessage(message, true)
+    }
+
+    private registerEventHandlerIfNeeded(answer: any): void {
+        const eventHandler = async ({stores, locality}: {
+            stores: woosmap.map.stores.StoreResponse[],
+            locality: SearchLocation
+        }) => {
+            const storesProperties = this.extractStoreProperties(stores);
+            this.context = {
+                answer: answer["assistant"] || answer["text"],
+                search: locality,
+                stores: storesProperties
+            };
+            await this.handleSummarizeResults();
+        };
+        const hasRelevantAction = answer["actions"].some((action: Action) =>
+            action.action === ChatbotComponentEvents.FIND_NEARBY_STORES || action.action === ChatbotComponentEvents.MOVE_MAP
+        );
+        if (hasRelevantAction) {
+            this.off(ChatbotComponentEvents.NEARBY_STORES_RETRIEVED);
+            this.once(ChatbotComponentEvents.NEARBY_STORES_RETRIEVED, eventHandler);
         }
     }
 
