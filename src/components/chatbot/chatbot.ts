@@ -217,7 +217,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
         distance: number | undefined,
         tags: string[]
     }[] {
-        return stores.map((store: woosmap.map.stores.StoreResponse) => {
+        return stores.slice(0, 3).map((store: woosmap.map.stores.StoreResponse) => {
             return {
                 name: store.properties.name,
                 opening_hours: store.properties.opening_hours,
