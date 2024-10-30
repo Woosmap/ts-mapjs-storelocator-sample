@@ -43,6 +43,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
     private $sidebarContentContainer!: HTMLElement;
     private urlParameterManager!: URLParameterManager<AllowedParameters>;
     private userLocationMarker!: woosmap.map.Marker | null;
+    private closestStore!: woosmap.map.stores.StoreResponse | null;
 
     init(): void {
         this.urlParameterManager = new URLParameterManager();
@@ -170,8 +171,18 @@ export default class StoreLocator extends Component<IStoreLocator> {
         })
         this.chatbotComponent.on(ChatbotComponentEvents.GET_DIRECTIONS, ({origin, destination}) => {
             let directionState = {};
+            if (!destination && this.closestStore) {
+                destination = {
+                    name: this.closestStore.properties.name,
+                    location: {
+                        lat: this.closestStore.geometry.coordinates[1],
+                        lng: this.closestStore.geometry.coordinates[0],
+                    },
+                }
+            }
             directionState = {...directionState, origin};
             directionState = {...directionState, destination};
+
             this.directionsComponent.setState(directionState, true, () => {
                 this.directionsComponent.emit(DirectionsComponentEvents.DESTINATION_CHANGED)
                 this.setDirectionsView();
@@ -196,6 +207,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
                     this.setUserPosition(nearbyLocation);
                 }
             );
+            this.closestStore = stores[0];
             this.setListView();
         });
         this.storesListComponent.on(StoresListComponentEvents.STORE_SELECTED, (selectedStore: AssetFeatureResponse) => {
@@ -223,6 +235,7 @@ export default class StoreLocator extends Component<IStoreLocator> {
         });
         this.mapComponent.on(MapComponentEvents.MAP_READY, () => {
             this.directionsComponent.emit(DirectionsComponentEvents.MAP_READY, this.mapComponent.map);
+            this.chatbotComponent.emit(DirectionsComponentEvents.MAP_READY, this.mapComponent.map)
             this.setChildrenInitialState()
         });
         this.mapComponent.on(MapComponentEvents.MAP_IDLE, () => {

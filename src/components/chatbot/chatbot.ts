@@ -7,6 +7,7 @@ import {handleFindNearestStores, handleGetDirections} from "./chatbotActions";
 import aiBotImg from "../../assets/ai.svg"
 import {SearchLocation} from "../search/search";
 import StoreOpeningHours = woosmap.map.stores.StoreOpeningHours;
+import {DirectionsComponentEvents} from "../directions/directions";
 
 export interface IChatbotComponent {
     messages?: { text: string, sender: string }[];
@@ -29,6 +30,7 @@ interface Action {
 }
 
 export default class ChatbotComponent extends Component<IChatbotComponent> {
+    private map!: woosmap.map.Map;
     private botButton!: HTMLElement;
     private localitiesService!: woosmap.map.LocalitiesService;
     private chatElement!: DeepChat;
@@ -48,6 +50,9 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
             this.handleChatInterceptors();
             this.$element.replaceChildren(chatHeader, this.chatElement);
         }
+        this.on(DirectionsComponentEvents.MAP_READY, (map: woosmap.map.Map) => {
+            this.map = map;
+        });
     }
 
     createChatHeader(): HTMLDivElement {
@@ -76,6 +81,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
         return botBtnElement;
     }
 
+
     private async handleActions(actions: Action[]): Promise<void> {
         this.localitiesService = this.localitiesService ?? new woosmap.map.LocalitiesService();
         let triggeredNearby = false
@@ -91,7 +97,7 @@ export default class ChatbotComponent extends Component<IChatbotComponent> {
                     }
                     break;
                 case ChatbotComponentEvents.GET_DIRECTIONS:
-                    directions = await handleGetDirections(this.localitiesService, action);
+                    directions = await handleGetDirections(this.localitiesService, action, this.map.getCenter());
                     this.emit(ChatbotComponentEvents.GET_DIRECTIONS, directions);
                     break;
                 case ChatbotComponentEvents.MOVE_MAP:

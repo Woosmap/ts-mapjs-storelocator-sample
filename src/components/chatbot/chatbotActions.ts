@@ -15,7 +15,7 @@ interface Action {
 
 export const handleSearch = async (
     localitiesService: woosmap.map.LocalitiesService,
-    latlng: woosmap.map.LatLngLiteral | null,
+    latlng: woosmap.map.LatLng | null,
     search: string | null
 ): Promise<woosmap.map.localities.LocalitiesGeocodeResult | woosmap.map.localities.LocalitiesDetailsResult | null> => {
     if (search && search !== "") {
@@ -56,7 +56,7 @@ export const handleSearch = async (
     return null;
 };
 
-export const getLocation = async (localitiesService: woosmap.map.LocalitiesService, param: string): Promise<SearchLocation | null> => {
+export const getLocation = async (localitiesService: woosmap.map.LocalitiesService, param: string, mapCenter?: woosmap.map.LatLng): Promise<SearchLocation | null> => {
     switch (param) {
         case "user_position":
         case "user_location":
@@ -81,7 +81,22 @@ export const getLocation = async (localitiesService: woosmap.map.LocalitiesServi
         case "current_mapview":
         case "current_view":
         case "user_viewport": {
-            return null;
+            if (mapCenter) {
+                const result = await handleSearch(localitiesService, mapCenter, null);
+                if (result) {
+                    return {
+                        name: result.formatted_address,
+                        publicId: result.public_id,
+                        location: result.geometry?.location
+                    };
+                } else {
+                    console.error(`No localities found for position: ${mapCenter.lat}, ${mapCenter.lng}`);
+                    return null;
+                }
+            } else {
+                console.error("Unable to get current map view");
+                return null;
+            }
         }
 
         case "closest_store":
@@ -121,7 +136,7 @@ export const handleFindNearestStores = async (localitiesService: woosmap.map.Loc
     return searchLocation;
 };
 
-export const handleGetDirections = async (localitiesService: woosmap.map.LocalitiesService, action: Action): Promise<{
+export const handleGetDirections = async (localitiesService: woosmap.map.LocalitiesService, action: Action, mapCenter?: woosmap.map.LatLng): Promise<{
     origin: SearchLocation | null,
     destination: SearchLocation | null
 } | null> => {
@@ -134,8 +149,8 @@ export const handleGetDirections = async (localitiesService: woosmap.map.Localit
         return null;
     }
 
-    const origin = await getLocation(localitiesService, action.parameters.from);
-    const destination = await getLocation(localitiesService, action.parameters.to);
+    const origin = await getLocation(localitiesService, action.parameters.from, mapCenter);
+    const destination = await getLocation(localitiesService, action.parameters.to, mapCenter);
 
     return {origin, destination};
 };
