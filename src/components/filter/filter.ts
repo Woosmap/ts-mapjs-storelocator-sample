@@ -15,7 +15,7 @@ export default class FilterComponent extends Component<IFilterComponent> {
     init(): void {
         this.$element = <HTMLDivElement>document.createElement("div");
         this.$element.className = "filterHeader collapsible";
-        this.$element.innerHTML = `<span class="collapsibleTitle">${getLocale().filtering.servicesTitle}</span><div class="collapsibleIcon"></div>`;
+        this.$element.innerHTML = `<span class="collapsibleTitle">${getLocale().filtering.servicesTitle}<span class="filterCount"></span></span><div class="collapsibleIcon"></div>`;
         this.$element.addEventListener("click", () => this.toggleActive());
         this.$target.appendChild(this.$element);
     }
@@ -68,10 +68,20 @@ export default class FilterComponent extends Component<IFilterComponent> {
         const queryString: string = filters
             .map((serviceKey) => `tag:${serviceKey}`)
             .join(" and ");
-        this.setState({activeFilters: filters}, true, () =>
-            this.emit(FilterComponentEvents.FILTERS_UPDATED, queryString)
+        this.setState({activeFilters: filters}, true, () => {
+                this.emit(FilterComponentEvents.FILTERS_UPDATED, queryString)
+                this.updateFilterCount(filters.length);
+            }
         );
     }
+
+    updateFilterCount(count: number): void {
+        const filterCountElement = this.$element.querySelector(".filterCount") as HTMLSpanElement;
+        if (filterCountElement) {
+            filterCountElement.textContent = count > 0 ? ` (${count})` : '';
+        }
+    }
+
 
     setActiveFilters(filters: string[]): void {
         const filterElements = document.querySelectorAll<HTMLLIElement>(".filterList li");
