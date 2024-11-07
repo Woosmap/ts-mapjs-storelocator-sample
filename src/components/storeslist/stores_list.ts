@@ -103,11 +103,16 @@ export default class StoresListComponent extends Component<IStoresListComponent>
                 .searchStores(params)
                 .then((response) => {
                     const storesList = response?.features.map((store) => store);
-                    this.updateStoresWithDistanceMatrix(storesList)
-                        .then((updatedStores) => {
-                            this.setState({stores: updatedStores});
-                            this.emit(StoresListComponentEvents.STORES_CHANGED, this.state);
-                        });
+                    if (storesList && storesList.length > 0) {
+                        this.updateStoresWithDistanceMatrix(storesList)
+                            .then((updatedStores) => {
+                                this.setState({stores: updatedStores});
+                                this.emit(StoresListComponentEvents.STORES_CHANGED, this.state);
+                            });
+                    } else {
+                        this.setState({stores: []});
+                        this.emit(StoresListComponentEvents.STORES_CHANGED, this.state);
+                    }
                 })
                 .catch((exception) => {
                     console.error(exception);
