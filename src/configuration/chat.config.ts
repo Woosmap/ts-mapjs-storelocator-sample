@@ -12,7 +12,7 @@ const chatConfig = {
     },
     textInput: {"placeholder": {"text": "Welcome!"}},
     introMessage: {
-        text: "Welcome to our Store Locator! I'm your AI assistant, here to help you find the nearest stores and answer any questions you may have."
+        text: "Welcome to our Coffee Shop Locator! I'm your AI assistant, here to help you find the nearest Starbucks and answer any questions you may have."
     },
     generateActionAPIUrl: "https://8iaxcc0rti.execute-api.us-east-1.amazonaws.com/dev/generate-action/",
     summarizeResultsAPIUrl: "https://dpvqg0cg58.execute-api.us-east-1.amazonaws.com/dev/summarize-woosmap/",
